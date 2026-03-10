@@ -1,5 +1,7 @@
 package net.helinos.moresnow.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.helinos.moresnow.block.BlockLogicSnowy;
 import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
@@ -10,95 +12,44 @@ import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = BlockLogicLayerSnow.class, remap = false)
 public abstract class BlockLogicLayerSnowMixin {
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", ordinal = 0))
-	private int blockId1(World world, int x, int y, int z) {
-		return this.accountForSnowy(world, x, y, z);
-	}
 
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I", ordinal = 1))
-	private int metadata1(World world, int x, int y, int z) {
-		return this.getLayers(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", ordinal = 1))
-	private int blockId2(World world, int x, int y, int z) {
-		return this.accountForSnowy(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I", ordinal = 2))
-	private int metadata2(World world, int x, int y, int z) {
-		return this.getLayers(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", ordinal = 2))
-	private int blockId3(World world, int x, int y, int z) {
-		return this.accountForSnowy(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I", ordinal = 3))
-	private int metadata3(World world, int x, int y, int z) {
-		return this.getLayers(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", ordinal = 3))
-	private int blockId4(World world, int x, int y, int z) {
-		return this.accountForSnowy(world, x, y, z);
-	}
-
-	@Redirect(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I", ordinal = 4))
-	private int metadata4(World world, int x, int y, int z) {
-		return this.getLayers(world, x, y, z);
-	}
-
-	@Unique
-	private int accountForSnowy(World world, int x, int y, int z) {
-		int id = world.getBlockId(x, y, z);
-
-		if (ArrayUtils.contains(MSBlocks.blockIds, id)) {
-			return Blocks.LAYER_SNOW.id();
-		}
-
-		return id;
-	}
-
-	@Unique
-	private int getLayers(World world, int x, int y, int z) {
+	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I"))
+	private int metadata1(World world, int x, int y, int z, Operation<Integer> original) {
+		int metadata = original.call(world, x, y, z);
 		Block<?> block = world.getBlock(x, y, z);
-		int metadata = world.getBlockMetadata(x, y, z);
-
-		if (block.getLogic() instanceof BlockLogicSnowy) {
+		if (block != null && block.getLogic() instanceof BlockLogicSnowy) {
 			return ((BlockLogicSnowy<?>) block.getLogic()).getRelativeLayers(metadata) - 1;
 		}
-
 		return metadata;
 	}
 
-	@Redirect(method = "canPlaceBlockAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I"))
-	private int topSlabAndUpsideDownStairsFix(World world, int x, int y, int z) {
-		Block<?> block = world.getBlock(x, y, z);
-
-		if (block != null && block.getLogic() instanceof BlockLogicSlab) {
-			int metadata = world.getBlockMetadata(x, y, z);
-			int slabState = metadata & 3;
-
-			if (slabState != 0) {
-				return Blocks.STONE.id();
-			}
-		} else if (block != null && block.getLogic() instanceof BlockLogicStairs) {
-			int metadata = world.getBlockMetadata(x, y, z);
-			int stairsState = metadata & 8;
-
-			if (stairsState != 0) {
-				return Blocks.STONE.id();
-			}
+	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I"))
+	private int blockId1(World world, int x, int y, int z, Operation<Integer> original) {
+		int id = original.call(world, x, y, z);
+		if (ArrayUtils.contains(MSBlocks.blockIds, id)) {
+			return Blocks.LAYER_SNOW.id();
 		}
+		return id;
+	}
 
-		return world.getBlockId(x, y, z);
+	@WrapOperation(method = "canPlaceBlockAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/block/Block;isSolidRender()Z"))
+	private boolean topSlabAndUpsideDownStairsFix(Block<?> block, Operation<Boolean> original, World world, int x, int y, int z) {
+		int metadata = world.getBlockMetadata(x, y, z);
+		if (block != null && block.getLogic() instanceof BlockLogicSlab) {
+			return (metadata & 3) != 0;
+		}
+		if (block != null && block.getLogic() instanceof BlockLogicStairs) {
+			return (metadata & 8) != 0;
+		}
+		if(block != null && block.getLogic() instanceof BlockLogicSnowy){
+			BlockLogicSnowy<?> snowy = (BlockLogicSnowy<?>) block.getLogic();
+			return snowy.getRelativeLayers(metadata) > snowy.getMaxLayers();
+		}
+		return original.call(block);
 	}
 }

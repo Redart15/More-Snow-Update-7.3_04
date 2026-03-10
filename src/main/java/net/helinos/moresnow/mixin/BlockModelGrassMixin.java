@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = BlockModelGrass.class, remap = false)
-public class BlockModelGrassMixin {
+public abstract class BlockModelGrassMixin {
 	@Redirect(method = "getBlockTexture", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/WorldSource;getBlockMaterial(III)Lnet/minecraft/core/block/material/Material;"))
 	private Material correctSnowTexture(WorldSource blockAccess, int x, int y, int z) {
 		Block<?> block = blockAccess.getBlock(x, y, z);

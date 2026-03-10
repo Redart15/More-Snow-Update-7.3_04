@@ -1,5 +1,7 @@
 package net.helinos.moresnow.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.helinos.moresnow.block.BlockLogicSnowy;
 import net.helinos.moresnow.block.BlockLogicSnowyPlant;
 import net.helinos.moresnow.block.IBlockLogicSnowyStairs;
@@ -16,26 +18,20 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ItemBlockLayer.class, remap = false)
-public class ItemBlockLayerMixin {
-	@Inject(method = "onUseItemOnBlock", at = @At("HEAD"), cancellable = true)
-	private void onUseItemOnBlock(ItemStack itemstack, Player player, World world, int blockX, int blockY,
-			int blockZ, Side side, double xPlaced, double yPlaced, CallbackInfoReturnable<Boolean> cir) {
+public abstract class ItemBlockLayerMixin {
+	@WrapMethod(method = "onUseItemOnBlock")
+	private boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced, Operation<Boolean> original) {
 		int blockId = world.getBlockId(blockX, blockY, blockZ);
 		int metadata = world.getBlockMetadata(blockX, blockY, blockZ);
 		Block<?> block = Blocks.getBlock(blockId);
 
 		if (itemstack.stackSize <= 0) {
-			cir.setReturnValue(false);
-			return;
+			return false;
 		}
 		if (blockY == world.getHeightBlocks() - 1 && itemstack.itemID == Blocks.LAYER_SNOW.id()) {
-			cir.setReturnValue(false);
-			return;
+			return false;
 		}
 
 		// Incrementing layer count on snow covered blocks with the snow layer item
@@ -45,8 +41,7 @@ public class ItemBlockLayerMixin {
 
 			AABB bbBox = AABB.getTemporaryBB(blockX, blockY, blockZ, block.getBounds().maxX, block.getBounds().maxY + 0.125f, block.getBounds().maxZ);
 			if (!world.checkIfAABBIsClear(bbBox)) {
-				cir.setReturnValue(false);
-				return;
+				return false;
 			}
 
 			if (block.getLogic() instanceof BlockLogicSnowyPlant) {
@@ -65,24 +60,24 @@ public class ItemBlockLayerMixin {
 					}
 					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), (metadata & ~(blockSnowy.getMaxLayers() - 1)) | newLayers - 1);
 				} else {
-					return;
+					return original.call(itemstack, player, world, blockX, blockY, blockZ, side, xPlaced, yPlaced);
 				}
 			}
 
-			world.playBlockSoundEffect((Entity) player, (double) blockX + 0.5d, (double) blockY + 0.5d, (double) blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
+			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
 			itemstack.consumeItem(player);
-			cir.setReturnValue(true);
-			return;
+			return true;
 		}
 
 		// Cover blocks that can be covered
 		if (itemstack.itemID == Blocks.LAYER_SNOW.id()) {
-			if (!MSBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ))
-				return;
-
-			world.playBlockSoundEffect((Entity) player, (double) blockX + 0.5d, (double) blockY + 0.5d, (double) blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
+			if (!MSBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ)) {
+				return original.call(itemstack, player, world, blockX, blockY, blockZ, side, xPlaced, yPlaced);
+			}
+			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
 			itemstack.consumeItem(player);
-			cir.setReturnValue(true);
+			return true;
 		}
+		return false;
 	}
 }

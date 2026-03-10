@@ -14,11 +14,10 @@ import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
 	private int storedBlockID;
-	
+
 	public BlockLogicSnowyFlowerStackable(Block<T> block, int storedBlockID) {
 		super(block, 8, 0, false);
 		block.setTicking(true);
-
 		this.storedBlockID = storedBlockID;
 	}
 
@@ -33,9 +32,9 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random random) {
 		super.updateTick(world, x, y, z, random);
-		
+
 		int metadata = world.getBlockMetadata(x, y, z);
-		
+
 		if (
 			!BlockLogicFlower.isPermanent(metadata) &&
 			world.getGameRuleValue(GameRules.DO_SEASONAL_GROWTH) &&
@@ -79,7 +78,7 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 	public boolean isSolidRender() {
 		return false;
 	}
-  
+
 	@Override
 	public boolean isCubeShaped() {
 		return false;

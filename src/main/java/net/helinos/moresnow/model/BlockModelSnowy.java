@@ -15,7 +15,7 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
     private static final IconCoordinate SNOW_TEXTURE = TextureRegistry.getTexture("minecraft:block/block_snow");
     protected boolean renderingSnow = false;
 
-    public BlockModelSnowy(Block<T> block) {
+    protected BlockModelSnowy(Block<T> block) {
         super(block);
     }
 
@@ -24,7 +24,6 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
         if (this.renderingSnow) {
             return SNOW_TEXTURE;
         }
-
         int metadata = blockAccess.getBlockMetadata(x, y, z);
         return this.getBlockTextureFromSideAndMetadata(side, metadata);
     }
@@ -35,7 +34,6 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
         int storedBlockID = logic.getStoredBlockId(metadata);
         Block<?> storedBlock = Blocks.getBlock(storedBlockID);
         int storedBlockMetadata = logic.getStoredBlockMetadata(metadata);
-
         try {
             return BlockModelDispatcher.getInstance().getDispatch(storedBlock).getBlockTextureFromSideAndMetadata(side, storedBlockMetadata);
         } catch (NullPointerException _exception) {

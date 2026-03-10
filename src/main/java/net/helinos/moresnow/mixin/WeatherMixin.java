@@ -21,22 +21,19 @@ public abstract class WeatherMixin {
 		int topY = world.getHeightValue(x, z);
 		for (int y = topY; y >= topY - 1; y--) {
 			Block<?> block = world.getBlock(x, y, z);
-
-			if (block == null) {
+			if (block == null || !(block.getLogic() instanceof BlockLogicSnowy)) {
 				continue;
 			}
-
-			if (block.getLogic() instanceof BlockLogicSnowy) {
-				BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
-				int metadata = world.getBlockMetadata(x, y, z);
-				int layers = blockSnowy.getLayers(metadata);
-
-				if (layers > 1) {
-					world.setBlockMetadata(x, y, z, metadata - 1);
-					world.markBlockNeedsUpdate(x, y, z);
-				} else if (!world.getBlockBiome(x, y, z).hasSurfaceSnow()) {
-					blockSnowy.removeSnow(world, metadata, x, y, z);
-				}
+			BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
+			int metadata = world.getBlockMetadata(x, y, z);
+			int layers = blockSnowy.getLayers(metadata);
+			if (layers > 1
+				&& layers < blockSnowy.getRelativeLayers(metadata)
+			) {
+				world.setBlockMetadata(x, y, z, metadata - 1);
+				world.markBlockNeedsUpdate(x, y, z);
+			} else if (!world.getBlockBiome(x, y, z).hasSurfaceSnow()) {
+				blockSnowy.removeSnow(world, metadata, x, y, z);
 			}
 		}
 	}
@@ -44,17 +41,15 @@ public abstract class WeatherMixin {
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void doChunkLoadEffect(World world, Chunk chunk, CallbackInfo callbackInfo, int x, int z, int y, int blockId) {
 		Block<?> block = Blocks.getBlock(blockId);
-
-		if (block !=null && block.getLogic() instanceof BlockLogicSnowy) {
-			BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
-			int metadata = chunk.getBlockMetadata(x, y, z);
-
-			int layers = blockSnowy.getLayers(metadata);
-			if (layers > 1 && world.getBlockBiome(chunk.xPosition * 16 + x, y, chunk.zPosition * 16 + z).hasSurfaceSnow()) {
-				chunk.setBlockMetadata(x, y, z, metadata - (layers - 2));
-			}
-
-			blockSnowy.removeSnow(chunk, metadata, x, y, z);
+		if (block == null || !(block.getLogic() instanceof BlockLogicSnowy)) {
+			return;
 		}
+		BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
+		int metadata = chunk.getBlockMetadata(x, y, z);
+		int layers = blockSnowy.getLayers(metadata);
+		if (layers > 1 && world.getBlockBiome(chunk.xPosition * 16 + x, y, chunk.zPosition * 16 + z).hasSurfaceSnow()) {
+			chunk.setBlockMetadata(x, y, z, metadata - (layers - 2));
+		}
+		blockSnowy.removeSnow(chunk, metadata, x, y, z);
 	}
 }

@@ -11,7 +11,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFence;
 import net.minecraft.core.block.Blocks;
-
+//Done
 public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFence> extends BlockLogicSnowy<T> {
     public BlockLogicSnowyFence(Block<T> block) {
         super(block, 8, 0, false);
@@ -57,7 +57,7 @@ public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFenc
     public boolean isSolidRender() {
         return false;
     }
-  
+
     @Override
     public boolean isCubeShaped() {
         return false;
