@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -6,11 +6,9 @@ import net.minecraft.core.block.BlockLogicSlab;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.WorldSource;
 
-import java.util.List;
-
-public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab> extends BlockLogicSnowyMultiple<T> {
-	public BlockLogicSnowySlab(Block<T> block, Class<S> blockLogic, List<Integer> excludedIds) {
-		super(block, blockLogic, excludedIds, 4, 4, true, 2, 0b00001111);
+public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab> extends BlockLogicSnowy<T> {
+	public BlockLogicSnowySlab(Block<T> block, Block<?> storedBlock) {
+		super(block, storedBlock, 4, 4, true);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 0.625, 1.0);
 	}
 
@@ -28,11 +26,6 @@ public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab>
 		float f = (2 * (1 + l)) / 16.0F;
 		return AABB.getTemporaryBB(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
 	}
-
-	@Override
-	public int getStoredBlockMetadata(int metadata) {
-		return 0;
-	};
 
 	@Override
 	public boolean isSolidRender() {

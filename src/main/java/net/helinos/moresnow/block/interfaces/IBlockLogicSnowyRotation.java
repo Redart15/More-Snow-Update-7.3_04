@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.interfaces;
 
 public interface IBlockLogicSnowyRotation {
     int getRotation(int metadata);

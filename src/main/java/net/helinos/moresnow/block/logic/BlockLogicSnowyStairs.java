@@ -1,41 +1,22 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
+import net.helinos.moresnow.block.MSBlocks;
+import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicStairs;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
 
-public class BlockLogicSnowyStairsMultiple<T extends BlockLogic, S extends BlockLogicStairs> extends BlockLogicSnowyMultiple<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation {
-	public BlockLogicSnowyStairsMultiple(Block<T> block, Class<S> blockLogic, List<Integer> excludedIds) {
-		super(block, blockLogic, excludedIds, 4, 4, true, 4, 0b00001111);
+public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicStairs> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation {
+	public BlockLogicSnowyStairs(Block<T> block, Block<?> storedBlock) {
+		super(block, storedBlock, 4, 4, true);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
-	}
-
-	@Override
-	protected Map<Integer, Integer> initMetadataToBlockId(Class<?> blockLogic, List<Integer> excludedIds) {
-		Hashtable<Integer, Integer> tmp = new Hashtable<>();
-		int metadataID = 0;
-		for (Block<?> b : Blocks.blocksList) {
-			if (metadataID == 16) {
-				break;
-			}
-			if (b == null)
-				continue;
-			int id = b.id();
-			if (!blockLogic.isInstance(b.getLogic()) || excludedIds.contains(id))
-				continue;
-			tmp.put(metadataID++, id);
-		}
-		return Collections.unmodifiableMap(tmp);
 	}
 
 	@Override
@@ -47,47 +28,24 @@ public class BlockLogicSnowyStairsMultiple<T extends BlockLogic, S extends Block
 		return false;
 	}
 
-	@Override
-	public boolean tryMakeSnowy(World world, int id, int meta, int x, int y, int z) {
-		return tryMakeSnowyDo(this, world, id, meta, x, y, z);
-	}
 
 	public static boolean tryMakeSnowyDo(BlockLogicSnowy<?> logic, World world, int id, int meta, int x, int y, int z) {
-		if (!logic.canReplaceBlock(id, meta))
+		if (!logic.canReplaceBlock(id, meta)) {
 			return false;
-		if (world.getBlockId(x, y + 1, z) == 0) {
-			world.setBlockAndMetadataWithNotify(x, y + 1, z, MSBlocks.SNOWY_PARTIAL.id(), meta << 2);
 		}
 		return world.setBlockAndMetadataWithNotify(x, y, z, logic.id(), logic.blockToMetadata(id, meta));
 	}
 
-	@Override
+
 	public boolean tryMakeSnowy(Chunk chunk, int id, int meta, int x, int y, int z) {
 		return tryMakeSnowyDo(this, chunk, id, meta, x, y, z);
 	}
 
 	public static boolean tryMakeSnowyDo(BlockLogicSnowy<?> logic, Chunk chunk, int id, int meta, int x, int y, int z) {
-		if (!logic.canReplaceBlock(id, meta))
+		if (!logic.canReplaceBlock(id, meta)) {
 			return false;
-		if (chunk.getBlockID(x, y + 1, z) == 0) {
-			chunk.setBlockIDWithMetadata(x, y + 1, z, MSBlocks.SNOWY_PARTIAL.id(), meta << 2);
 		}
 		return chunk.setBlockIDWithMetadata(x, y, z, logic.block.id(), logic.blockToMetadata(id, meta));
-	}
-
-	@Override
-	public void accumulate(World world, int x, int y, int z) {
-		accumulateDo(world, x, y, z);
-		super.accumulate(world, x, y, z);
-	}
-
-	public static void accumulateDo(World world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y, z);
-		int blockIdAbove = world.getBlockId(x, y + 1, z);
-
-		if (blockIdAbove == 0) {
-			world.setBlockAndMetadata(x, y, z, MSBlocks.SNOWY_PARTIAL.id(), metadata & 0b1111);
-		}		
 	}
 
 	@Override
@@ -118,42 +76,47 @@ public class BlockLogicSnowyStairsMultiple<T extends BlockLogic, S extends Block
 	}
 
 	public static void onNeighborBlockChangeDo(BlockLogicSnowy<?> logic, World world, int x, int y, int z, int blockId) {
-		Block<?> blockAbove = world.getBlock(x, y + 1, z);
-		int metadata = world.getBlockMetadata(x, y, z);
-
-		if (blockAbove != null && blockAbove.getLogic() instanceof BlockLogicSnowyPartial) {
-			BlockLogicSnowyPartial<?> blockSnowyPartial = (BlockLogicSnowyPartial<?>) blockAbove.getLogic();
-			int aboveMetadata = world.getBlockMetadata(x, y + 1, z);
-			int aboveLayers = blockSnowyPartial.getLayers(aboveMetadata);
-
-			if (aboveLayers != logic.getLayers(metadata)) {
-				world.setBlockMetadata(x, y, z, (metadata & 0b11111100) | aboveLayers - 1);
-			}
-		} else {
-			logic.removeSnow(world, metadata, x, y, z);
-		}
+//		Block<?> blockAbove = world.getBlock(x, y + 1, z);
+//		int metadata = world.getBlockMetadata(x, y, z);
+//
+//		if (blockAbove != null && blockAbove.getLogic() instanceof BlockLogicSnowyPartial) {
+//			BlockLogicSnowyPartial<?> blockSnowyPartial = (BlockLogicSnowyPartial<?>) blockAbove.getLogic();
+//			int aboveMetadata = world.getBlockMetadata(x, y + 1, z);
+//			int aboveLayers = blockSnowyPartial.getLayers(aboveMetadata);
+//
+//			if (aboveLayers != logic.getLayers(metadata)) {
+//				world.setBlockMetadata(x, y, z, (metadata & 0b11111100) | aboveLayers - 1);
+//			}
+//		} else {
+//			logic.removeSnow(world, metadata, x, y, z);
+//		}
 	}
 
 	@Override
 	public int getStoredBlockMetadata(int metadata) {
-		return this.getRotation(metadata);
+		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, 0);
+	}
+
+	@Override
+	public int getStoredBlockId(int metadata) {
+		return this.storedBlock.id();
 	}
 
 	@Override
 	protected int blockToMetadata(int blockId, int metadata) {
-		return (metadata << 2) | super.blockToMetadata(blockId, metadata);
+		return metadata << 4;
 	}
 
 	@Override
 	public int getRotation(int metadata) {
-		return (metadata >> 2) & 0b11;
+		return (metadata >> 4) & 0b11;
 	}
 
 	@Override
 	public boolean isSolidRender() {
 		return false;
 	}
-  
+
 	@Override
 	public boolean isCubeShaped() {
 		return false;

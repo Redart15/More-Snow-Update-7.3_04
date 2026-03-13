@@ -1,7 +1,7 @@
 package net.helinos.moresnow.particle;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.helinos.moresnow.block.BlockLogicSnowy;
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;

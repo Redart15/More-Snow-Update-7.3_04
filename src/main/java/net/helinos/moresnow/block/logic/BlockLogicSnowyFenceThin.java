@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import java.util.ArrayList;
 
@@ -11,13 +11,11 @@ import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
 public abstract class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends BlockLogicFenceThin> extends BlockLogicSnowy<T> {
-	private final int storedBlockID;
 	private final Class<F> storedBlockLogic;
 
-	public BlockLogicSnowyFenceThin(Block<T> block, int storedBlockID, Class<F> storedBlockLogic) {
-		super(block, 8, 0, false);
+	public BlockLogicSnowyFenceThin(Block<T> block, Block<?> storedBlock, Class<F> storedBlockLogic) {
+		super(block, storedBlock, 8, 0, false);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-		this.storedBlockID = storedBlockID;
 		this.storedBlockLogic = storedBlockLogic;
 	}
 
@@ -90,22 +88,7 @@ public abstract class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends B
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == this.storedBlockID;
-	}
-
-	@Override
-	public int getStoredBlockId(int metadata) {
-		return this.storedBlockID;
-	}
-
-	@Override
-	public int getStoredBlockMetadata(int metadata) {
-		return 0;
-	}
-
-	@Override
-	protected int blockToMetadata(int blockId, int metadata) {
-		return 0;
+		return id == this.storedBlock.id();
 	}
 
 	@Override

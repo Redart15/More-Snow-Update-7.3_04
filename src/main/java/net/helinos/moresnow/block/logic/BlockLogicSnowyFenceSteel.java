@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -9,7 +9,7 @@ import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowyFenceSteel<T extends BlockLogic> extends BlockLogicSnowyFenceThin<T, BlockLogicFenceSteel> {
 	public BlockLogicSnowyFenceSteel(Block<T> block) {
-		super(block, Blocks.FENCE_STEEL.id(), BlockLogicFenceSteel.class);
+		super(block, Blocks.FENCE_STEEL, BlockLogicFenceSteel.class);
 	}
 
 	@Override

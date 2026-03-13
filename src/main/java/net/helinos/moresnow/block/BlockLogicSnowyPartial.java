@@ -1,5 +1,7 @@
 package net.helinos.moresnow.block;
 
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
@@ -8,7 +10,7 @@ import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation {
 	public BlockLogicSnowyPartial(Block<T> block) {
-		super(block, 4, 0, false);
+		super(block,block, 4, 0, false);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.125f, 1.0f);
 	}
 
@@ -36,19 +38,19 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
-		Block<?> blockBelow = world.getBlock(x, y - 1, z);
-		if (blockBelow != null && blockBelow.getLogic() instanceof IBlockLogicSnowyStairs) {
-			IBlockLogicSnowyStairs blockSnowyStairs = (IBlockLogicSnowyStairs) blockBelow.getLogic();
-			int metadata = world.getBlockMetadata(x, y, z);
-			int belowMetadata = world.getBlockMetadata(x, y - 1, z);
-			int belowLayers = blockSnowyStairs.getLayers(belowMetadata);
-
-			if (belowLayers != this.getLayers(metadata)) {
-				world.setBlockMetadata(x, y, z, (metadata & 0b11111100) | belowLayers - 1);
-			}
-		} else {
-			world.setBlockWithNotify(x, y, z, 0);
-		}
+//		Block<?> blockBelow = world.getBlock(x, y - 1, z);
+//		if (blockBelow != null && blockBelow.getLogic() instanceof IBlockLogicSnowyStairs) {
+//			IBlockLogicSnowyStairs blockSnowyStairs = (IBlockLogicSnowyStairs) blockBelow.getLogic();
+//			int metadata = world.getBlockMetadata(x, y, z);
+//			int belowMetadata = world.getBlockMetadata(x, y - 1, z);
+//			int belowLayers = blockSnowyStairs.getLayers(belowMetadata);
+//
+//			if (belowLayers != this.getLayers(metadata)) {
+//				world.setBlockMetadata(x, y, z, (metadata & 0b11111100) | belowLayers - 1);
+//			}
+//		} else {
+//			world.setBlockWithNotify(x, y, z, 0);
+//		}
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 	public boolean isSolidRender() {
 		return false;
 	}
-  
+
 	@Override
 	public boolean isCubeShaped() {
 		return false;

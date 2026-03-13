@@ -14,18 +14,15 @@
   "license": "LGPL-3.0",
   "environment": "*",
   "entrypoints": {
-    "beforeClientStart": [
-      "net.helinos.moresnow.MoreSnow"
-    ],
-    "afterBlockInit": [
-      "net.helinos.moresnow.block.MSBlocks"
-    ],
-    "initModels": [
-      "net.helinos.moresnow.block.MSModels"
-    ],
-    "modmenu": [
-      "net.helinos.moresnow.impl.ModMenuApiImpl"
-    ]
+		"main": 							["net.helinos.moresnow.MoreSnow"],
+		"beforeGameStart": 		["net.helinos.moresnow.MoreSnow"],
+		"afterGameStart": 		["net.helinos.moresnow.MoreSnow"],
+		"client": 						["net.helinos.moresnow.MoreSnow"],
+		"beforeClientStart": 	["net.helinos.moresnow.MoreSnow"],
+		"afterClientStart":		["net.helinos.moresnow.MoreSnow"],
+		"afterBlockInit": 		["net.helinos.moresnow.block.MSBlocks"],
+		"initModels": 				["net.helinos.moresnow.model.MSModels"],
+		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"]
   },
   "mixins": [
     "moresnow.mixins.json"

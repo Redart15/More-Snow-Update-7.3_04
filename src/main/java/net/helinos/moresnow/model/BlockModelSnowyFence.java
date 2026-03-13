@@ -1,10 +1,14 @@
 package net.helinos.moresnow.model;
 
-import net.helinos.moresnow.block.BlockLogicSnowyFence;
+import net.helinos.moresnow.block.logic.BlockLogicSnowyFence;
+import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<T> {
     public BlockModelSnowyFence(Block<T> block) {
@@ -19,12 +23,12 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
         if (logic.getLayers(metadata) != 8) {
 			somethingRendered |= this.renderSnowLayers(tessellator, x, y, z, logic);
 		}
-        this.renderingSnow = true;
+		this.startLayerRendering();
         int layers = logic.getLayers(metadata);
         double height = layers * 2 / 16.0;
         AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, height, 1.0);
         somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
-        this.renderingSnow = false;
+		this.stopLayerRendering();
         return somethingRendered;
     }
 
@@ -67,5 +71,11 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
 			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
 		}
 		return somethingRendered;
+	}
+
+	@Override
+	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
+		GL11.glTranslatef(0.0F, -0.25F, 0.0F);
+		BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW).renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

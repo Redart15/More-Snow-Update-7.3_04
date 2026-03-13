@@ -2,7 +2,7 @@ package net.helinos.moresnow.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.helinos.moresnow.block.BlockLogicSnowy;
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicLayerSnow;
@@ -13,7 +13,6 @@ import net.minecraft.core.world.World;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = BlockLogicLayerSnow.class, remap = false)
 public abstract class BlockLogicLayerSnowMixin {
@@ -39,7 +38,7 @@ public abstract class BlockLogicLayerSnowMixin {
 
 	@WrapOperation(method = "canPlaceBlockAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/block/Block;isSolidRender()Z"))
 	private boolean topSlabAndUpsideDownStairsFix(Block<?> block, Operation<Boolean> original, World world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y, z);
+		int metadata = world.getBlockMetadata(x, y - 1, z);
 		if (block != null && block.getLogic() instanceof BlockLogicSlab) {
 			return (metadata & 3) != 0;
 		}
@@ -48,7 +47,7 @@ public abstract class BlockLogicLayerSnowMixin {
 		}
 		if(block != null && block.getLogic() instanceof BlockLogicSnowy){
 			BlockLogicSnowy<?> snowy = (BlockLogicSnowy<?>) block.getLogic();
-			return snowy.getRelativeLayers(metadata) > snowy.getMaxLayers();
+			return snowy.getLayers(metadata) >= snowy.getMaxLayers();
 		}
 		return original.call(block);
 	}

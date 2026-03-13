@@ -1,0 +1,36 @@
+package net.helinos.moresnow.block.logic;
+
+import net.helinos.moresnow.util.BlockMetadata;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
+import net.minecraft.core.util.helper.DyeColor;
+import org.jetbrains.annotations.Nullable;
+
+public class BlockLogicSnowyFenceGatePainted extends BlockLogicSnowyFenceGate  implements PaintedBlock {
+	private final DyeColor color;
+
+	public BlockLogicSnowyFenceGatePainted(Block block, Block storedBlock, @Nullable DyeColor color) {
+		super(block, storedBlock);
+		this.color = color;
+	}
+
+	@Override
+	public DyeColor getColor() {
+		return this.color;
+	}
+
+	@Override
+	public String getLanguageKey(int meta) {
+		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
+	}
+
+	@Override
+	public int getStoredBlockMetadata(int metadata) {
+		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.color.blockMeta & 15);
+	}
+
+	@Override
+	protected int blockToMetadata(int blockId, int metadata) {
+		return (metadata);
+	}
+}

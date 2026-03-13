@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import java.util.ArrayList;
 
@@ -6,14 +6,12 @@ import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFenceGate;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntityActivator;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.tag.ItemTags;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Direction;
-import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
@@ -22,19 +20,16 @@ import org.jetbrains.annotations.Nullable;
 
 //Done
 public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSnowy<T> {
-	private final boolean isPainted;
-	private final DyeColor color;
 
-	public BlockLogicSnowyFenceGate(Block<T> block, @Nullable DyeColor color) {
-		super(block, 8, 0, false);
+
+	public BlockLogicSnowyFenceGate(Block<T> block, Block<?> storedBlock) {
+		super(block, storedBlock, 8, 0, false);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-		this.isPainted = color != null;
-		this.color = color;
 	}
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == this.getStoredBlockId(metadata) && this.color == DyeColor.colorFromBlockMeta(metadata >> 4);
+		return id == this.getStoredBlockId(metadata);
 	}
 
 	@Override
@@ -92,15 +87,7 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 	@Override
 	public int getStoredBlockMetadata(int metadata) {
-		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.isPainted ? this.color.blockMeta : 0);
-	}
-
-	@Override
-	public int getStoredBlockId(int metadata) {
-		if (this.isPainted) {
-			return Blocks.FENCE_GATE_PLANKS_OAK_PAINTED.id();
-		}
-		return Blocks.FENCE_GATE_PLANKS_OAK.id();
+		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, 0);
 	}
 
 	@Override
@@ -124,12 +111,5 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 	public int getDirection(int metadata) {
 		return BlockLogicFenceGate.getDirection(BlockMetadata.getUpperBlock(metadata));
-	}
-
-	public DyeColor getColor() {
-		if (this.isPainted) {
-			return this.color;
-		}
-		return null;
 	}
 }

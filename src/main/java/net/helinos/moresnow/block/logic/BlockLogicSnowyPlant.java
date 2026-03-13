@@ -1,7 +1,8 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import java.util.Random;
 
+import net.helinos.moresnow.block.interfaces.IBlockLogicPlant;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFlower;
@@ -12,13 +13,12 @@ import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
-public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
-	private int storedBlockID;
+public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlower> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
+	public boolean killedByWeather;
 
-	public BlockLogicSnowyFlowerStackable(Block<T> block, int storedBlockID) {
-		super(block, 8, 0, false);
+	public BlockLogicSnowyPlant(Block<T> block, Block<?> storedBlock) {
+		super(block, storedBlock, 8, 0, false);
 		block.setTicking(true);
-		this.storedBlockID = storedBlockID;
 	}
 
 	@Override
@@ -28,6 +28,11 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 		double height = layers * 2 / 16.0;
 		return AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, height, 1.0);
 	}
+
+	@Override
+    public int getStoredBlockMetadata(int metadata) {
+        return (metadata) & 0b10000000;
+    }
 
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random random) {
@@ -51,27 +56,16 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 	@Override
 	public boolean getKilledByWeather(int metadata) {
 		int blockID = this.getStoredBlockId(metadata);
-		return BlockLogicSnowyPlant.doGetKilledByWeather(blockID);
+		return doGetKilledByWeather(blockID);
 	}
 
-	@Override
-	public boolean canReplaceBlock(int id, int metadata) {
-		return id == storedBlockID;
-	}
+	public static boolean doGetKilledByWeather(int blockID) {
+		Block<?> block = Blocks.getBlock(blockID);
+		if (block != null && block.getLogic() instanceof BlockLogicFlower) {
+			return ((BlockLogicFlower) block.getLogic()).killedByWeather;
+		}
 
-	@Override
-	public int getStoredBlockId(int metadata) {
-		return storedBlockID;
-	}
-
-	@Override
-    public int getStoredBlockMetadata(int metadata) {
-        return (metadata) & 0b11100000;
-    }
-
-	@Override
-	protected int blockToMetadata(int blockId, int metadata) {
-		return metadata;
+		return false;
 	}
 
 	@Override

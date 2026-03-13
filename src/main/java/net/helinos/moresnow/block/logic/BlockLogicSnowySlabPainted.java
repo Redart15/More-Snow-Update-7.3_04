@@ -1,14 +1,29 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
+import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.Blocks;
+import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.WorldSource;
 
-public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogicSnowy<T> {
-	public BlockLogicSnowySlabPainted(Block<T> block) {
-		super(block, 4, 4, true);
+public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements PaintedBlock {
+	private final DyeColor color;
+
+	public BlockLogicSnowySlabPainted(Block<T> block, Block<?> storedBlock, DyeColor color) {
+		super(block, storedBlock, 4, 4, true);
+		this.color = color;
+	}
+
+	@Override
+	public DyeColor getColor() {
+		return this.color;
+	}
+
+	@Override
+	public String getLanguageKey(int meta) {
+		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(this.color.blockMeta << 4);
 	}
 
 	@Override
@@ -24,13 +39,8 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 	}
 
 	@Override
-	public int getStoredBlockId(int metadata) {
-		return Blocks.SLAB_PLANKS_PAINTED.id();
-	}
-
-	@Override
 	public int getStoredBlockMetadata(int metadata) {
-		return metadata & 0b11110000;
+		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.color.blockMeta & 15);
 	}
 
 	@Override

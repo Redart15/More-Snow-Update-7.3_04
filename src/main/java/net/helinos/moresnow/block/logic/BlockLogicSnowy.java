@@ -1,10 +1,11 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import java.util.Random;
 
+import net.helinos.moresnow.block.MSBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
-import net.minecraft.core.util.phys.AABB;
-import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.enums.EnumBlockSoundEffectType;
+import net.minecraft.core.world.LevelListener;
 import org.apache.commons.lang3.ArrayUtils;
 
 import net.minecraft.core.block.Block;
@@ -30,12 +31,14 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	public static final int START_INDEX = 4;
 	public static final int END_INDEX = 7;
 	public static final int FULL_BLOCK = 8;
+	public final Block<?> storedBlock;
 	private final int maxLayers;
 	private final int lowestLayerHeight;
 	private final boolean supportsOwnSnow;
 
-	public BlockLogicSnowy(Block<T> block, int maxLayers, int lowestLayerHeight, boolean supportsOwnSnow) {
+	public BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight, boolean supportsOwnSnow) {
 		super(block, Material.snow);
+		this.storedBlock = storedBlock;
 		this.maxLayers = maxLayers;
 		this.lowestLayerHeight = lowestLayerHeight;
 		this.supportsOwnSnow = supportsOwnSnow;
@@ -49,11 +52,25 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return id == this.getStoredBlockId(metadata);
 	}
 
-	public abstract int getStoredBlockMetadata(int metadata);
+	public Block<?> getStoredBlock() {
+		return storedBlock;
+	}
 
-	public abstract int getStoredBlockId(int metadata);
 
-	protected abstract int blockToMetadata(int blockId, int metadata);
+	public int getStoredBlockMetadata(int metadata) {
+		return 0;
+	}
+	public int getStoredBlockId(int metadata) {
+		return this.storedBlock.id();
+	}
+	protected int blockToMetadata(int blockId, int metadata) {
+		return 0;
+	}
+
+	@Override
+	public String getLanguageKey(int meta) {
+		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "bug" : storedBlock.getLogic().getLanguageKey(meta);
+	}
 
 	public int getLayers(int metadata) {
 		return BlockMetadata.getLowerBlock(metadata) + 1;
@@ -67,22 +84,16 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return this.getLayers(metadata) + this.lowestLayerHeight;
 	}
 
-	/**
-	 * Check if the block can support having snow on it.
-	 *
-	 * @see BlockLogicSnowyMultiple#canSupportSnow(Chunk, int, int, int)
-	 */
+	public int getRelativeMaxLayer(int metadata) {
+		return this.maxLayers + this.lowestLayerHeight;
+	}
+
 	public boolean canSupportSnow(World world, int x, int y, int z) {
 		Block<?> belowBlock = world.getBlock(x, y - 1, z);
 		int belowMetadata = world.getBlockMetadata(x, y - 1, z);
 		return this.canSupportSnow(belowBlock, belowMetadata);
 	}
 
-	/**
-	 * Check if the block can support having snow on it.
-	 *
-	 * @see BlockSnowy$canSupportSnow(World, int, int, int)
-	 */
 	public boolean canSupportSnow(Chunk chunk, int x, int y, int z) {
 		int belowID = chunk.getBlockID(x, y - 1, z);
 		int belowMetadata = chunk.getBlockMetadata(x, y - 1, z);
@@ -115,28 +126,11 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	/**
 	 * Place a snow covered variant of a block at the given coordinates.
 	 *
-	 * @param id The block id to be "stored" inside the snow covered block
+	 * @param id   The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int, int)
 	 */
 	public boolean tryMakeSnowy(World world, int id, int x, int y, int z) {
 		int meta = world.getBlockMetadata(x, y, z);
-		return this.tryMakeSnowy(world, id, meta, x, y, z);
-	}
-
-	/**
-	 * Place a snow covered variant of a block at the given coordinates.
-	 *
-	 * @param id   The block id to be "stored" inside the snow covered block
-	 * @param meta The metadata to be "stored"
-	 * @return Whether the block was placed successfully
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int, int)
-	 */
-	public boolean tryMakeSnowy(World world, int id, int meta, int x, int y, int z) {
 		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(world, x, y, z))
 			return false;
 		return world.setBlockAndMetadataWithNotify(x, y, z, this.block.id(), this.blockToMetadata(id, meta));
@@ -145,28 +139,11 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	/**
 	 * Place a snow covered variant of a block at the given coordinates.
 	 *
-	 * @param id The block id to be "stored" inside the snow covered block
+	 * @param id   The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int, int)
 	 */
 	public boolean tryMakeSnowy(Chunk chunk, int id, int x, int y, int z) {
 		int meta = chunk.getBlockMetadata(x, y, z);
-		return this.tryMakeSnowy(chunk, id, meta, x, y, z);
-	}
-
-	/**
-	 * Place a snow covered variant of a block at the given coordinates.
-	 *
-	 * @param id   The block id to be "stored" inside the snow covered block
-	 * @param meta The metadata to be "stored"
-	 * @return Whether the block was placed successfully
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(Chunk, int, int, int, int)
-	 * @see BlockLogicSnowy#tryMakeSnowy(World, int, int, int, int, int)
-	 */
-	public boolean tryMakeSnowy(Chunk chunk, int id, int meta, int x, int y, int z) {
 		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(chunk, x, y, z))
 			return false;
 		return chunk.setBlockIDWithMetadata(x, y, z, this.block.id(), this.blockToMetadata(id, meta));
@@ -295,6 +272,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
 		if (!this.canSupportSnow(world, x, y, z)) {
 			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
+			world.playBlockEvent(null, LevelListener.EVENT_BLOCK_BREAK, x, y - 1, z, Blocks.BLOCK_SNOW.id());
 		}
 	}
 }

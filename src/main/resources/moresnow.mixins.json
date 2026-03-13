@@ -11,8 +11,11 @@
   "mixins": [
     "BlockLogicLayerSnowMixin",
     "ItemBlockLayerMixin",
-    "WeatherMixin",
-    "WeatherSnowMixin"
+    "ItemMixinNameAdjustment",
+    "accessor.BlockAccessor",
+    "accessor.ItemBlockAccessor",
+    "weather.WeatherMixin",
+    "weather.WeatherSnowMixin"
   ],
   "client": [
     "BlockModelGrassMixin",

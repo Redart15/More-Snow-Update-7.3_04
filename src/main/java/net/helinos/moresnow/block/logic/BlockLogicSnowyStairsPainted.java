@@ -1,18 +1,35 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import java.util.ArrayList;
 
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
+import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.Blocks;
+import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
 
-public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation {
-	public BlockLogicSnowyStairsPainted(Block<T> block) {
-		super(block, 4, 4, true);
+public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation, PaintedBlock {
+	protected DyeColor color;
+
+	public BlockLogicSnowyStairsPainted(Block<T> block, Block<?> storedBlock, DyeColor color) {
+		super(block, storedBlock, 4, 4, true);
+		this.color = color;
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	@Override
+	public DyeColor getColor() {
+		return this.color;
+	}
+
+	@Override
+	public String getLanguageKey(int meta) {
+		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 
 	@Override
@@ -20,19 +37,16 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 		return id == getStoredBlockId(metadata) && (metadata & 8) == 0;
 	}
 
-	@Override
 	public boolean tryMakeSnowy(World world, int id, int meta, int x, int y, int z) {
-		return BlockLogicSnowyStairsMultiple.tryMakeSnowyDo(this, world, id, meta, x, y, z);
+		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, world, id, meta, x, y, z);
 	}
 
-	@Override
 	public boolean tryMakeSnowy(Chunk chunk, int id, int meta, int x, int y, int z) {
-		return BlockLogicSnowyStairsMultiple.tryMakeSnowyDo(this, chunk, id, meta, x, y, z);
+		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, chunk, id, meta, x, y, z);
 	}
 
 	@Override
 	public void accumulate(World world, int x, int y, int z) {
-		BlockLogicSnowyStairsMultiple.accumulateDo(world, x, y, z);
 		super.accumulate(world, x, y, z);
 	}
 
@@ -60,7 +74,7 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
-		BlockLogicSnowyStairsMultiple.onNeighborBlockChangeDo(this, world, x, y, z, blockId);
+		BlockLogicSnowyStairs.onNeighborBlockChangeDo(this, world, x, y, z, blockId);
 	}
 
 	@Override
@@ -70,26 +84,24 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 
 	@Override
 	public int getStoredBlockMetadata(int metadata) {
-		int rotation = this.getRotation(metadata);
-		return (metadata & 0b11110000) | rotation;
+		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.color.blockMeta & 15);
 	}
 
 	@Override
 	protected int blockToMetadata(int blockId, int metadata) {
-		int rotation = (metadata & 0b11) << 2;
-		return (metadata & 0b11110000) | rotation;
+		return (metadata & 0b11) << 4;
 	}
 
 	@Override
 	public int getRotation(int metadata) {
-		return (metadata >> 2) & 0b11;
+		return (metadata >> 4) & 0b11;
 	}
 
 	@Override
 	public boolean isSolidRender() {
 		return false;
 	}
-  
+
 	@Override
 	public boolean isCubeShaped() {
 		return false;

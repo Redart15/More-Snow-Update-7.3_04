@@ -1,8 +1,8 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
-import java.util.ArrayList;
 import java.util.Random;
 
+import net.helinos.moresnow.block.interfaces.IBlockLogicPlant;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFlower;
@@ -13,11 +13,10 @@ import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
-public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlower> extends BlockLogicSnowyMultiple<T> implements IBlockLogicPlant {
-	public boolean killedByWeather;
-	
-	public BlockLogicSnowyPlant(Block<T> block, Class<F> blockLogic, ArrayList<Integer> excludedIds) {
-		super(block, blockLogic, excludedIds, 8, 0, false, 3, 0b00001111);
+public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
+
+	public BlockLogicSnowyFlowerStackable(Block<T> block, Block<?> storedBlock) {
+		super(block, storedBlock, 8, 0, false);
 		block.setTicking(true);
 	}
 
@@ -30,16 +29,11 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 	}
 
 	@Override
-    public int getStoredBlockMetadata(int metadata) {
-        return (metadata) & 0b10000000;
-    }
-
-	@Override
 	public void updateTick(World world, int x, int y, int z, Random random) {
 		super.updateTick(world, x, y, z, random);
-		
+
 		int metadata = world.getBlockMetadata(x, y, z);
-		
+
 		if (
 			!BlockLogicFlower.isPermanent(metadata) &&
 			world.getGameRuleValue(GameRules.DO_SEASONAL_GROWTH) &&
@@ -56,23 +50,29 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 	@Override
 	public boolean getKilledByWeather(int metadata) {
 		int blockID = this.getStoredBlockId(metadata);
-		return doGetKilledByWeather(blockID);
+		return BlockLogicSnowyPlant.doGetKilledByWeather(blockID);
 	}
 
-	public static boolean doGetKilledByWeather(int blockID) {
-		Block<?> block = Blocks.getBlock(blockID);
-		if (block != null && block.getLogic() instanceof BlockLogicFlower) {
-			return ((BlockLogicFlower) block.getLogic()).killedByWeather;
-		}
-			
-		return false;
+	@Override
+	public boolean canReplaceBlock(int id, int metadata) {
+		return id == storedBlock.id();
+	}
+
+	@Override
+    public int getStoredBlockMetadata(int metadata) {
+        return (metadata) & 0b11100000;
+    }
+
+	@Override
+	protected int blockToMetadata(int blockId, int metadata) {
+		return metadata;
 	}
 
 	@Override
 	public boolean isSolidRender() {
 		return false;
 	}
-  
+
 	@Override
 	public boolean isCubeShaped() {
 		return false;

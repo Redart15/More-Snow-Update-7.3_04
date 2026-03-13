@@ -1,6 +1,6 @@
 package net.helinos.moresnow.mixin;
 
-import net.helinos.moresnow.block.BlockLogicSnowy;
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.client.render.block.model.BlockModelGrass;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.material.Material;

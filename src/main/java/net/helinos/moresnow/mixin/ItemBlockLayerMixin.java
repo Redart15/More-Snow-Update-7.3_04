@@ -2,13 +2,12 @@ package net.helinos.moresnow.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.helinos.moresnow.block.BlockLogicSnowy;
-import net.helinos.moresnow.block.BlockLogicSnowyPlant;
-import net.helinos.moresnow.block.IBlockLogicSnowyStairs;
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
+import net.helinos.moresnow.block.logic.BlockLogicSnowyPlant;
+import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
 import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
-import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.enums.EnumDropCause;
@@ -44,9 +43,10 @@ public abstract class ItemBlockLayerMixin {
 				return false;
 			}
 
+			int newMetadata = (metadata + 1) & 0b0000_1111;
 			if (block.getLogic() instanceof BlockLogicSnowyPlant) {
 				if (newLayers <= blockSnowy.getMaxLayers()) {
-					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), (metadata & ~(blockSnowy.getMaxLayers() - 1)) | newLayers - 1);
+					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), newMetadata);
 				} else {
 					int storedID = ((BlockLogicSnowyPlant<?, ?>) block.getLogic()).getStoredBlockId(metadata);
 					block.getLogic().dropBlockWithCause(world, EnumDropCause.WORLD, blockX, blockY, blockZ, metadata, null, null);
@@ -55,10 +55,7 @@ public abstract class ItemBlockLayerMixin {
 				}
 			} else {
 				if (newLayers <= blockSnowy.getMaxLayers()) {
-					if (block.getLogic() instanceof IBlockLogicSnowyStairs && world.getBlock(blockX, blockY + 1, blockZ) == null) {
-						world.setBlockAndMetadataWithNotify(blockX, blockY + 1, blockZ, MSBlocks.SNOWY_PARTIAL.id(), newLayers - 1);
-					}
-					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), (metadata & ~(blockSnowy.getMaxLayers() - 1)) | newLayers - 1);
+					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), newMetadata);
 				} else {
 					return original.call(itemstack, player, world, blockX, blockY, blockZ, side, xPlaced, yPlaced);
 				}

@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block;
+package net.helinos.moresnow.block.logic;
 
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.util.phys.AABB;
@@ -13,8 +13,8 @@ import net.minecraft.core.block.BlockLogicFence;
 import net.minecraft.core.block.Blocks;
 //Done
 public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFence> extends BlockLogicSnowy<T> {
-    public BlockLogicSnowyFence(Block<T> block) {
-        super(block, 8, 0, false);
+    public BlockLogicSnowyFence(Block<T> block, Block<?> storedBlock) {
+        super(block, storedBlock, 8, 0, false);
         this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
     }
 
@@ -61,20 +61,5 @@ public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFenc
     @Override
     public boolean isCubeShaped() {
         return false;
-    }
-
-    @Override
-    public int getStoredBlockMetadata(int metadata) {
-        return 0;
-    }
-
-    @Override
-    public int getStoredBlockId(int metadata) {
-        return Blocks.FENCE_PLANKS_OAK.id();
-    }
-
-    @Override
-    protected int blockToMetadata(int blockId, int metadata) {
-        return 0;
     }
 }
