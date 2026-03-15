@@ -43,7 +43,7 @@ public abstract class ItemBlockLayerMixin {
 				return false;
 			}
 
-			int newMetadata = (metadata + 1) & 0b0000_1111;
+			int newMetadata = (metadata + 1);
 			if (block.getLogic() instanceof BlockLogicSnowyPlant) {
 				if (newLayers <= blockSnowy.getMaxLayers()) {
 					world.setBlockAndMetadataWithNotify(blockX, blockY, blockZ, block.id(), newMetadata);

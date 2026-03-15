@@ -31,6 +31,6 @@ public class BlockLogicSnowyFenceGatePainted extends BlockLogicSnowyFenceGate  i
 
 	@Override
 	protected int blockToMetadata(int blockId, int metadata) {
-		return (metadata);
+		return (metadata << 4);
 	}
 }
