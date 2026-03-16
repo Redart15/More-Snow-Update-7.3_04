@@ -19,6 +19,7 @@
   ],
   "client": [
     "BlockModelGrassMixin",
+    "BlockModelLayerMixinFixSideRenderer",
     "particle.PlayerControllerMixinSnowyParticle"
   ],
   "server": [

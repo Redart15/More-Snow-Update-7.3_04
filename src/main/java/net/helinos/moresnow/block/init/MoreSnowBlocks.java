@@ -62,6 +62,7 @@ public class MoreSnowBlocks {
 			BlockLogic logic = supplier.get(block);
 			MoreSnowBlockInitializer.createFlower(block, logic);
 			MoreSnowBlockInitializer.createSapling(block, logic);
+			MoreSnowBlockInitializer.createMushrooms(block, logic);
 			MoreSnowBlockInitializer.createSlab(block, logic);
 			MoreSnowBlockInitializer.createStairs(block, logic);
 			MoreSnowBlockInitializer.createFence(block, logic);

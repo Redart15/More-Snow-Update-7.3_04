@@ -15,10 +15,8 @@ import net.minecraft.core.world.WorldSource;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelStandard<T> {
-	private final BlockModel<?> model;
-	private final IconCoordinate iconCoordinate;
-
-    private static final IconCoordinate SNOW_TEXTURE = TextureRegistry.getTexture("minecraft:block/block_snow");
+	protected final BlockModel<?> model;
+	protected final IconCoordinate iconCoordinate;
     protected boolean renderingSnow = false;
 
     protected BlockModelSnowy(Block<T> block) {
@@ -30,7 +28,7 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
     @Override
     public IconCoordinate getBlockTexture(WorldSource blockAccess, int x, int y, int z, Side side) {
         if (this.renderingSnow) {
-            return SNOW_TEXTURE;
+            return this.iconCoordinate;
         }
         int metadata = blockAccess.getBlockMetadata(x, y, z);
         return this.getBlockTextureFromSideAndMetadata(side, metadata);
@@ -44,7 +42,7 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
         int storedBlockMetadata = logic.getStoredBlockMetadata(metadata);
         try {
             return BlockModelDispatcher.getInstance().getDispatch(storedBlock).getBlockTextureFromSideAndMetadata(side, storedBlockMetadata);
-        } catch (NullPointerException _exception) {
+        } catch (NullPointerException e) {
             return BLOCK_TEXTURE_UNASSIGNED;
         }
     }
@@ -52,20 +50,12 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
 	@Override
 	public void renderBlockOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
 		Block<?> storedBlock = ((BlockLogicSnowy<?>) this.block.getLogic()).getStoredBlock();
-		BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
-		model.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+		BlockModel<?> storedBlockModel = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
+		storedBlockModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 		this.renderLayerOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 
 	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
-		BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW).renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
-	}
-
-	public final void startLayerRendering(){
-		this.renderingSnow = true;
-	}
-
-	public final void stopLayerRendering(){
-		this.renderingSnow = false;
+		model.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

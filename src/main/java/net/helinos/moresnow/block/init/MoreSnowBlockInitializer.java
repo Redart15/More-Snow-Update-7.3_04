@@ -13,6 +13,7 @@ import turniplabs.halplibe.helper.BlockBuilder;
 
 import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
 
+@SuppressWarnings({"java:S1144"})
 public class MoreSnowBlockInitializer {
 	private MoreSnowBlockInitializer(){}
 	/// BlockTags of Snow
@@ -46,6 +47,20 @@ public class MoreSnowBlockInitializer {
 				.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "sapling", logic.namespaceId());
+		}
+	}
+
+	public static void createMushrooms(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+		if (logic instanceof BlockLogicMushroom) {
+			Block<?> snowy = new BlockBuilder(MOD_ID)
+				.setBlockSound(Blocks.BLOCK_SNOW.getSound())
+				.setHardness(Blocks.BLOCK_SNOW.getHardness())
+				.setUseInternalLight()
+				.setVisualUpdateOnMetadata()
+				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
+				.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+			SNOWY_FLOWERS.add(snowy);
+			printMessage(currentBlock.id(), "mushroom", logic.namespaceId());
 		}
 	}
 

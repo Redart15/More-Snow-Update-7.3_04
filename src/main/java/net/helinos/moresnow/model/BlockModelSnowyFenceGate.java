@@ -2,15 +2,9 @@ package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyFenceGate;
-import net.minecraft.client.render.block.model.BlockModelDispatcher;
-import net.minecraft.client.render.block.model.BlockModelPlanksPainted;
 import net.minecraft.client.render.tessellator.Tessellator;
-import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
-import net.minecraft.core.util.helper.DyeColor;
-import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -30,12 +24,10 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
         if (logic.getLayers(metadata) != BlockLogicSnowy.FULL_BLOCK) {
 			somethingRendered |= this.renderFenceGate(tessellator, x, y, z, logic, metadata, bounds);
 		}
-		this.startLayerRendering();
         int layers = logic.getLayers(metadata);
         double height = layers * 2 / 16.0;
         bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, height, 1.0);
-        somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
-		this.stopLayerRendering();
+        somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
         return somethingRendered;
     }
 
@@ -149,6 +141,6 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
 	@Override
 	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
 		GL11.glTranslatef(0.0F, -0.25F, 0.0F);
-		BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW).renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+		this.model.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

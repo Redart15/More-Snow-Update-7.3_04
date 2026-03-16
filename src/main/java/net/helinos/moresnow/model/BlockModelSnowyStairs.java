@@ -2,15 +2,12 @@ package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
-import net.minecraft.client.render.block.color.BlockColor;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
-import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicLayerBase;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -53,37 +50,34 @@ public class BlockModelSnowyStairs<T extends BlockLogic> extends BlockModelSnowy
 		}
 
 		// Render the snow
-		this.startLayerRendering();
 		int layers = logic.getLayers(metadata);
 		double heightFromSnow = layers * 2 / 16.0;
 
 		// Render the snow
 		if (horizontalRotation == 0) {
 			bounds.set(0.0, 0.5, 0.0, 0.5, 0.5 + heightFromSnow, 1.0);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 			somethingRendered |= renderSnowLayerAboveBlock(tessellator, bounds.set(0.5, 0.0, 0.0, 1.0, heightFromSnow, 1.0), x, y + 1, z);
 		} else if (horizontalRotation == 1) {
 			bounds.set(0.5, 0.5, 0.0, 1.0, 0.5 + heightFromSnow, 1.0);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 			somethingRendered |= renderSnowLayerAboveBlock(tessellator, bounds.set(0.0, 0.0, 0.0, 0.5, heightFromSnow, 1.0), x, y + 1, z);
 		} else if (horizontalRotation == 2) {
 			bounds.set(0.0, 0.5, 0.0, 1.0, 0.5 + heightFromSnow, 0.5);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 			somethingRendered |= renderSnowLayerAboveBlock(tessellator, bounds.set(0.0, 0.0, 0.5, 1.0, heightFromSnow, 1.0), x, y + 1, z);
 		} else {
 			bounds.set(0.0, 0.5, 0.5, 1.0, 0.5 + heightFromSnow, 1.0);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 			somethingRendered |= renderSnowLayerAboveBlock(tessellator, bounds.set(0.0, 0.0, 0.0, 1.0, heightFromSnow, 0.5), x, y + 1, z);
 		}
-		this.stopLayerRendering();
-
 		return somethingRendered;
 	}
 
 	private boolean renderSnowLayerAboveBlock(Tessellator tessellator, AABB bounds, int x, int y, int z) {
 		Block<?> block = renderBlocks.blockAccess.getBlock(x, y, z);
 		if(block == null){
-			return this.renderStandardBlock(tessellator, bounds, x, y, z);
+			return this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 		}
 		BlockLogic logic = block.getLogic();
 		if(logic == null){
@@ -91,8 +85,8 @@ public class BlockModelSnowyStairs<T extends BlockLogic> extends BlockModelSnowy
 		}
 		if(logic instanceof BlockLogicLayerBase){
 			int layer = renderBlocks.blockAccess.getBlockMetadata(x, y, z) & 7;
-			bounds.minY = (float)(2 * (1 + layer)) / 16.0F;
-			return this.renderStandardBlock(tessellator, bounds, x, y, z);
+			bounds.minY = (2 * (1 + layer)) / 16.0F;
+			return this.model.renderStandardBlock(tessellator, bounds, x, y, z);
 		}
 		return false;
 	}
@@ -111,7 +105,7 @@ public class BlockModelSnowyStairs<T extends BlockLogic> extends BlockModelSnowy
 		float yOffset = 0.5F;
 		AABB bounds = AABB.getTemporaryBB(0.0, 0.5, 0.5, 1.0, 0.5 + 2 / 16.0, 1.0);
 		GL11.glTranslatef(-0.5F, 0.0F - yOffset, -0.5F);
-		((BlockModelStandard<BlockLogic>) BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW)).renderBlockWithBounds(tessellator, bounds, metadata, brightness, alpha, lightmapCoordinate);
+		((BlockModelStandard<BlockLogic>)this.model).renderBlockWithBounds(tessellator, bounds, metadata, brightness, alpha, lightmapCoordinate);
 		GL11.glTranslatef(0.5F, yOffset, 0.5F);
 	}
 }

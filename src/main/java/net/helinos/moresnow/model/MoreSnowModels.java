@@ -7,9 +7,7 @@ import net.minecraft.client.render.TileEntityRenderDispatcher;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
-import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.Blocks;
 
 import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
 
@@ -66,33 +64,9 @@ public class MoreSnowModels {
 	}
 
 	private static void assignModelFenceThin(BlockModelDispatcher dispatcher) {
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(
-			MoreSnowBlocks.SNOWY_FENCE_CHAINLINK,
-			Blocks.FENCE_CHAINLINK.getLogic().getClass(),
-			TextureRegistry.getTexture("minecraft:block/fence_chain/center"),
-			null,
-			TextureRegistry.getTexture("minecraft:block/fence_chain/top"),
-			TextureRegistry.getTexture("minecraft:block/fence_chain/column")
-		).setAllTextures(0, SNOW_PATH));
-
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(
-			MoreSnowBlocks.SNOWY_FENCE_STEEL,
-			Blocks.FENCE_STEEL.getLogic().getClass(),
-			TextureRegistry.getTexture("minecraft:block/fence_steel/center"),
-			null,
-			TextureRegistry.getTexture("minecraft:block/fence_steel/top"),
-			TextureRegistry.getTexture("minecraft:block/fence_steel/column")
-		).setAllTextures(0, SNOW_PATH));
-
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(
-			MoreSnowBlocks.SNOWY_FENCE_WALLPAPER,
-			Blocks.FENCE_PAPER_WALL.getLogic().getClass(),
-			TextureRegistry.getTexture("minecraft:block/fence_paper/center"),
-			null,
-			null,
-			TextureRegistry.getTexture("minecraft:block/fence_paper/column")
-		).setAllTextures(0, SNOW_PATH));
-
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_CHAINLINK).setAllTextures(0, SNOW_PATH));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_STEEL).setAllTextures(0, SNOW_PATH));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_WALLPAPER).setAllTextures(0, SNOW_PATH));
 	}
 
 	private static void assignModelFenceGate(BlockModelDispatcher dispatcher) {

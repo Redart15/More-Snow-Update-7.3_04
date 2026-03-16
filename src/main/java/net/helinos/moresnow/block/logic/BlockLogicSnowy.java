@@ -4,7 +4,6 @@ import java.util.Random;
 
 import net.helinos.moresnow.block.MSBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
-import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.world.LevelListener;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -36,7 +35,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	private final int lowestLayerHeight;
 	private final boolean supportsOwnSnow;
 
-	public BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight, boolean supportsOwnSnow) {
+	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight, boolean supportsOwnSnow) {
 		super(block, Material.snow);
 		this.storedBlock = storedBlock;
 		this.maxLayers = maxLayers;
@@ -56,13 +55,17 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return storedBlock;
 	}
 
-
+	@SuppressWarnings("java:S1172")
 	public int getStoredBlockMetadata(int metadata) {
 		return 0;
 	}
+
+	@SuppressWarnings("java:S1172")
 	public int getStoredBlockId(int metadata) {
 		return this.storedBlock.id();
 	}
+
+	@SuppressWarnings("java:S1172")
 	protected int blockToMetadata(int blockId, int metadata) {
 		return 0;
 	}
@@ -110,6 +113,12 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		}
 		Material belowMaterial = belowBlock.getMaterial();
 		BlockLogic logic = belowBlock.getLogic();
+		if(logic instanceof BlockLogicSnowy){
+			BlockLogicSnowy snowyLogic = (BlockLogicSnowy) logic;
+			if(snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()){
+				return true;
+			}
+		}
 		if (logic instanceof BlockLogicSlab && (metadata & 3) != 0 || logic instanceof BlockLogicStairs && (metadata & 8) != 0) {
 			return true;
 		}
@@ -262,8 +271,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	private static boolean shouldSnowMelt(World world, int x, int y, int z) {
-		return world.getBlockBiome(x, y, z) != null &&
-			!world.getBlockBiome(x, y, z).hasSurfaceSnow() &&
+		return!world.getBlockBiome(x, y, z).hasSurfaceSnow() &&
 			world.seasonManager.getCurrentSeason() != null &&
 			world.seasonManager.getCurrentSeason().letWeatherCleanUpSnow;
 	}

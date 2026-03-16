@@ -1,108 +1,32 @@
 package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.minecraft.client.render.LightmapHelper;
-import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
-import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.tessellator.Tessellator;
-import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
-import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
 
 public class BlockModelSnowyPlant<T extends BlockLogic> extends BlockModelSnowy<T> {
-    public BlockModelSnowyPlant(Block<T> block) {
-        super(block);
-    }
+	public BlockModelSnowyPlant(Block<T> block) {
+		super(block);
+	}
 
-    @Override
-    public boolean render(Tessellator tessellator, int x, int y, int z) {
-		if(true){
-			int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-			// Render the slab
-			AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
-			Block<?> storedBlock = ((BlockLogicSnowy) this.block.getLogic()).getStoredBlock();
-			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
-			boolean somethingRendered = model.render(tessellator, x, y, z);
-			// Render the snow
-			this.startLayerRendering();
-			int layers = ((BlockLogicSnowy<?>) block.getLogic()).getLayers(metadata);
-			double height = layers * 2 / 16.0;
-			bounds.set(0.0, 0.0, 0.0, 1.0, height, 1.0);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
-			this.stopLayerRendering();
-			return somethingRendered;
-		}
+	@Override
+	public boolean render(Tessellator tessellator, int x, int y, int z) {
+		int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+		// Render the slab
+		AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
+		Block<?> storedBlock = ((BlockLogicSnowy<?>) this.block.getLogic()).getStoredBlock();
+		BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
+		boolean somethingRendered = model.render(tessellator, x, y, z);
+		// Render the snow
+		int layers = ((BlockLogicSnowy<?>) block.getLogic()).getLayers(metadata);
+		double height = layers * 2 / 16.0;
+		bounds.set(0.0, 0.0, 0.0, 1.0, height, 1.0);
+		somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
+		return somethingRendered;
 
-        BlockLogicSnowy<?> logic = (BlockLogicSnowy<?>) this.block.getLogic();
-
-        float blockBrightness = 1.0F;
-        if (!LightmapHelper.isLightmapEnabled()) {
-            blockBrightness = this.getBlockBrightness(renderBlocks.blockAccess, x, y, z);
-        } else {
-            tessellator.setLightmapCoord(this.block.getLightmapCoord(renderBlocks.blockAccess, x, y, z));
-        }
-
-        int blockColor = BlockColorDispatcher.getInstance().getDispatch(this.block).getWorldColor(renderBlocks.blockAccess, x, y, z);
-        float red = (blockColor >> 16 & 0xFF) / 255.0f;
-        float green = (blockColor >> 8 & 0xFF) / 255.0f;
-        float blue = (blockColor & 0xFF) / 255.0f;
-        tessellator.setColorOpaque_F(blockBrightness * red, blockBrightness * green, blockBrightness * blue);
-        double renderX = x;
-        double renderY = y;
-        double renderZ = z;
-        int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        int storedBlockID = logic.getStoredBlockId(metadata);
-        Block<?> storedBlock = Blocks.getBlock(storedBlockID);
-
-        // Random offset based on coordinates
-        if (storedBlock == Blocks.TALLGRASS || storedBlock == Blocks.TALLGRASS_FERN || storedBlock == Blocks.SPINIFEX) {
-            long hashValue = (x * 3129871) ^ z * 116129781 ^ y;
-            hashValue = hashValue * hashValue * 42317861 + hashValue * 11;
-
-            renderX += ((hashValue >> 16 & 0xF) / 15.0 - 0.5) * 0.5;
-            renderY += ((hashValue >> 20 & 0xF) / 15.0 - 1.0) * 0.2;
-            renderZ += ((hashValue >> 24 & 0xF) / 15.0 - 0.5) * 0.5;
-        }
-
-        IconCoordinate textureIndex;
-
-        try {
-            textureIndex = BlockModelDispatcher.getInstance().getDispatch(storedBlock).getBlockTextureFromSideAndMetadata(Side.BOTTOM, logic.getStoredBlockMetadata(metadata));
-        } catch (NullPointerException _exception) {
-            textureIndex = BLOCK_TEXTURE_UNASSIGNED;
-        }
-
-        double minU = textureIndex.getIconUMin();
-        double maxU = textureIndex.getIconUMax();
-        double minV = textureIndex.getIconVMin();
-        double maxV = textureIndex.getIconVMax();
-        double minX = renderX + 0.5 - 0.45;
-        double maxX = renderX + 0.5 + 0.45;
-        double minZ = renderZ + 0.5 - 0.45;
-        double maxZ = renderZ + 0.5 + 0.45;
-        tessellator.addVertexWithUV(minX, renderY + 1.0 + 0.0, minZ, minU, minV);
-        tessellator.addVertexWithUV(minX, renderY + 0.0, minZ, minU, maxV);
-        tessellator.addVertexWithUV(maxX, renderY + 0.0, maxZ, maxU, maxV);
-        tessellator.addVertexWithUV(maxX, renderY + 1.0 + 0.0, maxZ, maxU, minV);
-        tessellator.addVertexWithUV(maxX, renderY + 1.0 + 0.0, maxZ, minU, minV);
-        tessellator.addVertexWithUV(maxX, renderY + 0.0, maxZ, minU, maxV);
-        tessellator.addVertexWithUV(minX, renderY + 0.0, minZ, maxU, maxV);
-        tessellator.addVertexWithUV(minX, renderY + 1.0 + 0.0, minZ, maxU, minV);
-        tessellator.addVertexWithUV(minX, renderY + 1.0 + 0.0, maxZ, minU, minV);
-        tessellator.addVertexWithUV(minX, renderY + 0.0, maxZ, minU, maxV);
-        tessellator.addVertexWithUV(maxX, renderY + 0.0, minZ, maxU, maxV);
-        tessellator.addVertexWithUV(maxX, renderY + 1.0 + 0.0, minZ, maxU, minV);
-        tessellator.addVertexWithUV(maxX, renderY + 1.0 + 0.0, minZ, minU, minV);
-        tessellator.addVertexWithUV(maxX, renderY + 0.0, minZ, minU, maxV);
-        tessellator.addVertexWithUV(minX, renderY + 0.0, maxZ, maxU, maxV);
-        tessellator.addVertexWithUV(minX, renderY + 1.0 + 0.0, maxZ, maxU, minV);
-
-        boolean somethingRendered = super.render(tessellator, x, y, z);
-        return somethingRendered;
-    }
+	}
 }
