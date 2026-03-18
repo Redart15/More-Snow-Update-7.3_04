@@ -23,7 +23,7 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 
 	public BlockLogicSnowyFenceGate(Block<T> block, Block<?> storedBlock) {
-		super(block, storedBlock, 8, 0, false);
+		super(block, storedBlock, 8, 0);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
 	}
 

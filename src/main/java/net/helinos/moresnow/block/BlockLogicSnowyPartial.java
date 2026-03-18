@@ -10,7 +10,7 @@ import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation {
 	public BlockLogicSnowyPartial(Block<T> block) {
-		super(block,block, 4, 0, false);
+		super(block,block, 4, 0);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.125f, 1.0f);
 	}
 

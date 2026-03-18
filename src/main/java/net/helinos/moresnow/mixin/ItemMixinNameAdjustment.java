@@ -2,6 +2,7 @@ package net.helinos.moresnow.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.helinos.moresnow.MoreSnow;
 import net.helinos.moresnow.block.init.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.mixin.accessor.ItemBlockAccessor;
@@ -23,7 +24,7 @@ public abstract class ItemMixinNameAdjustment {
 		if(asThis instanceof ItemBlock && MOD_ID.equals(asThis.namespaceID.namespace())){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
 			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
-				 result = MoreSnowBlocks.prePendName(block, itemstack) + result;
+				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(block)) + result;
 			}
 		}
 		return result;
@@ -35,7 +36,7 @@ public abstract class ItemMixinNameAdjustment {
 		if(asThis instanceof ItemBlock && MOD_ID.equals(asThis.namespaceID.namespace())){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
 			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
-				return MoreSnowBlocks.prePendDesc(block, itemstack);
+				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(block));
 			}
 		}
 		return original.call(itemstack);

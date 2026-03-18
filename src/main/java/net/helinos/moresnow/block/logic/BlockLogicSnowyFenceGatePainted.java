@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public class BlockLogicSnowyFenceGatePainted extends BlockLogicSnowyFenceGate  implements PaintedBlock {
 	private final DyeColor color;
 
-	public BlockLogicSnowyFenceGatePainted(Block block, Block storedBlock, @Nullable DyeColor color) {
+	public BlockLogicSnowyFenceGatePainted(Block<?> block, Block<?> storedBlock, @Nullable DyeColor color) {
 		super(block, storedBlock);
 		this.color = color;
 	}

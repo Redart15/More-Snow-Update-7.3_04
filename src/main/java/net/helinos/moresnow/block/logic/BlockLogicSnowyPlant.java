@@ -17,7 +17,7 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 	public boolean killedByWeather;
 
 	public BlockLogicSnowyPlant(Block<T> block, Block<?> storedBlock) {
-		super(block, storedBlock, 8, 0, false);
+		super(block, storedBlock, 8, 0);
 		block.setTicking(true);
 	}
 

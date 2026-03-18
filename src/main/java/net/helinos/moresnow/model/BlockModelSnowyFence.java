@@ -1,6 +1,7 @@
 package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowyFence;
+import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -8,9 +9,11 @@ import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
+import static net.helinos.moresnow.model.MoreSnowModels.zFactor;
+
 public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<T> {
-    public BlockModelSnowyFence(Block<T> block) {
-        super(block);
+    public BlockModelSnowyFence(Block<T> block, BlockModel<?> layerModel, String texID) {
+        super(block, layerModel, texID);
     }
 
     @Override
@@ -23,8 +26,8 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
 		}
         int layers = logic.getLayers(metadata);
         double height = layers * 2 / 16.0;
-        AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, height, 1.0);
-        somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
+		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height, 1.0f - zFactor);
+        somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
         return somethingRendered;
     }
 
@@ -72,6 +75,6 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
 	@Override
 	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
 		GL11.glTranslatef(0.0F, -0.25F, 0.0F);
-		this.model.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+		this.layerModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

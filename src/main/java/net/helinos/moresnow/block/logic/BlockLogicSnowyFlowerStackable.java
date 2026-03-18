@@ -16,7 +16,7 @@ import net.minecraft.core.world.WorldSource;
 public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
 
 	public BlockLogicSnowyFlowerStackable(Block<T> block, Block<?> storedBlock) {
-		super(block, storedBlock, 8, 0, false);
+		super(block, storedBlock, 8, 0);
 		block.setTicking(true);
 	}
 

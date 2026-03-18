@@ -14,7 +14,7 @@ public abstract class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends B
 	private final Class<F> storedBlockLogic;
 
 	public BlockLogicSnowyFenceThin(Block<T> block, Block<?> storedBlock, Class<F> storedBlockLogic) {
-		super(block, storedBlock, 8, 0, false);
+		super(block, storedBlock, 8, 0);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
 		this.storedBlockLogic = storedBlockLogic;
 	}

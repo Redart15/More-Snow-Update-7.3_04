@@ -14,7 +14,7 @@ import net.minecraft.core.block.Blocks;
 //Done
 public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFence> extends BlockLogicSnowy<T> {
     public BlockLogicSnowyFence(Block<T> block, Block<?> storedBlock) {
-        super(block, storedBlock, 8, 0, false);
+        super(block, storedBlock, 8, 0);
         this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
     }
 

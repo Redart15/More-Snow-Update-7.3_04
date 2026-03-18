@@ -2,11 +2,12 @@ package net.helinos.moresnow.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.helinos.moresnow.MoreSnow;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyPlant;
-import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
 import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockLogicLayerBase;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumBlockSoundEffectType;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class ItemBlockLayerMixin {
 	@WrapMethod(method = "onUseItemOnBlock")
 	private boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced, Operation<Boolean> original) {
+		Block<?> layerBlock = ((ItemBlockLayer<? extends BlockLogicLayerBase>) (Object) this).getBlock();
 		int blockId = world.getBlockId(blockX, blockY, blockZ);
 		int metadata = world.getBlockMetadata(blockX, blockY, blockZ);
 		Block<?> block = Blocks.getBlock(blockId);
@@ -29,12 +31,13 @@ public abstract class ItemBlockLayerMixin {
 		if (itemstack.stackSize <= 0) {
 			return false;
 		}
-		if (blockY == world.getHeightBlocks() - 1 && itemstack.itemID == Blocks.LAYER_SNOW.id()) {
+		if (blockY == world.getHeightBlocks() - 1 && itemstack.itemID == layerBlock.id()) {
 			return false;
 		}
 
 		// Incrementing layer count on snow covered blocks with the snow layer item
-		if (itemstack.itemID == Blocks.LAYER_SNOW.id() && side == Side.TOP && block.getLogic() instanceof BlockLogicSnowy) {
+
+		if (itemstack.itemID == layerBlock.id() && side == Side.TOP && block.getLogic() instanceof BlockLogicSnowy) {
 			BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
 			int newLayers = blockSnowy.getLayers(metadata) + 1;
 
@@ -51,7 +54,7 @@ public abstract class ItemBlockLayerMixin {
 					int storedID = ((BlockLogicSnowyPlant<?, ?>) block.getLogic()).getStoredBlockId(metadata);
 					block.getLogic().dropBlockWithCause(world, EnumDropCause.WORLD, blockX, blockY, blockZ, metadata, null, null);
 					world.playBlockSoundEffect(player, blockX, blockY, blockZ, Blocks.getBlock(storedID), EnumBlockSoundEffectType.DIG);
-					world.setBlockWithNotify(blockX, blockY, blockZ, Blocks.BLOCK_SNOW.id());
+					world.setBlockWithNotify(blockX, blockY, blockZ, layerBlock.id());
 				}
 			} else {
 				if (newLayers <= blockSnowy.getMaxLayers()) {
@@ -61,17 +64,17 @@ public abstract class ItemBlockLayerMixin {
 				}
 			}
 
-			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
+			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, layerBlock, EnumBlockSoundEffectType.PLACE);
 			itemstack.consumeItem(player);
 			return true;
 		}
 
 		// Cover blocks that can be covered
-		if (itemstack.itemID == Blocks.LAYER_SNOW.id()) {
-			if (!MSBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ)) {
+		if (itemstack.itemID == layerBlock.id()){
+			if (!MSBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ, MoreSnow.LAYERS.getKey(layerBlock) + "_%s")) {
 				return original.call(itemstack, player, world, blockX, blockY, blockZ, side, xPlaced, yPlaced);
 			}
-			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, Blocks.LAYER_SNOW, EnumBlockSoundEffectType.PLACE);
+			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, layerBlock, EnumBlockSoundEffectType.PLACE);
 			itemstack.consumeItem(player);
 			return true;
 		}

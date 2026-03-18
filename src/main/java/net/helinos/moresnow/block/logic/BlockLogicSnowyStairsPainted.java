@@ -17,7 +17,7 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 	protected DyeColor color;
 
 	public BlockLogicSnowyStairsPainted(Block<T> block, Block<?> storedBlock, DyeColor color) {
-		super(block, storedBlock, 4, 4, true);
+		super(block, storedBlock, 4, 4);
 		this.color = color;
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 	}

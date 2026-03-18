@@ -2,6 +2,7 @@ package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
+import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -9,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockModelSnowyFenceGatePainted<T extends BlockLogic & PaintedBlock> extends BlockModelSnowyFenceGate<T> {
 
-	public BlockModelSnowyFenceGatePainted(Block<T> block) {
-        super(block);
+	public BlockModelSnowyFenceGatePainted(Block<T> block, BlockModel<?> layerModel, String texID) {
+		super(block, layerModel, texID);
     }
 
 	@Override

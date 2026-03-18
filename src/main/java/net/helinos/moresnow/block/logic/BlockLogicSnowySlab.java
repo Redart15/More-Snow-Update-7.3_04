@@ -8,7 +8,7 @@ import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab> extends BlockLogicSnowy<T> {
 	public BlockLogicSnowySlab(Block<T> block, Block<?> storedBlock) {
-		super(block, storedBlock, 4, 4, true);
+		super(block, storedBlock, 4, 4);
 		this.setBlockBounds(0.0, 0.0, 0.0, 1.0, 0.625, 1.0);
 	}
 

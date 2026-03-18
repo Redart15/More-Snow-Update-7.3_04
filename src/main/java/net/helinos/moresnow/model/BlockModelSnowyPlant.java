@@ -9,8 +9,8 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
 
 public class BlockModelSnowyPlant<T extends BlockLogic> extends BlockModelSnowy<T> {
-	public BlockModelSnowyPlant(Block<T> block) {
-		super(block);
+	public BlockModelSnowyPlant(Block<T> block, BlockModel<?> layerModel, String texID) {
+		super(block, layerModel, texID);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class BlockModelSnowyPlant<T extends BlockLogic> extends BlockModelSnowy<
 		int layers = ((BlockLogicSnowy<?>) block.getLogic()).getLayers(metadata);
 		double height = layers * 2 / 16.0;
 		bounds.set(0.0, 0.0, 0.0, 1.0, height, 1.0);
-		somethingRendered |= this.model.renderStandardBlock(tessellator, bounds, x, y, z);
+		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
 		return somethingRendered;
 
 	}

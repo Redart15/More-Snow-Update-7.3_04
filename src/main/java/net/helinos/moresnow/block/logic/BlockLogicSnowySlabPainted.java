@@ -12,7 +12,7 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 	private final DyeColor color;
 
 	public BlockLogicSnowySlabPainted(Block<T> block, Block<?> storedBlock, DyeColor color) {
-		super(block, storedBlock, 4, 4, true);
+		super(block, storedBlock, 4, 4);
 		this.color = color;
 	}
 

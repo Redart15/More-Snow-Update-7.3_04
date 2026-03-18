@@ -3,6 +3,9 @@ package net.helinos.moresnow;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.gui.options.data.OptionsPage;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
+import net.minecraft.core.data.registry.Registry;
 import net.minecraft.core.lang.I18n;
 import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.GameStartEntrypoint;
@@ -19,7 +22,8 @@ public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, Mod
 	public static final String MOD_ID = "moresnow";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final TomlConfigHandler CONFIG = new TomlConfigHandler(MOD_ID, new Toml("More Snow configuration file."), false);
-	public ModSettings modSettings;
+    public static final Registry<Block<?>> LAYERS = new Registry<>();
+    public ModSettings modSettings;
 	public static I18n LANGUAGE = null;
 	public static OptionsPage MOD_OPTIONS = null;
 
@@ -57,7 +61,11 @@ public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, Mod
 	}
 
 	@Override
-	public void beforeGameStart() {/* no need */}
+	public void beforeGameStart() {
+		MoreSnow.LAYERS.register("snow", Blocks.LAYER_SNOW);
+		MoreSnow.LAYERS.register("leaves", Blocks.LAYER_LEAVES_OAK);
+		MoreSnow.LAYERS.register("slate", Blocks.LAYER_SLATE);
+	}
 
 	@Override
 	public void afterClientStart() {/* no need */}

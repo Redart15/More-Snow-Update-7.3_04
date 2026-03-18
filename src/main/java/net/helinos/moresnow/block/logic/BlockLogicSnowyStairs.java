@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicStairs> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation {
 	public BlockLogicSnowyStairs(Block<T> block, Block<?> storedBlock) {
-		super(block, storedBlock, 4, 4, true);
+		super(block, storedBlock, 4, 4);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 	}
 

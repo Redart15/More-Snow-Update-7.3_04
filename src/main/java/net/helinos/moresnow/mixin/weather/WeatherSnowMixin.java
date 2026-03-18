@@ -82,11 +82,11 @@ public abstract class WeatherSnowMixin extends Weather {
 				return;
 			}
 
-			if (MSBlocks.tryMakeSnowy(world, blockID, x, y, z)) {
+			if (MSBlocks.tryMakeSnowy(world, blockID, x, y, z, "snowy_%s")) {
 				return;
 			}
 
-			if (MSBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z)) {
+			if (MSBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snowy_%s")) {
 				return;
 			}
 		}
@@ -137,11 +137,11 @@ public abstract class WeatherSnowMixin extends Weather {
 			return;
 		}
 
-		if (MSBlocks.tryMakeSnowy(chunk, blockId, x, y, z)) {
+		if (MSBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snowy_%s")) {
 			return;
 		}
 
 		int blockIDBelow = chunk.getBlockID(x, y - 1, z);
-		MSBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z);
+		MSBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snowy_%s");
 	}
 }

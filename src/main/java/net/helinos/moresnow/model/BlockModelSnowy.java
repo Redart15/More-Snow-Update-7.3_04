@@ -15,15 +15,15 @@ import net.minecraft.core.world.WorldSource;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelStandard<T> {
-	protected final BlockModel<?> model;
+	protected final BlockModel<?> layerModel;
 	protected final IconCoordinate iconCoordinate;
     protected boolean renderingSnow = false;
 
-    protected BlockModelSnowy(Block<T> block) {
+    protected BlockModelSnowy(Block<T> block, BlockModel<?> layerModel, String texID) {
         super(block);
-		this.model = BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW);
-		this.iconCoordinate = TextureRegistry.getTexture("minecraft:block/block_snow");
-    }
+		this.layerModel = layerModel;
+		this.iconCoordinate = TextureRegistry.getTexture(texID);
+	}
 
     @Override
     public IconCoordinate getBlockTexture(WorldSource blockAccess, int x, int y, int z, Side side) {
@@ -34,6 +34,7 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
         return this.getBlockTextureFromSideAndMetadata(side, metadata);
     }
 
+	/// TODO: figure out if this is needed
     @Override
     public IconCoordinate getBlockTextureFromSideAndMetadata(Side side, int metadata) {
         BlockLogicSnowy<?> logic = (BlockLogicSnowy<?>) this.block.getLogic();
@@ -56,6 +57,6 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
 	}
 
 	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
-		model.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+		layerModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

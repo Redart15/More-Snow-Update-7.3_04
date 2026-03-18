@@ -33,14 +33,12 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	public final Block<?> storedBlock;
 	private final int maxLayers;
 	private final int lowestLayerHeight;
-	private final boolean supportsOwnSnow;
 
-	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight, boolean supportsOwnSnow) {
+	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight) {
 		super(block, Material.snow);
 		this.storedBlock = storedBlock;
 		this.maxLayers = maxLayers;
 		this.lowestLayerHeight = lowestLayerHeight;
-		this.supportsOwnSnow = supportsOwnSnow;
 	}
 
 	/**
@@ -56,13 +54,13 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	@SuppressWarnings("java:S1172")
-	public int getStoredBlockMetadata(int metadata) {
-		return 0;
+	public int getStoredBlockId(int metadata) {
+		return this.storedBlock.id();
 	}
 
 	@SuppressWarnings("java:S1172")
-	public int getStoredBlockId(int metadata) {
-		return this.storedBlock.id();
+	public int getStoredBlockMetadata(int metadata) {
+		return 0;
 	}
 
 	@SuppressWarnings("java:S1172")
@@ -105,9 +103,6 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	private boolean canSupportSnow(@Nullable Block<?> belowBlock, int metadata) {
-		if (this.supportsOwnSnow) {
-			return true;
-		}
 		if (belowBlock == null) {
 			return false;
 		}
@@ -126,10 +121,6 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 			return false;
 		}
 		return belowMaterial == Material.leaves || belowMaterial.blocksMotion();
-	}
-
-	public boolean getSupportsOwnSnow() {
-		return this.supportsOwnSnow;
 	}
 
 	/**
@@ -282,5 +273,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
 			world.playBlockEvent(null, LevelListener.EVENT_BLOCK_BREAK, x, y - 1, z, Blocks.BLOCK_SNOW.id());
 		}
+	}
+
+	public boolean getSupportsOwnSnow() {
+		return true;
 	}
 }

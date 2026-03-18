@@ -12,6 +12,8 @@ import net.minecraft.core.util.helper.DyeColor;
 import turniplabs.halplibe.helper.BlockBuilder;
 
 import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
+import static net.helinos.moresnow.block.init.MoreSnowBlocks.LEAVY_FENCE_CHAINLINK;
+import static net.helinos.moresnow.block.init.MoreSnowBlocks.SLATY_FENCE_CHAINLINK;
 
 @SuppressWarnings({"java:S1144"})
 public class MoreSnowBlockInitializer {
@@ -21,7 +23,7 @@ public class MoreSnowBlockInitializer {
 
 
 	///	BlockTags.BROKEN_BY_FLUIDS, BlockTags.PLANTABLE_IN_JAR, BlockTags.SHEEPS_FAVOURITE_BLOCK, BlockTags.SHEARS_DO_SILK_TOUCH
-	public static void createFlower(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createFlower(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicFlowerStackable) {
 			Block<?> snowy = new BlockBuilder(MOD_ID)
 				.setBlockSound(Blocks.BLOCK_SNOW.getSound())
@@ -29,14 +31,14 @@ public class MoreSnowBlockInitializer {
 				.setUseInternalLight()
 				.setVisualUpdateOnMetadata()
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
-				.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+				.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "flower", logic.namespaceId());
 		}
 	}
 
 	/// BlockTags.SHEARS_DO_SILK_TOUCH, BlockTags.MINEABLE_BY_AXE, BlockTags.MINEABLE_BY_HOE, BlockTags.MINEABLE_BY_SWORD, BlockTags.MINEABLE_BY_SHEARS
-	public static void createSapling(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createSapling(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicSaplingBase) {
 			Block<?> snowy = new BlockBuilder(MOD_ID)
 				.setBlockSound(Blocks.BLOCK_SNOW.getSound())
@@ -44,13 +46,13 @@ public class MoreSnowBlockInitializer {
 				.setUseInternalLight()
 				.setVisualUpdateOnMetadata()
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
-				.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+				.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "sapling", logic.namespaceId());
 		}
 	}
 
-	public static void createMushrooms(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createMushrooms(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicMushroom) {
 			Block<?> snowy = new BlockBuilder(MOD_ID)
 				.setBlockSound(Blocks.BLOCK_SNOW.getSound())
@@ -58,13 +60,13 @@ public class MoreSnowBlockInitializer {
 				.setUseInternalLight()
 				.setVisualUpdateOnMetadata()
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
-				.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+				.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "mushroom", logic.namespaceId());
 		}
 	}
 
-	public static void createSlab(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createSlab(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicSlab) {
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "slab", logic.namespaceId());
@@ -77,18 +79,18 @@ public class MoreSnowBlockInitializer {
 				.addTags(BlockTags.MINEABLE_BY_SHOVEL, NOT_IN_CREATIVE_MENU);
 			if(logic instanceof IPainted){
 				for(DyeColor color: DyeColor.values()) {
-					String key = convertNameSpaceID(currentBlock.namespaceId()) + "_" + color.colorID;
+					String key = convertNameSpaceID(currentBlock.namespaceId(), prefix) + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowySlabPainted<>(block, currentBlock, color));
 					SNOWY_SLAB_PAINTED.add(snowy);
 				}
 				return;
 			}
-			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowySlab<>(block, currentBlock));
+			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowySlab<>(block, currentBlock));
 			SNOWY_SLAB.add(snowy);
 		}
 	}
 
-	public static void createStairs(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createStairs(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicStairs) {
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "stairs", logic.namespaceId());
@@ -101,19 +103,19 @@ public class MoreSnowBlockInitializer {
 				.addTags(BlockTags.MINEABLE_BY_SHOVEL, NOT_IN_CREATIVE_MENU);
 			if(logic instanceof IPainted) {
 				for(DyeColor color: DyeColor.values()) {
-					String key = convertNameSpaceID(currentBlock.namespaceId()) + "_" + color.colorID;
+					String key = convertNameSpaceID(currentBlock.namespaceId(), prefix) + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyStairsPainted<>(block, currentBlock, color));
 					SNOWY_STAIRS_PAINTED.add(snowy);
 				}
 				return;
 			}
-			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyStairs<>(block, currentBlock));
+			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyStairs<>(block, currentBlock));
 			SNOWY_STAIRS.add(snowy);
 		}
 	}
 
 	/// BlockTags.FENCES_CONNECT, BlockTags.MINEABLE_BY_AXE, BlockTags.CAN_HANG_OFF
-	public static void createFence(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createFence(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicFence) {
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "fence", logic.namespaceId());
@@ -127,13 +129,13 @@ public class MoreSnowBlockInitializer {
 			blockBuilder = addConnectTags(currentBlock, blockBuilder);
 			if(logic instanceof IPainted) {
 				for(DyeColor color: DyeColor.values()) {
-					String key = convertNameSpaceID(currentBlock.namespaceId()) + "_" + color.colorID;
+					String key = convertNameSpaceID(currentBlock.namespaceId(), prefix) + "_" + color.colorID;
 					Block<BlockLogicSnowyFencePainted<?>> fence = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFencePainted<>(block, currentBlock, color));
 					SNOWY_FENCE_PAINTED.add(fence);
 				}
 				return;
 			}
-			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFence<>(block, currentBlock));
+			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyFence<>(block, currentBlock));
 			SNOWY_FENCE.add(snowy);
 		}
 	}
@@ -148,27 +150,30 @@ public class MoreSnowBlockInitializer {
 				.setVisualUpdateOnMetadata();
 			blockBuilder = addConnectTags(currentBlock, blockBuilder);
 			if(currentBlock.id() == Blocks.FENCE_STEEL.id()){
-				SNOWY_FENCE_STEEL = blockBuilder
-					.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU)
-					.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), BlockLogicSnowyFenceSteel::new);
+				BlockBuilder fenceSteelBuilder = blockBuilder.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
+				SNOWY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceSteel::new);
+				LEAVY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceSteel::new);
+				SLATY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceSteel::new);
 				return;
 			}
 			if(currentBlock.id() == Blocks.FENCE_CHAINLINK.id()){
-				SNOWY_FENCE_CHAINLINK = blockBuilder
-					.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU)
-					.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), BlockLogicSnowyFenceChainlink::new);
+				BlockBuilder fenceChainBuilder = blockBuilder.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
+				SNOWY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new);
+				LEAVY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new);
+				SLATY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new);
 				return;
 			}
 			if(currentBlock.id() == Blocks.FENCE_PAPER_WALL.id()){
-				SNOWY_FENCE_WALLPAPER = blockBuilder
-					.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.FENCES_CONNECT, NOT_IN_CREATIVE_MENU)
-					.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), BlockLogicSnowyFenceWallPaper::new);
+				BlockBuilder fencePaperWallBuilder = blockBuilder.addTags(BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND, BlockTags.FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
+				SNOWY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new);
+				LEAVY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new);
+				SLATY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new);
 			}
 		}
 	}
 
 	///  BlockTags.FENCES_CONNECT, BlockTags.MINEABLE_BY_AXE
-	public static void createFenceGate(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+	public static void createFenceGate(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicFenceGate) {
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "fence-gate", logic.namespaceId());
@@ -181,13 +186,13 @@ public class MoreSnowBlockInitializer {
 			blockBuilder = addConnectTags(currentBlock, blockBuilder);
 			if(logic instanceof IPainted) {
 				for(DyeColor color: DyeColor.values()) {
-					String key = convertNameSpaceID(currentBlock.namespaceId()) + "_" + color.colorID;
+					String key = convertNameSpaceID(currentBlock.namespaceId(), prefix) + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFenceGatePainted(block, currentBlock, color));
 					SNOWY_FENCE_GATES_PAINTED.add(snowy);
 				}
 				return;
 			}
-			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId()), getNextID(), block -> new BlockLogicSnowyFenceGate<>(block, currentBlock));
+			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix), getNextID(), block -> new BlockLogicSnowyFenceGate<>(block, currentBlock));
 			SNOWY_FENCE_GATE.add(snowy);
 		}
 	}
@@ -200,6 +205,29 @@ public class MoreSnowBlockInitializer {
 			return blockBuilder.addTags(BlockTags.CHAINLINK_FENCES_CONNECT);
 		}
 		return blockBuilder;
+	}
+
+	public static void createTrapDoor(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
+		if (logic instanceof BlockLogicTrapDoor) {
+			Block<?> snowy;
+			printMessage(currentBlock.id(), "trapdoor", logic.namespaceId());
+			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
+				.setBlockSound(Blocks.BLOCK_SNOW.getSound())
+				.setHardness(Blocks.BLOCK_SNOW.getHardness())
+				.setUseInternalLight()
+				.setVisualUpdateOnMetadata()
+				.setTags(BlockTags.MINEABLE_BY_SHOVEL, NOT_IN_CREATIVE_MENU);
+//			if(logic instanceof IPainted) {
+//				for(DyeColor color: DyeColor.values()) {
+//					String key = convertNameSpaceID(currentBlock.namespaceId()) + "_" + color.colorID;
+//					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFenceGatePainted(block, currentBlock, color));
+//					SNOWY_FENCE_GATES_PAINTED.add(snowy);
+//				}
+//				return;
+//			}
+			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snowy_%s"), getNextID(), block -> new BlockLogicSnowyTrapDoor<>(block, currentBlock));
+			SNOWY_TRAPDOOR.add(snowy);
+		}
 	}
 
 	private static void createSign(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
@@ -242,4 +270,6 @@ public class MoreSnowBlockInitializer {
 			printMessage(currentBlock.id(), "basket", logic.namespaceId());
 		}
 	}
+
+
 }
