@@ -5,6 +5,7 @@ import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -12,24 +13,22 @@ import org.lwjgl.opengl.GL11;
 import static net.helinos.moresnow.model.MoreSnowModels.zFactor;
 
 public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<T> {
-    public BlockModelSnowyFence(Block<T> block, BlockModel<?> layerModel, String texID) {
-        super(block, layerModel, texID);
-    }
+	public BlockModelSnowyFence(Block<T> block, BlockModel<?> layerModel, String texID) {
+		super(block, layerModel, texID);
+	}
 
-    @Override
-    public boolean render(Tessellator tessellator, int x, int y, int z) {
-        BlockLogicSnowyFence<?, ?> logic = (BlockLogicSnowyFence<?, ?>) this.block.getLogic();
-        int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        boolean somethingRendered = false;
-        if (logic.getLayers(metadata) != 8) {
-			somethingRendered |= this.renderSnowLayers(tessellator, x, y, z, logic);
-		}
-        int layers = logic.getLayers(metadata);
-        double height = layers * 2 / 16.0;
-		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height, 1.0f - zFactor);
-        somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
-        return somethingRendered;
-    }
+	@Override
+	public boolean render(Tessellator tessellator, int x, int y, int z) {
+		BlockLogicSnowyFence<?, ?> logic = (BlockLogicSnowyFence<?, ?>) this.block.getLogic();
+		int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+		boolean somethingRendered = false;
+		somethingRendered |= this.renderSnowLayers(tessellator, x, y, z, logic);
+		int layers = logic.getLayers(metadata);
+		double height = layers * 2 / 16.0;
+		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height - zFactor, 1.0f - zFactor);
+		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
+		return somethingRendered;
+	}
 
 	private boolean renderSnowLayers(Tessellator tessellator, int x, int y, int z, BlockLogicSnowyFence<?, ?> logic) {
 		boolean somethingRendered = false;

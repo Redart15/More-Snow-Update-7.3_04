@@ -15,25 +15,23 @@ import static net.helinos.moresnow.model.MoreSnowModels.zFactor;
 
 public class BlockModelSnowyFenceThin<T extends BlockLogic, F extends BlockLogicFenceThin> extends BlockModelSnowy<T> {
 
-    public BlockModelSnowyFenceThin(Block<T> block, BlockModel<?> layerModel, String texID) {
+	public BlockModelSnowyFenceThin(Block<T> block, BlockModel<?> layerModel, String texID) {
 		super(block, layerModel, texID);
-    }
+	}
 
-    @Override
-    public boolean render(Tessellator tessellator, int x, int y, int z) {
-        BlockLogicSnowyFenceThin<?, ?> logic = (BlockLogicSnowyFenceThin<?, ?>) this.block.getLogic();
-        int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        boolean somethingRendered = false;
-		if(logic.getLayers(metadata) != 8){
-			somethingRendered |= BlockModelDispatcher.getInstance().getDispatch(logic.storedBlock).render(tessellator, x, y, z);
-		}
-        // Render snow
-        int layers = logic.getLayers(metadata);
-        double height = layers * 2 / 16.0;
-		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height, 1.0f - zFactor);
-        somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
-        return somethingRendered;
-    }
+	@Override
+	public boolean render(Tessellator tessellator, int x, int y, int z) {
+		BlockLogicSnowyFenceThin<?, ?> logic = (BlockLogicSnowyFenceThin<?, ?>) this.block.getLogic();
+		int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+		boolean somethingRendered = false;
+		somethingRendered |= BlockModelDispatcher.getInstance().getDispatch(logic.storedBlock).render(tessellator, x, y, z);
+		// Render snow
+		int layers = logic.getLayers(metadata);
+		double height = layers * 2 / 16.0;
+		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height - zFactor, 1.0f - zFactor);
+		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
+		return somethingRendered;
+	}
 
 	@Override
 	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {

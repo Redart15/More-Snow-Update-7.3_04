@@ -9,8 +9,10 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "BlockLogicLayerLeavesMixin",
     "BlockLogicLayerSnowMixin",
     "ItemBlockLayerMixin",
+    "ItemBlockLeaveLayerMixin",
     "ItemMixinNameAdjustment",
     "accessor.BlockAccessor",
     "accessor.ItemBlockAccessor",

@@ -6,33 +6,34 @@ import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
+
+import static net.helinos.moresnow.model.MoreSnowModels.zFactor;
 
 public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSnowy<T> {
 
 	public BlockModelSnowyFenceGate(Block<T> block, BlockModel<?> layerModel, String texID) {
 		super(block, layerModel, texID);
-    }
+	}
 
-    @Override
-    public boolean render(Tessellator tessellator, int x, int y, int z) {
+	@Override
+	public boolean render(Tessellator tessellator, int x, int y, int z) {
 		AABB bounds = this.block.getBounds();
 		BlockLogicSnowyFenceGate<?> logic = (BlockLogicSnowyFenceGate<?>) this.block.getLogic();
 		int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        boolean somethingRendered = false;
-        if (logic.getLayers(metadata) != BlockLogicSnowy.FULL_BLOCK) {
-			somethingRendered |= this.renderFenceGate(tessellator, x, y, z, logic, metadata, bounds);
-		}
+		boolean somethingRendered = false;
+		somethingRendered |= this.renderFenceGate(tessellator, x, y, z, logic, metadata, bounds);
 		this.renderingSnow = true;
-        int layers = logic.getLayers(metadata);
-        double height = layers * 2 / 16.0;
-        bounds = AABB.getTemporaryBB(MoreSnowModels.zFactor, 0.0, MoreSnowModels.zFactor, 1.0f - MoreSnowModels.zFactor, height, 1.0f - MoreSnowModels.zFactor);
-        somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
+		int layers = logic.getLayers(metadata);
+		double height = layers * 2 / 16.0;
+		bounds = AABB.getTemporaryBB(MoreSnowModels.zFactor, 0.0, MoreSnowModels.zFactor, 1.0f - MoreSnowModels.zFactor, height - zFactor, 1.0f - MoreSnowModels.zFactor);
+		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
 		this.renderingSnow = false;
-        return somethingRendered;
-    }
+		return somethingRendered;
+	}
 
 	private boolean renderFenceGate(Tessellator tessellator, int x, int y, int z, BlockLogicSnowyFenceGate<?> logic, int metadata, AABB bounds) {
 		int direction = logic.getDirection(metadata);
@@ -54,6 +55,7 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
 		}
 		return somethingRendered;
 	}
+
 	private boolean renderClosedGate(Tessellator tessellator, int x, int y, int z, int direction, AABB bounds) {
 		if (direction != 3 && direction != 1) {
 			bounds.set(0.375, 0.375, 0.4375, 0.5, 0.9375, 0.5625);
@@ -68,7 +70,7 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
 			this.renderStandardBlock(tessellator, bounds, x, y, z);
 			bounds.set(0.125, 0.75, 0.4375, 0.375, 0.9375, 0.5625);
 			return this.renderStandardBlock(tessellator, bounds, x, y, z);
-		}else {
+		} else {
 			bounds.set(0.4375, 0.375, 0.375, 0.5625, 0.9375, 0.5);
 			this.renderStandardBlock(tessellator, bounds, x, y, z);
 			bounds.set(0.4375, 0.375, 0.5, 0.5625, 0.9375, 0.625);
@@ -83,6 +85,7 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
 			return this.renderStandardBlock(tessellator, bounds, x, y, z);
 		}
 	}
+
 	private boolean renderOpenGate(Tessellator tessellator, int x, int y, int z, int direction, AABB bounds) {
 		switch (direction) {
 			case 0:
