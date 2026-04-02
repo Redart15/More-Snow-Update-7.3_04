@@ -9,6 +9,8 @@ import net.helinos.moresnow.block.logic.BlockLogicSnowyStairsPainted;
 import net.minecraft.core.block.*;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.data.tag.Tag;
+import net.minecraft.core.util.HardIllegalArgumentException;
+import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.DyeColor;
 import turniplabs.halplibe.helper.BlockBuilder;
 
@@ -16,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
-import static net.helinos.moresnow.block.init.MoreSnowBlocks.LEAVY_FENCE_CHAINLINK;
-import static net.helinos.moresnow.block.init.MoreSnowBlocks.SLATY_FENCE_CHAINLINK;
 
 @SuppressWarnings({"java:S1144"})
 public class MoreSnowBlockInitializer {
@@ -57,13 +57,47 @@ public class MoreSnowBlockInitializer {
 		return tag.toArray(new Tag[0]);
 	}
 
+	public static String convertNameSpaceID(NamespaceID blockID, String prefix) {
+		String[] splitstring = blockID.value().split("/");
+		String result = String.format(prefix, splitstring[splitstring.length - 1]);
+		try {
+			if(Blocks.blockMap.containsKey(NamespaceID.getPermanent("moresnow:block/" + result))){
+				result += "_" + blockID.namespace();
+			}
+		} catch (HardIllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
 	/// BlockTags of Snow
 	///	BlockTags.BROKEN_BY_FLUIDS, BlockTags.PLACE_OVERWRITES, BlockTags.MINEABLE_BY_SHOVEL, BlockTags.OVERRIDE_STEPSOUND
 
 
 	///    BlockTags.BROKEN_BY_FLUIDS, BlockTags.PLANTABLE_IN_JAR, BlockTags.SHEEPS_FAVOURITE_BLOCK, BlockTags.SHEARS_DO_SILK_TOUCH
-	public static void createFlower(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
+	public static void createFlowerStackable(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicFlowerStackable) {
+			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
+			Block<?> snowy = new BlockBuilder(MOD_ID)
+				.setBlockSound(layer.getSound())
+				.setHardness(layer.getHardness())
+				.setUseInternalLight()
+				.setVisualUpdateOnMetadata()
+				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
+				.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+			snowy.withTags(addTooling(layer));
+			SNOWY_FLOWERS.add(snowy);
+			printMessage(currentBlock.id(), "flower", logic.namespaceId());
+		}
+	}
+
+	public static void createFlower(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
+		if ((logic instanceof BlockLogicFlower || logic instanceof BlockLogicSugarcane)
+			&& !(logic instanceof BlockLogicFlowerStackable)
+			&& !(logic instanceof BlockLogicSaplingBase)
+			&& !(logic instanceof BlockLogicMushroom)
+			&& !(logic instanceof BlockLogicTallGrass)
+		) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy = new BlockBuilder(MOD_ID)
 				.setBlockSound(layer.getSound())
@@ -269,6 +303,22 @@ public class MoreSnowBlockInitializer {
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFenceGate<>(block, currentBlock));
 			snowy.withTags(addTooling(currentBlock));
 			SNOWY_FENCE_GATE.add(snowy);
+		}
+	}
+
+	public static void createGrass(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
+		if (logic instanceof BlockLogicTallGrass) {
+			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
+			Block<?> snowy = new BlockBuilder(MOD_ID)
+				.setBlockSound(layer.getSound())
+				.setHardness(layer.getHardness())
+				.setUseInternalLight()
+				.setVisualUpdateOnMetadata()
+				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
+				.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
+			snowy.withTags(addTooling(layer));
+			SNOWY_GRASS.add(snowy);
+			printMessage(currentBlock.id(), "grass", logic.namespaceId());
 		}
 	}
 }

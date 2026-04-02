@@ -2,8 +2,10 @@ package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
+import net.minecraft.client.render.block.color.BlockColor;
 import net.minecraft.client.render.block.color.BlockColorDispatcher;
 import net.minecraft.client.render.block.model.BlockModel;
+import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.block.model.BlockModelStandard;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
@@ -93,20 +95,22 @@ public class BlockModelSnowyStairs<T extends BlockLogic> extends BlockModelSnowy
 	}
 
 	@Override
-	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
-		if (renderBlocks.useInventoryTint) {
-			int color = (BlockColorDispatcher.getInstance().getDispatch(this.block)).getFallbackColor(metadata);
+	public void renderBlockOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
+		Block<?> storedBlock = ((BlockLogicSnowy<?>) this.block.getLogic()).getStoredBlock();
+		BlockModel<?> storedBlockModel = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
+		storedBlockModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+			int color = (BlockColorDispatcher.getInstance().getDispatch(((BlockLogicSnowy<?>) this.block.getLogic()).layerBlock)).getFallbackColor(metadata);
 			float r = (color >> 16 & 255) / 255.0F;
 			float g = (color >> 8 & 255) / 255.0F;
 			float b = (color & 255) / 255.0F;
 			GL11.glColor4f(r * brightness, g * brightness, b * brightness, alpha);
-		} else {
-			GL11.glColor4f(brightness, brightness, brightness, alpha);
-		}
+
 		float yOffset = 0.5F;
 		AABB bounds = AABB.getTemporaryBB(0.0, 0.5, 0.5, 1.0, 0.5 + 2 / 16.0, 1.0);
 		GL11.glTranslatef(-0.5F, 0.0F - yOffset, -0.5F);
 		((BlockModelStandard<BlockLogic>)this.layerModel).renderBlockWithBounds(tessellator, bounds, metadata, brightness, alpha, lightmapCoordinate);
 		GL11.glTranslatef(0.5F, yOffset, 0.5F);
 	}
+
+
 }

@@ -21,6 +21,7 @@ public class MoreSnowModels {
 	public static void initBlockModels(BlockModelDispatcher dispatcher) {
 		String texID = "minecraft:block/block_snow";
 		MoreSnowModels.assignModelFlower(dispatcher, texID);
+		MoreSnowModels.assignModelGrass(dispatcher, texID);
 		MoreSnowModels.assignModelSapling(dispatcher, texID);
 		MoreSnowModels.assignModelSlab(dispatcher, texID);
 		MoreSnowModels.assignModelStairs(dispatcher, texID);
@@ -35,6 +36,13 @@ public class MoreSnowModels {
 			dispatcher.addDispatch(new BlockModelSnowyPlant<>(block, model, texID).setAllTextures(0, SNOW_PATH));
 		}
 
+	}
+
+	private static void assignModelGrass(BlockModelDispatcher dispatcher, String texID) {
+		for (Block<?> block : SNOWY_GRASS) {
+			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
+			dispatcher.addDispatch(new BlockModelSnowyCrossed<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+		}
 	}
 
 	private static void assignModelSapling(BlockModelDispatcher dispatcher, String texID) {

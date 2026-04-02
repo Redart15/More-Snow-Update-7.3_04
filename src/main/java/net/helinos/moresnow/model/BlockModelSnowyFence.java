@@ -5,7 +5,6 @@ import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -25,7 +24,7 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
 		somethingRendered |= this.renderSnowLayers(tessellator, x, y, z, logic);
 		int layers = logic.getLayers(metadata);
 		double height = layers * 2 / 16.0;
-		AABB bounds = AABB.getTemporaryBB(zFactor, 0.0, zFactor, 1.0f - zFactor, height - zFactor, 1.0f - zFactor);
+		AABB bounds = AABB.getTemporaryBB(-zFactor, 0.0, -zFactor, 1.0f + zFactor, height + zFactor, 1.0f + zFactor);
 		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
 		return somethingRendered;
 	}

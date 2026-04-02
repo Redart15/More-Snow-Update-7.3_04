@@ -22,6 +22,7 @@ import static net.helinos.moresnow.MoreSnow.*;
 @SuppressWarnings({"java:S1104", "java:S1444", "java:S2386", "java:S3008"})
 public class MoreSnowBlocks {
 	public static List<Block<?>> SNOWY_FLOWERS = new ArrayList<>();
+	public static List<Block<?>> SNOWY_GRASS = new ArrayList<>();
 	public static List<Block<?>> SNOWY_SLAB = new ArrayList<>();
 	public static List<Block<?>> SNOWY_SLAB_PAINTED = new ArrayList<>();
 	public static List<Block<?>> SNOWY_STAIRS = new ArrayList<>();
@@ -74,6 +75,8 @@ public class MoreSnowBlocks {
 			for (Block<?> layerBlock : LAYERS) {
 				String prefix = MoreSnow.LAYERS.getKey(layerBlock);
 				MoreSnowBlockInitializer.createFlower(block, logic, prefix);
+				MoreSnowBlockInitializer.createFlowerStackable(block, logic, prefix);
+				MoreSnowBlockInitializer.createGrass(block, logic, prefix);
 				MoreSnowBlockInitializer.createSapling(block, logic, prefix);
 				MoreSnowBlockInitializer.createMushrooms(block, logic, prefix);
 				MoreSnowBlockInitializer.createSlab(block, logic, prefix);
@@ -95,9 +98,7 @@ public class MoreSnowBlocks {
 
 	public static String convertNameSpaceID(NamespaceID blockID, String prefix) {
 		String[] splitstring = blockID.value().split("/");
-		int index = 0;
-		while("block".equals(splitstring[index])) index++;
-		return String.format(prefix, splitstring[index]);
+		return String.format(prefix, splitstring[splitstring.length - 1]);
 	}
 
 	public static void printMessage(int id, String blockType, @NotNull NamespaceID namespaceID) {

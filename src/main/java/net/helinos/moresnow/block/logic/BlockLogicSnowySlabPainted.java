@@ -45,11 +45,13 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 
 	@Override
 	protected int blockToMetadata(int blockId, int metadata) {
-		return metadata;
+		return (metadata) << 4;
 	}
 
 	@Override
 	public boolean isSolidRender() {
 		return false;
 	}
+
+
 }

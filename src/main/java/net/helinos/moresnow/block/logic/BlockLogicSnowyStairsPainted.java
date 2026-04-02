@@ -78,11 +78,6 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 	}
 
 	@Override
-	public int getStoredBlockId(int metadata) {
-		return Blocks.STAIRS_PLANKS_PAINTED.id();
-	}
-
-	@Override
 	public int getStoredBlockMetadata(int metadata) {
 		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.color.blockMeta & 15);
 	}

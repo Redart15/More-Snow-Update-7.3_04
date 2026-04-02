@@ -29,7 +29,7 @@ public class BlockModelSnowyFenceGate<T extends BlockLogic> extends BlockModelSn
 		this.renderingSnow = true;
 		int layers = logic.getLayers(metadata);
 		double height = layers * 2 / 16.0;
-		bounds = AABB.getTemporaryBB(MoreSnowModels.zFactor, 0.0, MoreSnowModels.zFactor, 1.0f - MoreSnowModels.zFactor, height - zFactor, 1.0f - MoreSnowModels.zFactor);
+		bounds = AABB.getTemporaryBB(-MoreSnowModels.zFactor, 0.0, -MoreSnowModels.zFactor, 1.0f + MoreSnowModels.zFactor, height + zFactor, 1.0f + MoreSnowModels.zFactor);
 		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
 		this.renderingSnow = false;
 		return somethingRendered;

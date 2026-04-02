@@ -34,7 +34,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	private final int lowestLayerHeight;
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight) {
-		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, MoreSnowBlocks.getLayerBlock(block).getMaterial());
+		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, storedBlock.getMaterial());
 	}
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, Block<?> layerBlock, int maxLayers, int lowestLayerHeight, Material material) {
