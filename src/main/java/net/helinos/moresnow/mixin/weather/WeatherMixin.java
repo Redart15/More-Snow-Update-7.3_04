@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Random;
 
+import static net.helinos.moresnow.MoreSnow.LAYERS;
+
 @Mixin(value = Weather.class, remap = false)
 public abstract class WeatherMixin {
 	@Inject(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", shift = At.Shift.AFTER, ordinal = 1))
@@ -25,11 +27,12 @@ public abstract class WeatherMixin {
 				continue;
 			}
 			BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
+			if(blockSnowy.layerBlock.id() != Blocks.LAYER_SNOW.id()){
+				continue;
+			}
 			int metadata = world.getBlockMetadata(x, y, z);
 			int layers = blockSnowy.getLayers(metadata);
-			if (layers > 1
-				&& layers < blockSnowy.getRelativeLayers(metadata)
-			) {
+			if (layers > 1 && layers < blockSnowy.getRelativeLayers(metadata)) {
 				world.setBlockMetadata(x, y, z, metadata - 1);
 				world.markBlockNeedsUpdate(x, y, z);
 			} else if (!world.getBlockBiome(x, y, z).hasSurfaceSnow()) {
@@ -45,6 +48,9 @@ public abstract class WeatherMixin {
 			return;
 		}
 		BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
+		if(blockSnowy.layerBlock.id() != Blocks.LAYER_SNOW.id()){
+			return;
+		}
 		int metadata = chunk.getBlockMetadata(x, y, z);
 		int layers = blockSnowy.getLayers(metadata);
 		if (layers > 1 && world.getBlockBiome(chunk.xPosition * 16 + x, y, chunk.zPosition * 16 + z).hasSurfaceSnow()) {

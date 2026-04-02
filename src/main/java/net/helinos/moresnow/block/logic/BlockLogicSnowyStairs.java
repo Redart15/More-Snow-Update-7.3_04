@@ -2,7 +2,6 @@ package net.helinos.moresnow.block.logic;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
-import net.helinos.moresnow.block.MSBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;

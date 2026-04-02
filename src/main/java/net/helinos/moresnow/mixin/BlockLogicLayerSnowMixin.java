@@ -3,14 +3,12 @@ package net.helinos.moresnow.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicLayerSnow;
 import net.minecraft.core.block.BlockLogicSlab;
 import net.minecraft.core.block.BlockLogicStairs;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
-import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -30,7 +28,7 @@ public abstract class BlockLogicLayerSnowMixin {
 	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I"))
 	private int blockId1(World world, int x, int y, int z, Operation<Integer> original) {
 		int id = original.call(world, x, y, z);
-		if (ArrayUtils.contains(MSBlocks.blockIds, id)) {
+		if (id == Blocks.LAYER_SNOW.id()) {
 			return Blocks.LAYER_SNOW.id();
 		}
 		return id;

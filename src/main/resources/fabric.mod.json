@@ -20,7 +20,7 @@
 		"client": 						["net.helinos.moresnow.MoreSnow"],
 		"beforeClientStart": 	["net.helinos.moresnow.MoreSnow"],
 		"afterClientStart":		["net.helinos.moresnow.MoreSnow"],
-		"afterBlockInit": 		["net.helinos.moresnow.block.MSBlocks"],
+		"afterBlockInit": 		["net.helinos.moresnow.MoreSnow"],
 		"initModels": 				["net.helinos.moresnow.model.MSModels"],
 		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"]
   },

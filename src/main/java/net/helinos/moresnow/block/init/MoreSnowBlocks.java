@@ -30,8 +30,8 @@ public class MoreSnowBlocks {
 	public static List<Block<BlockLogicSnowyFencePainted<?>>> SNOWY_FENCE_PAINTED = new ArrayList<>();
 	public static List<Block<?>> SNOWY_FENCE_GATE = new ArrayList<>();
 	public static List<Block<?>> SNOWY_FENCE_GATES_PAINTED = new ArrayList<>();
-	public static List<Block<?>> SNOWY_TRAPDOOR = new ArrayList<>();
-	public static List<Block<?>> SNOWY_TRAPDOOR_PAINTED = new ArrayList<>();
+	public static List<Block<?>> SNOWY_FENCE_THIN = new ArrayList<>();
+
 	public static Block<?> SNOWY_FENCE_WALLPAPER;
 	public static Block<?> SNOWY_FENCE_STEEL;
 	public static Block<?> SNOWY_FENCE_CHAINLINK;
@@ -49,9 +49,9 @@ public class MoreSnowBlocks {
 	private static final String UNFORMATTED_MESSAGE = "%6d \t %14s -> %s";
 	private static final int STARTING_ID = 4500;
 	private static int currentID = STARTING_ID;
-	//	public static final Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.NOT_IN_CREATIVE_MENU;
+//	public static final Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.NOT_IN_CREATIVE_MENU;
 	public static final Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.OVERRIDE_STEPSOUND;
-	public static final String MOD_ID = "test";
+	public static final String MOD_ID = MoreSnow.MOD_ID;
 
 	private MoreSnowBlocks() {
 	}
@@ -72,7 +72,7 @@ public class MoreSnowBlocks {
 			}
 			BlockLogic logic = supplier.get(block);
 			for (Block<?> layerBlock : LAYERS) {
-				String prefix = MoreSnow.LAYERS.getKey(layerBlock) + "_%s";
+				String prefix = MoreSnow.LAYERS.getKey(layerBlock);
 				MoreSnowBlockInitializer.createFlower(block, logic, prefix);
 				MoreSnowBlockInitializer.createSapling(block, logic, prefix);
 				MoreSnowBlockInitializer.createMushrooms(block, logic, prefix);
@@ -80,19 +80,7 @@ public class MoreSnowBlocks {
 				MoreSnowBlockInitializer.createStairs(block, logic, prefix);
 				MoreSnowBlockInitializer.createFence(block, logic, prefix);
 				MoreSnowBlockInitializer.createFenceGate(block, logic, prefix);
-//				MoreSnowBlockInitializer.createTrapDoor(block, logic);
-				/// TODO: Implement them later on once everything is fixed
-//				createSign(block, logic);
-//				createRail(block, logic);
-//				createButton(block, logic);
-//				createPressurePlate(block, logic);
-//				createDoor(block, logic);
-//				createBrazier(block, logic);
-//				createFlag(block, logic);
-//				createBasket(block, logic);
-				/// TODO: repeat it with leaves layers
-				/// TODO: repeat it with slate layers
-				///	TODO: prep for ash layers
+				MoreSnowBlockInitializer.createFenceThinGeneral(block, logic, prefix);
 			}
 			MoreSnowBlockInitializer.createFenceThin(block, logic);
 		}
@@ -107,7 +95,9 @@ public class MoreSnowBlocks {
 
 	public static String convertNameSpaceID(NamespaceID blockID, String prefix) {
 		String[] splitstring = blockID.value().split("/");
-		return String.format(prefix, splitstring[1]);
+		int index = 0;
+		while("block".equals(splitstring[index])) index++;
+		return String.format(prefix, splitstring[index]);
 	}
 
 	public static void printMessage(int id, String blockType, @NotNull NamespaceID namespaceID) {
@@ -169,5 +159,19 @@ public class MoreSnowBlocks {
 	public static @NotNull String prePendDesc(Block<?> block, ItemStack itemStack, String prefix) {
 		String suffix = LANGUAGE.translateKey(block.getLogic().getLanguageKey(itemStack.getMetadata()) + ".name");
 		return LANGUAGE.translateKey(prefix + ".desc") + " " + suffix.toLowerCase() + ".";
+	}
+
+	public static Block<?> getLayerBlock(Block<?> block) {
+		NamespaceID namespaceId = block.namespaceId();
+		String[] parts = namespaceId.value().split("[/_]");
+		return parts.length > 2 ? LAYERS.getItem(parts[1]) : Blocks.LAYER_SNOW;
+	}
+
+	public static boolean tryMakeSnowy(World world, int id, int x, int y, int z, String prefix) {
+		return convertBlock(world, id, x, y, z, prefix);
+	}
+
+	public static boolean tryMakeSnowy(Chunk chunk, int id, int x, int y, int z, String prefix) {
+		return convertBlock(chunk, id, x, y, z, prefix);
 	}
 }

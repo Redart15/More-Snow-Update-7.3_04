@@ -24,7 +24,7 @@ public abstract class ItemMixinNameAdjustment {
 		if(asThis instanceof ItemBlock && MOD_ID.equals(asThis.namespaceID.namespace())){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
 			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
-				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(block)) + result;
+				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy)block.getLogic()).layerBlock)) + result;
 			}
 		}
 		return result;

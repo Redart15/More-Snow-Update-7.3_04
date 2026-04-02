@@ -2,10 +2,9 @@ package net.helinos.moresnow.block.logic;
 
 import java.util.Random;
 
-import net.helinos.moresnow.block.MSBlocks;
+import net.helinos.moresnow.block.init.MoreSnowBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.world.LevelListener;
-import org.apache.commons.lang3.ArrayUtils;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -20,7 +19,6 @@ import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.enums.LightLayer;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.item.Items;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
@@ -31,11 +29,17 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	public static final int END_INDEX = 7;
 	public static final int FULL_BLOCK = 8;
 	public final Block<?> storedBlock;
+	public final Block<?> layerBlock;
 	private final int maxLayers;
 	private final int lowestLayerHeight;
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight) {
-		super(block, Material.snow);
+		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, MoreSnowBlocks.getLayerBlock(block).getMaterial());
+	}
+
+	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, Block<?> layerBlock, int maxLayers, int lowestLayerHeight, Material material) {
+		super(block, material);
+		this.layerBlock = layerBlock;
 		this.storedBlock = storedBlock;
 		this.maxLayers = maxLayers;
 		this.lowestLayerHeight = lowestLayerHeight;
@@ -108,9 +112,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		}
 		Material belowMaterial = belowBlock.getMaterial();
 		BlockLogic logic = belowBlock.getLogic();
-		if(logic instanceof BlockLogicSnowy){
+		if (logic instanceof BlockLogicSnowy) {
 			BlockLogicSnowy snowyLogic = (BlockLogicSnowy) logic;
-			if(snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()){
+			if (snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()) {
 				return true;
 			}
 		}
@@ -126,7 +130,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	/**
 	 * Place a snow covered variant of a block at the given coordinates.
 	 *
-	 * @param id   The block id to be "stored" inside the snow covered block
+	 * @param id The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
 	 */
 	public boolean tryMakeSnowy(World world, int id, int x, int y, int z) {
@@ -139,7 +143,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	/**
 	 * Place a snow covered variant of a block at the given coordinates.
 	 *
-	 * @param id   The block id to be "stored" inside the snow covered block
+	 * @param id The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
 	 */
 	public boolean tryMakeSnowy(Chunk chunk, int id, int x, int y, int z) {
@@ -204,7 +208,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 */
 	private boolean isSnow(World world, int x, int y, int z) {
 		int id = world.getBlockId(x, y, z);
-		return ArrayUtils.contains(MSBlocks.blockIds, id) || id == Blocks.LAYER_SNOW.id();
+		return id == Blocks.LAYER_SNOW.id();
 	}
 
 	/**
@@ -229,26 +233,19 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	@Override
 	public ItemStack[] getBreakResult(World world, EnumDropCause dropCause, int x, int y, int z, int meta, TileEntity tileEntity) {
 		switch (dropCause) {
-			case SILK_TOUCH: {
-				return new ItemStack[]{new ItemStack(Blocks.LAYER_SNOW, this.getLayers(meta) + 1)};
-			}
-			case PICK_BLOCK: {
-				return new ItemStack[]{new ItemStack(Blocks.LAYER_SNOW)};
-			}
+			case SILK_TOUCH:
+			case PICK_BLOCK:
 			case PROPER_TOOL: {
-				return new ItemStack[]{new ItemStack(Items.AMMO_SNOWBALL, this.getLayers(meta) + 1)};
+				return this.layerBlock.getBreakResult(world, dropCause, x, y, z, this.getLayers(meta) - 1, tileEntity);
 			}
 			case IMPROPER_TOOL: {
 				return null;
 			}
 			default: { // Drop the underlying block if it's destroyed by WORLD or EXPLOSION
-				Block<?> block = Blocks.getBlock(this.getStoredBlockId(meta));
-				if (block != null) {
-					return block.getBreakResult(world, dropCause, x, y, z, this.getStoredBlockMetadata(meta), tileEntity);
-				}
+				return storedBlock.getBreakResult(world, dropCause, x, y, z, this.getStoredBlockMetadata(meta), tileEntity);
+
 			}
 		}
-		return null;
 	}
 
 	@Override
@@ -262,7 +259,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	private static boolean shouldSnowMelt(World world, int x, int y, int z) {
-		return!world.getBlockBiome(x, y, z).hasSurfaceSnow() &&
+		return !world.getBlockBiome(x, y, z).hasSurfaceSnow() &&
 			world.seasonManager.getCurrentSeason() != null &&
 			world.seasonManager.getCurrentSeason().letWeatherCleanUpSnow;
 	}
@@ -271,7 +268,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
 		if (!this.canSupportSnow(world, x, y, z)) {
 			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
-			world.playBlockEvent(null, LevelListener.EVENT_BLOCK_BREAK, x, y - 1, z, Blocks.BLOCK_SNOW.id());
+			world.playBlockEvent(null, LevelListener.EVENT_BLOCK_BREAK, x, y - 1, z, this.layerBlock.id());
 		}
 	}
 

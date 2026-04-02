@@ -12,7 +12,8 @@ public class SnowyParticleHelper {
 	public static void spoofBlockIDs(World instance, int event, int x, int y, int z, int id, Operation<Void> original) {
 		Block<?> block = Blocks.getBlock(id);
 		if(block != null && block.getLogic() instanceof BlockLogicSnowy){
-			id = Blocks.BLOCK_SNOW.id();
+			BlockLogicSnowy logic = (BlockLogicSnowy) block.getLogic();
+			id = logic.layerBlock.id();
 		}
 		original.call(instance, event, x, y, z, id);
 	}

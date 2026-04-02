@@ -1,7 +1,7 @@
 package net.helinos.moresnow.mixin.weather;
 
+import net.helinos.moresnow.block.init.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFence;
@@ -58,7 +58,7 @@ public abstract class WeatherSnowMixin extends Weather {
 			y -= 1;
 			blockBelow = world.getBlock(x, y - 1, z);
 			blockBelowLogic = blockBelow != null ? blockBelow.getLogic() : null;
-		};
+		}
 
 		int blockID = world.getBlockId(x, y, z);
 
@@ -82,20 +82,17 @@ public abstract class WeatherSnowMixin extends Weather {
 				return;
 			}
 
-			if (MSBlocks.tryMakeSnowy(world, blockID, x, y, z, "snowy_%s")) {
+			if (MoreSnowBlocks.tryMakeSnowy(world, blockID, x, y, z, "snowy_%s")) {
 				return;
 			}
 
-			if (MSBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snowy_%s")) {
+			if (MoreSnowBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snowy_%s")) {
 				return;
 			}
 		}
 
 		if (
-			(
-				blockID == Blocks.LAYER_SNOW.id()
-				|| blockBelowLogic instanceof BlockLogicSnowy
-			)
+			(blockID == Blocks.LAYER_SNOW.id() || (blockBelowLogic instanceof BlockLogicSnowy))
 			&& world.getSeasonManager().getCurrentSeason() != null
 			&& (biomeHasDeeperSnow || biome == Biomes.OVERWORLD_GLACIER)
 		) {
@@ -105,7 +102,7 @@ public abstract class WeatherSnowMixin extends Weather {
 
 			if (blockID == Blocks.LAYER_SNOW.id()) {
 				Blocks.LAYER_SNOW.getLogic().accumulate(world, x, y, z);
-			} else if (blockBelowLogic != null) {
+			} else if (blockBelowLogic != null && ((BlockLogicSnowy<?>) blockBelowLogic).layerBlock.id() == Blocks.LAYER_SNOW.id()) {
 				((BlockLogicSnowy<?>) blockBelowLogic).accumulate(world, x, y - 1, z);
 			}
 
@@ -129,19 +126,10 @@ public abstract class WeatherSnowMixin extends Weather {
 
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void doChunkLoadEffect(World world, Chunk chunk, CallbackInfo callbackInfo, int x, int worldX, int z, int worldZ, int y, Biome biome, int blockId) {
-		if (
-			y < 0
-			|| y >= world.getHeightBlocks()
-			|| chunk.getBrightness(LightLayer.Block, x, y, z) >= 10
-		) {
+		if (y < 0 || y >= world.getHeightBlocks() || chunk.getBrightness(LightLayer.Block, x, y, z) >= 10 || MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snowy_%s")) {
 			return;
 		}
-
-		if (MSBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snowy_%s")) {
-			return;
-		}
-
 		int blockIDBelow = chunk.getBlockID(x, y - 1, z);
-		MSBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snowy_%s");
+		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snowy_%s");
 	}
 }

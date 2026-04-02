@@ -3,9 +3,9 @@ package net.helinos.moresnow.mixin;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.helinos.moresnow.MoreSnow;
+import net.helinos.moresnow.block.init.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyPlant;
-import net.helinos.moresnow.block.MSBlocks;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicLayerBase;
 import net.minecraft.core.block.Blocks;
@@ -71,7 +71,7 @@ public abstract class ItemBlockLayerMixin {
 
 		// Cover blocks that can be covered
 		if (itemstack.itemID == layerBlock.id()){
-			if (!MSBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ, MoreSnow.LAYERS.getKey(layerBlock) + "_%s")) {
+			if (!MoreSnowBlocks.tryMakeSnowy(world, blockId, blockX, blockY, blockZ, MoreSnow.LAYERS.getKey(layerBlock) + "_%s")) {
 				return original.call(itemstack, player, world, blockX, blockY, blockZ, side, xPlaced, yPlaced);
 			}
 			world.playBlockSoundEffect(player, blockX + 0.5d, blockY + 0.5d, blockZ + 0.5d, layerBlock, EnumBlockSoundEffectType.PLACE);

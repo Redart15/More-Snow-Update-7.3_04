@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFenceThin;
+import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
-public abstract class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends BlockLogicFenceThin> extends BlockLogicSnowy<T> {
+public class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends BlockLogicFenceThin> extends BlockLogicSnowy<T> {
 	private final Class<F> storedBlockLogic;
 
 	public BlockLogicSnowyFenceThin(Block<T> block, Block<?> storedBlock, Class<F> storedBlockLogic) {
@@ -19,8 +20,10 @@ public abstract class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends B
 		this.storedBlockLogic = storedBlockLogic;
 	}
 
-	public abstract boolean canConnectTo(WorldSource worldSource, int x, int y, int z);
-
+	public boolean canConnectTo(WorldSource world, int x, int y, int z) {
+		Block<?> block = world.getBlock(x, y, z);
+		return BlockTags.CHAINLINK_FENCES_CONNECT.appliesTo(block) || block != null && (block.getMaterial().isStone() || block.getMaterial().isMetal());
+	}
 	@Override
 	@SuppressWarnings(value = {"unchecked", "rawtypes"})
 	public void getCollidingBoundingBoxes(World world, int x, int y, int z, AABB aabb, ArrayList aabbList) {
