@@ -37,6 +37,12 @@ repositories {
         patternLayout { artifact("v1/[organisation]/[revision]/[module].jar") }
         metadataSources { artifact() }
     }
+    ivy("https://github.com/") {
+        patternLayout {
+            artifact("[organization]/[module]/releases/download/[revision]/[module]-1.0.2+7.3_04.jar")
+        }
+        metadataSources { artifact() }
+    }
 }
 lwjgl {
 	version = libs.versions.lwjgl
@@ -44,6 +50,8 @@ lwjgl {
 }
 dependencies {
     minecraft("::${libs.versions.bta.get()}")
+
+    compileOnly(libs.aether)
 
 	runtimeOnly(libs.clientJar)
 	implementation(libs.loader)

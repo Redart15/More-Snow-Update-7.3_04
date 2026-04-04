@@ -1,6 +1,6 @@
 package net.helinos.moresnow.model;
 
-import net.helinos.moresnow.block.logic.PaintedBlock;
+import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.tessellator.Tessellator;

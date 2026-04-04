@@ -1,8 +1,8 @@
 package net.helinos.moresnow.block.logic;
 
+import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.helper.DyeColor;
 import org.jetbrains.annotations.Nullable;
 

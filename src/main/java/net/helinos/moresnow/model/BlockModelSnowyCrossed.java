@@ -38,11 +38,11 @@ public class BlockModelSnowyCrossed<T extends BlockLogic> extends BlockModelSnow
 		AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
 		boolean somethingRendered = false;
 		if(((BlockLogicSnowy)block.getLogic()).layerBlock.id() == Blocks.LAYER_SNOW.id()){
-			somethingRendered = this.renderCrossShaped(tessellator, x, y, z);
+			somethingRendered |= this.renderCrossShaped(tessellator, x, y, z);
 		}else{
 			Block<?> storedBlock = ((BlockLogicSnowy<?>) this.block.getLogic()).getStoredBlock();
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
-			somethingRendered = model.render(tessellator, x, y, z);
+			somethingRendered |= model.render(tessellator, x, y, z);
 		}
 		// Render the snow
 		int layers = ((BlockLogicSnowy<?>) block.getLogic()).getLayers(metadata);

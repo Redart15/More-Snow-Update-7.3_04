@@ -6,6 +6,7 @@ import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
+import net.minecraft.core.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 

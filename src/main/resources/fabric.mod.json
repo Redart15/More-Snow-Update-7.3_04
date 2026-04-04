@@ -22,8 +22,10 @@
 		"afterClientStart":		["net.helinos.moresnow.MoreSnow"],
 		"afterBlockInit": 		["net.helinos.moresnow.MoreSnow"],
 		"initModels": 				["net.helinos.moresnow.model.MSModels"],
-		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"]
-  },
+		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"],
+		"server": 						["net.helinos.moresnow.MoreSnow"],
+		"preLaunch": 					["net.helinos.moresnow.compat.aether.MoreSnowAetherMixins"]
+	},
   "mixins": [
     "moresnow.mixins.json"
   ],

@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixin.weather;
+package net.helinos.moresnow.mixins.mixin.weather;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
@@ -13,8 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Random;
-
-import static net.helinos.moresnow.MoreSnow.LAYERS;
 
 @Mixin(value = Weather.class, remap = false)
 public abstract class WeatherMixin {

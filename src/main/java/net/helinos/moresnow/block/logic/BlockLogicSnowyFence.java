@@ -62,4 +62,10 @@ public class BlockLogicSnowyFence<T extends BlockLogic, F extends BlockLogicFenc
     public boolean isCubeShaped() {
         return false;
     }
+
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
+	}
 }

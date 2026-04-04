@@ -1,6 +1,5 @@
-package net.helinos.moresnow.block.logic;
+package net.helinos.moresnow.block.interfaces;
 
-import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.helper.DyeColor;
 
 public interface PaintedBlock {

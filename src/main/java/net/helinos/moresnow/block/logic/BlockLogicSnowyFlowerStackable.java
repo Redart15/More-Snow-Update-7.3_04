@@ -77,4 +77,9 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 	public boolean isCubeShaped() {
 		return false;
 	}
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
+	}
 }

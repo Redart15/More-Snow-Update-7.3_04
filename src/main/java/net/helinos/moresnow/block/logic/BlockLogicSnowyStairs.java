@@ -1,7 +1,6 @@
 package net.helinos.moresnow.block.logic;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
-import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
@@ -12,7 +11,7 @@ import net.minecraft.core.world.chunk.Chunk;
 
 import java.util.ArrayList;
 
-public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicStairs> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation {
+public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicStairs> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation {
 	public BlockLogicSnowyStairs(Block<T> block, Block<?> storedBlock) {
 		super(block, storedBlock, 4, 4);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
@@ -55,17 +54,22 @@ public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicSta
 		int layers = this.getLayers(metadata);
 		double heightFromSnow = layers * 2 / 16.0;
 		if (rotation == 0) {
+			//fucked
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, heightFromSnow, 1.0).move(x, y + 1.0f, z), aabbList);
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, 1.0, 1.0).move(x, y, z), aabbList);
 		} else if (rotation == 1) {
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, 1.0, 1.0).move(x, y, z), aabbList);
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, heightFromSnow, 1.0).move(x, y + 1.0f, z), aabbList);
 		} else if (rotation == 2) {
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 0.5).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, heightFromSnow, 1.0).move(x, y + 1.0f, z), aabbList);
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, 1.0, 1.0).move(x, y, z), aabbList);
 		} else {
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 1.0, 0.5).move(x, y, z), aabbList);
 			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, heightFromSnow, 0.5).move(x, y + 1.0f, z), aabbList);
 		}
 	}
 

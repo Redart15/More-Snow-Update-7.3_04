@@ -7,6 +7,8 @@ import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.phys.AABB;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 public class BlockModelSnowyPlant<T extends BlockLogic> extends BlockModelSnowy<T> {
 	public BlockModelSnowyPlant(Block<T> block, BlockModel<?> layerModel, String texID) {
@@ -28,5 +30,11 @@ public class BlockModelSnowyPlant<T extends BlockLogic> extends BlockModelSnowy<
 		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
 		return somethingRendered;
 
+	}
+
+	@Override
+	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
+		GL11.glTranslatef(0.0F, -0.25F, 0.0F);
+		this.layerModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
 	}
 }

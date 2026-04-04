@@ -1,4 +1,4 @@
-package net.helinos.moresnow.block.init;
+package net.helinos.moresnow.block;
 
 import net.helinos.moresnow.MoreSnow;
 import net.helinos.moresnow.block.logic.*;
@@ -12,12 +12,14 @@ import net.minecraft.core.data.tag.Tag;
 import net.minecraft.core.util.HardIllegalArgumentException;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.DyeColor;
+import org.jspecify.annotations.NonNull;
 import turniplabs.halplibe.helper.BlockBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
+import static net.helinos.moresnow.MoreSnow.MOD_ID;
+import static net.helinos.moresnow.block.MoreSnowBlocks.*;
 
 @SuppressWarnings({"java:S1144"})
 public class MoreSnowBlockInitializer {
@@ -57,6 +59,10 @@ public class MoreSnowBlockInitializer {
 		return tag.toArray(new Tag[0]);
 	}
 
+	public static @NonNull String getModID(BlockLogic logic) {
+		return MOD_ID +  "." + logic.namespaceId().namespace();
+	}
+
 	public static String convertNameSpaceID(NamespaceID blockID, String prefix) {
 		String[] splitstring = blockID.value().split("/");
 		String result = String.format(prefix, splitstring[splitstring.length - 1]);
@@ -78,7 +84,7 @@ public class MoreSnowBlockInitializer {
 	public static void createFlowerStackable(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicFlowerStackable) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
-			Block<?> snowy = new BlockBuilder(MOD_ID)
+			Block<?> snowy = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -88,18 +94,14 @@ public class MoreSnowBlockInitializer {
 			snowy.withTags(addTooling(layer));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "flower", logic.namespaceId());
+			count++;
 		}
 	}
 
 	public static void createFlower(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
-		if ((logic instanceof BlockLogicFlower || logic instanceof BlockLogicSugarcane)
-			&& !(logic instanceof BlockLogicFlowerStackable)
-			&& !(logic instanceof BlockLogicSaplingBase)
-			&& !(logic instanceof BlockLogicMushroom)
-			&& !(logic instanceof BlockLogicTallGrass)
-		) {
+		if ((logic instanceof BlockLogicFlower || logic instanceof BlockLogicSugarcane)) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
-			Block<?> snowy = new BlockBuilder(MOD_ID)
+			Block<?> snowy = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -109,6 +111,7 @@ public class MoreSnowBlockInitializer {
 			snowy.withTags(addTooling(layer));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "flower", logic.namespaceId());
+			count++;
 		}
 	}
 
@@ -116,7 +119,7 @@ public class MoreSnowBlockInitializer {
 	public static void createSapling(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicSaplingBase) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
-			Block<?> snowy = new BlockBuilder(MOD_ID)
+			Block<?> snowy = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -126,13 +129,14 @@ public class MoreSnowBlockInitializer {
 			snowy.withTags(addTooling(layer));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "sapling", logic.namespaceId());
+			count++;
 		}
 	}
 
 	public static void createMushrooms(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicMushroom) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
-			Block<?> snowy = new BlockBuilder(MOD_ID)
+			Block<?> snowy = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -142,6 +146,7 @@ public class MoreSnowBlockInitializer {
 			snowy.withTags(addTooling(layer));
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "mushroom", logic.namespaceId());
+			count++;
 		}
 	}
 
@@ -150,7 +155,7 @@ public class MoreSnowBlockInitializer {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "slab", logic.namespaceId());
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -163,12 +168,14 @@ public class MoreSnowBlockInitializer {
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowySlabPainted<>(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
 					SNOWY_SLAB_PAINTED.add(snowy);
+					count++;
 				}
 				return;
 			}
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowySlab<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
 			SNOWY_SLAB.add(snowy);
+			count++;
 		}
 	}
 
@@ -177,7 +184,7 @@ public class MoreSnowBlockInitializer {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "stairs", logic.namespaceId());
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -190,12 +197,14 @@ public class MoreSnowBlockInitializer {
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyStairsPainted<>(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
 					SNOWY_STAIRS_PAINTED.add(snowy);
+					count++;
 				}
 				return;
 			}
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyStairs<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
 			SNOWY_STAIRS.add(snowy);
+			count++;
 		}
 	}
 
@@ -205,7 +214,7 @@ public class MoreSnowBlockInitializer {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "fence", logic.namespaceId());
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -219,12 +228,14 @@ public class MoreSnowBlockInitializer {
 					Block<BlockLogicSnowyFencePainted<?>> fence = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFencePainted<>(block, currentBlock, color));
 					fence.withTags(addTooling(layer));
 					SNOWY_FENCE_PAINTED.add(fence);
+					count++;
 				}
 				return;
 			}
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFence<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
 			SNOWY_FENCE.add(snowy);
+			count++;
 		}
 	}
 
@@ -236,44 +247,74 @@ public class MoreSnowBlockInitializer {
 			}
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy;
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
-				.setHardness(0.1f)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
+				.setHardness(layer.getHardness())
 				.setUseInternalLight()
 				.setVisualUpdateOnMetadata();
 			blockBuilder = blockBuilder.addTags(BlockTags.CHAINLINK_FENCES_CONNECT);
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), (block) -> new BlockLogicSnowyFenceThin(block, currentBlock, BlockLogicFenceSteel.class));
 			snowy.withTags(addTooling(layer));
 			SNOWY_FENCE_THIN.add(snowy);
+			count++;
 		}
 	}
 
 	public static void createFenceThin(Block<? extends BlockLogic> currentBlock, BlockLogic logic) {
 		if (logic instanceof BlockLogicFenceThin) {
 			printMessage(currentBlock.id(), "thin-fence", logic.namespaceId());
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
-				.setHardness(0.1f)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
 				.setUseInternalLight()
 				.setVisualUpdateOnMetadata();
 			blockBuilder = addConnectTags(currentBlock, blockBuilder);
 			if (currentBlock.id() == Blocks.FENCE_STEEL.id()) {
 				BlockBuilder fenceSteelBuilder = blockBuilder.addTags(BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
-				SNOWY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceSteel::new).withTags(addTooling(Blocks.LAYER_SNOW)).withSound(Blocks.LAYER_SNOW.getSound());
-				LEAVY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceSteel::new).withTags(addTooling(Blocks.LAYER_LEAVES_OAK)).withSound(Blocks.LAYER_LEAVES_OAK.getSound());
-				SLATY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceSteel::new).withTags(addTooling(Blocks.LAYER_SLATE)).withSound(Blocks.LAYER_SLATE.getSound());
+				SNOWY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceSteel::new)
+					.withTags(addTooling(Blocks.LAYER_SNOW))
+					.withSound(Blocks.LAYER_SNOW.getSound())
+					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				LEAVY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceSteel::new)
+					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
+					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
+					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				SLATY_FENCE_STEEL = fenceSteelBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceSteel::new)
+					.withTags(addTooling(Blocks.LAYER_SLATE))
+					.withSound(Blocks.LAYER_SLATE.getSound())
+					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				count += 3;
 				return;
 			}
 			if (currentBlock.id() == Blocks.FENCE_CHAINLINK.id()) {
 				BlockBuilder fenceChainBuilder = blockBuilder.addTags(BlockTags.OVERRIDE_STEPSOUND, BlockTags.CHAINLINK_FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
-				SNOWY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new).withTags(addTooling(Blocks.LAYER_SNOW)).withSound(Blocks.LAYER_SNOW.getSound());
-				LEAVY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new).withTags(addTooling(Blocks.LAYER_LEAVES_OAK)).withSound(Blocks.LAYER_LEAVES_OAK.getSound());
-				SLATY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new).withTags(addTooling(Blocks.LAYER_SLATE)).withSound(Blocks.LAYER_SLATE.getSound());
+				SNOWY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new)
+					.withTags(addTooling(Blocks.LAYER_SNOW))
+					.withSound(Blocks.LAYER_SNOW.getSound())
+					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				LEAVY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new)
+					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
+					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
+					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				SLATY_FENCE_CHAINLINK = fenceChainBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new)
+					.withTags(addTooling(Blocks.LAYER_SLATE))
+					.withSound(Blocks.LAYER_SLATE.getSound())
+					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				count += 3;
 				return;
 			}
 			if (currentBlock.id() == Blocks.FENCE_PAPER_WALL.id()) {
 				BlockBuilder fencePaperWallBuilder = blockBuilder.addTags(BlockTags.OVERRIDE_STEPSOUND, BlockTags.FENCES_CONNECT, NOT_IN_CREATIVE_MENU);
-				SNOWY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new).withTags(addTooling(Blocks.LAYER_SNOW)).withSound(Blocks.LAYER_SNOW.getSound());
-				LEAVY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new).withTags(addTooling(Blocks.LAYER_LEAVES_OAK)).withSound(Blocks.LAYER_LEAVES_OAK.getSound());
-				SLATY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new).withTags(addTooling(Blocks.LAYER_SLATE)).withSound(Blocks.LAYER_SLATE.getSound());
+				SNOWY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "snow_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new)
+					.withTags(addTooling(Blocks.LAYER_SNOW))
+					.withSound(Blocks.LAYER_SNOW.getSound())
+					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				LEAVY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new)
+					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
+					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
+					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				SLATY_FENCE_WALLPAPER = fencePaperWallBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new)
+					.withTags(addTooling(Blocks.LAYER_SLATE))
+					.withSound(Blocks.LAYER_SLATE.getSound())
+					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				count += 3;
 			}
 		}
 	}
@@ -284,7 +325,7 @@ public class MoreSnowBlockInitializer {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
 			Block<?> snowy;
 			printMessage(currentBlock.id(), "fence-gate", logic.namespaceId());
-			BlockBuilder blockBuilder = new BlockBuilder(MOD_ID)
+			BlockBuilder blockBuilder = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -297,19 +338,21 @@ public class MoreSnowBlockInitializer {
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFenceGatePainted(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
 					SNOWY_FENCE_GATES_PAINTED.add(snowy);
+					count ++;
 				}
 				return;
 			}
 			snowy = blockBuilder.build(convertNameSpaceID(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFenceGate<>(block, currentBlock));
 			snowy.withTags(addTooling(currentBlock));
 			SNOWY_FENCE_GATE.add(snowy);
+			count ++;
 		}
 	}
 
 	public static void createGrass(Block<? extends BlockLogic> currentBlock, BlockLogic logic, String prefix) {
 		if (logic instanceof BlockLogicTallGrass) {
 			Block<?> layer = MoreSnow.LAYERS.getItem(prefix);
-			Block<?> snowy = new BlockBuilder(MOD_ID)
+			Block<?> snowy = new BlockBuilder(getModID(logic))
 				.setBlockSound(layer.getSound())
 				.setHardness(layer.getHardness())
 				.setUseInternalLight()
@@ -319,6 +362,7 @@ public class MoreSnowBlockInitializer {
 			snowy.withTags(addTooling(layer));
 			SNOWY_GRASS.add(snowy);
 			printMessage(currentBlock.id(), "grass", logic.namespaceId());
+			count ++;
 		}
 	}
 }

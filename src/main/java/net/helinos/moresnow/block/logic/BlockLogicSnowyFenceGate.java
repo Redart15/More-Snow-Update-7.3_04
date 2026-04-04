@@ -58,6 +58,10 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 	@Override
 	public boolean onBlockRightClicked(World world, int x, int y, int z, @Nullable Player player, Side side, double xPlaced, double yPlaced) {
 		int metadata = world.getBlockMetadata(x, y, z);
+		if(this.getLayers(metadata) >= this.getMaxLayers()){
+			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, x, y, z, "random.door_close", 1.0F, 1.0F);
+			return false;
+		}
 		if (isOpen(metadata)) {
 			world.setBlockMetadataWithNotify(x, y, z, BlockMetadata.flipBit(metadata, 6));
 		} else {
@@ -111,5 +115,10 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 	public int getDirection(int metadata) {
 		return BlockLogicFenceGate.getDirection(BlockMetadata.getUpperBlock(metadata));
+	}
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
 	}
 }

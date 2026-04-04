@@ -77,4 +77,9 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 	public boolean isCubeShaped() {
 		return false;
 	}
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
+	}
 }

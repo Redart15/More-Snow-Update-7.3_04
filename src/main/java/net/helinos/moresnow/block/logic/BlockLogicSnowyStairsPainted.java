@@ -3,17 +3,16 @@ package net.helinos.moresnow.block.logic;
 import java.util.ArrayList;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
-import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyStairs;
+import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
 
-public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyStairs, IBlockLogicSnowyRotation, PaintedBlock {
+public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation, PaintedBlock {
 	protected DyeColor color;
 
 	public BlockLogicSnowyStairsPainted(Block<T> block, Block<?> storedBlock, DyeColor color) {

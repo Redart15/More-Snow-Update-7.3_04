@@ -1,12 +1,9 @@
-package net.helinos.moresnow.mixin.weather;
+package net.helinos.moresnow.mixins.mixin.weather;
 
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.BlockLogicFence;
-import net.minecraft.core.block.BlockLogicFenceThin;
-import net.minecraft.core.block.Blocks;
+import net.helinos.moresnow.mixins.MoreSnowMixin;
+import net.minecraft.core.block.*;
 import net.minecraft.core.enums.LightLayer;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.world.World;
@@ -20,6 +17,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,7 +29,7 @@ public abstract class WeatherSnowMixin extends Weather {
 	// was simply too hard for me to wrap my head around, especially when trying to update this to newer versions
 	// of BTA. When this inevitably causes an incompatibilty with another mod let me know and I'll fix it.
 
-	public WeatherSnowMixin(int id) {
+	private WeatherSnowMixin(int id) {
 		super(id);
 	}
 
@@ -54,14 +52,13 @@ public abstract class WeatherSnowMixin extends Weather {
 		Block<?> blockBelow = Blocks.getBlock(blockIDBelow);
 		BlockLogic blockBelowLogic = blockBelow != null ? blockBelow.getLogic() : null;
 
-		while (blockBelowLogic instanceof BlockLogicFence || blockBelowLogic instanceof BlockLogicFenceThin) {
+		while (MoreSnowMixin.advanceBelow(world, random, blockBelow, blockBelowLogic, x, y - 1, z)) {
 			y -= 1;
 			blockBelow = world.getBlock(x, y - 1, z);
 			blockBelowLogic = blockBelow != null ? blockBelow.getLogic() : null;
 		}
 
 		int blockID = world.getBlockId(x, y, z);
-
 		Biome biome = world.getBlockBiome(x, y, z);
 
 		if (ArrayUtils.contains(biome.blockedWeathers, ((WeatherSnow) (Object) this))
@@ -74,25 +71,22 @@ public abstract class WeatherSnowMixin extends Weather {
 		}
 
 		if (blockIDBelow != 0) {
-			if (blockID == 0
-				&& Blocks.LAYER_SNOW.canPlaceBlockAt(world, x, y, z)
-				&& blockIDBelow != Blocks.ICE.id()
-			) {
+			if (blockID == 0 && Blocks.LAYER_SNOW.canPlaceBlockAt(world, x, y, z) && blockIDBelow != Blocks.ICE.id()) {
 				world.setBlockWithNotify(x, y, z, Blocks.LAYER_SNOW.id());
 				return;
 			}
 
-			if (MoreSnowBlocks.tryMakeSnowy(world, blockID, x, y, z, "snowy_%s")) {
+			if (MoreSnowBlocks.tryMakeSnowy(world, blockID, x, y, z, "snow_%s")) {
 				return;
 			}
 
-			if (MoreSnowBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snowy_%s")) {
+			if (MoreSnowBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snow_%s")) {
 				return;
 			}
 		}
 
 		if (
-			(blockID == Blocks.LAYER_SNOW.id() || (blockBelowLogic instanceof BlockLogicSnowy))
+			(blockID == Blocks.LAYER_SNOW.id() || (Blocks.getBlock(blockID) != null && Blocks.getBlock(blockID).getLogic() instanceof BlockLogicSnowy))
 			&& world.getSeasonManager().getCurrentSeason() != null
 			&& (biomeHasDeeperSnow || biome == Biomes.OVERWORLD_GLACIER)
 		) {
@@ -102,8 +96,8 @@ public abstract class WeatherSnowMixin extends Weather {
 
 			if (blockID == Blocks.LAYER_SNOW.id()) {
 				Blocks.LAYER_SNOW.getLogic().accumulate(world, x, y, z);
-			} else if (blockBelowLogic != null && ((BlockLogicSnowy<?>) blockBelowLogic).layerBlock.id() == Blocks.LAYER_SNOW.id()) {
-				((BlockLogicSnowy<?>) blockBelowLogic).accumulate(world, x, y - 1, z);
+			} else if ((Blocks.getBlock(blockID) != null && ((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).layerBlock.id() == Blocks.LAYER_SNOW.id())) {
+				((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).accumulate(world, x, y - 1, z);
 			}
 
 			return;
@@ -126,10 +120,10 @@ public abstract class WeatherSnowMixin extends Weather {
 
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void doChunkLoadEffect(World world, Chunk chunk, CallbackInfo callbackInfo, int x, int worldX, int z, int worldZ, int y, Biome biome, int blockId) {
-		if (y < 0 || y >= world.getHeightBlocks() || chunk.getBrightness(LightLayer.Block, x, y, z) >= 10 || MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snowy_%s")) {
+		if (y < 0 || y >= world.getHeightBlocks() || chunk.getBrightness(LightLayer.Block, x, y, z) >= 10 || MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snow_%s")) {
 			return;
 		}
 		int blockIDBelow = chunk.getBlockID(x, y - 1, z);
-		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snowy_%s");
+		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snow_%s");
 	}
 }

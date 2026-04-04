@@ -2,7 +2,7 @@ package net.helinos.moresnow.block.logic;
 
 import java.util.Random;
 
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.world.LevelListener;
 
@@ -107,6 +107,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	private boolean canSupportSnow(@Nullable Block<?> belowBlock, int metadata) {
+		if(this.getSupportsOwnSnow()){
+			return true;
+		}
 		if (belowBlock == null) {
 			return false;
 		}
@@ -118,7 +121,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 				return true;
 			}
 		}
-		if (logic instanceof BlockLogicSlab && (metadata & 3) != 0 || logic instanceof BlockLogicStairs && (metadata & 8) != 0) {
+		if ((logic instanceof BlockLogicSlab && (metadata & 0b11) != 0) || (logic instanceof BlockLogicStairs && (metadata & 0b1000) != 0)) {
 			return true;
 		}
 		if (belowBlock == Blocks.ICE || (!belowBlock.isSolidRender() && !(logic instanceof BlockLogicLeavesBase))) {
@@ -176,26 +179,26 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	// Vanilla accumulate function but get layers from function rather than directly
 	// from metadata
 	public void accumulate(World world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y, z);
+		int metadata = world.getBlockMetadata(x, y + 1, z);
 		int layers = this.getLayers(metadata);
 		if (layers >= this.getMaxLayers()) {
 			return;
 		}
 		int relativeLayers = this.getRelativeLayers(metadata);
 
-		if (!this.isBlockValid(world, x + 1, y, z, relativeLayers)) {
+		if (!this.isBlockValid(world, x + 1, y + 1, z, relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x, y, z + 1, relativeLayers)) {
+		if (!this.isBlockValid(world, x, y + 1, z + 1, relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x - 1, y, z, relativeLayers)) {
+		if (!this.isBlockValid(world, x - 1, y + 1, z, relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x, y, z - 1, relativeLayers)) {
+		if (!this.isBlockValid(world, x, y + 1, z - 1, relativeLayers)) {
 			return;
 		}
-		world.setBlockMetadataWithNotify(x, y, z, metadata + 1);
+		world.setBlockMetadataWithNotify(x, y + 1, z, metadata + 1);
 	}
 
 	private boolean isBlockValid(World world, int x, int y, int z, int relativeLayers) {

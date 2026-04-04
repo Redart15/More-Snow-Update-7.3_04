@@ -1,9 +1,9 @@
 package net.helinos.moresnow.block.logic;
 
+import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.WorldSource;

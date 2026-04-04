@@ -4,6 +4,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicSlab;
 import net.minecraft.core.util.phys.AABB;
+import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab> extends BlockLogicSnowy<T> {

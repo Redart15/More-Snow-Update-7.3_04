@@ -1,30 +1,29 @@
-package net.helinos.moresnow.mixin;
+package net.helinos.moresnow.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.helinos.moresnow.MoreSnow;
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyPlant;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogicLayerLeaves;
+import net.minecraft.core.block.BlockLogicLayerBase;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.ItemStack;
-import net.minecraft.core.item.block.ItemBlockLayerLeaves;
+import net.minecraft.core.item.block.ItemBlockLayer;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(value = ItemBlockLayerLeaves.class, remap = false)
-public class ItemBlockLeaveLayerMixin {
-
+@Mixin(value = ItemBlockLayer.class, remap = false)
+public abstract class ItemBlockLayerMixin {
 	@WrapMethod(method = "onUseItemOnBlock")
 	private boolean onUseItemOnBlock(ItemStack itemstack, Player player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced, Operation<Boolean> original) {
-		Block<?> layerBlock = ((ItemBlockLayerLeaves<? extends BlockLogicLayerLeaves>) (Object) this).getBlock();
+		Block<?> layerBlock = ((ItemBlockLayer<? extends BlockLogicLayerBase>) (Object) this).getBlock();
 		int blockId = world.getBlockId(blockX, blockY, blockZ);
 		int metadata = world.getBlockMetadata(blockX, blockY, blockZ);
 		Block<?> block = Blocks.getBlock(blockId);
@@ -81,4 +80,4 @@ public class ItemBlockLeaveLayerMixin {
 		}
 		return false;
 	}
-	}
+}

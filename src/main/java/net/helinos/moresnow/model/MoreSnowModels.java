@@ -1,6 +1,6 @@
 package net.helinos.moresnow.model;
 
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyFencePainted;
 import net.minecraft.client.render.EntityRenderDispatcher;
 import net.minecraft.client.render.TileEntityRenderDispatcher;
@@ -9,10 +9,9 @@ import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogicFenceThin;
 import net.minecraft.core.block.Blocks;
 
-import static net.helinos.moresnow.block.init.MoreSnowBlocks.*;
+import static net.helinos.moresnow.block.MoreSnowBlocks.*;
 
 public class MoreSnowModels {
 	public static final String SNOW_PATH = "minecraft:block/block_snow";
@@ -20,9 +19,10 @@ public class MoreSnowModels {
 
 	public static void initBlockModels(BlockModelDispatcher dispatcher) {
 		String texID = "minecraft:block/block_snow";
-		MoreSnowModels.assignModelFlower(dispatcher, texID);
-		MoreSnowModels.assignModelGrass(dispatcher, texID);
-		MoreSnowModels.assignModelSapling(dispatcher, texID);
+		MoreSnowModels.assignModelCrossed(dispatcher, texID);
+//		MoreSnowModels.assignModelFlower(dispatcher, texID);
+//		MoreSnowModels.assignModelGrass(dispatcher, texID);
+//		MoreSnowModels.assignModelSapling(dispatcher, texID);
 		MoreSnowModels.assignModelSlab(dispatcher, texID);
 		MoreSnowModels.assignModelStairs(dispatcher, texID);
 		MoreSnowModels.assignModelFence(dispatcher, texID);
@@ -30,12 +30,18 @@ public class MoreSnowModels {
 		MoreSnowModels.assignModelFenceGate(dispatcher, texID);
 	}
 
+	private static void assignModelCrossed(BlockModelDispatcher dispatcher, String texID){
+		for (Block<?> block : SNOWY_FLOWERS) {
+			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
+			dispatcher.addDispatch(new BlockModelSnowyCrossed<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+		}
+	}
+
 	private static void assignModelFlower(BlockModelDispatcher dispatcher, String texID) {
 		for (Block<?> block : SNOWY_FLOWERS) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
 			dispatcher.addDispatch(new BlockModelSnowyPlant<>(block, model, texID).setAllTextures(0, SNOW_PATH));
 		}
-
 	}
 
 	private static void assignModelGrass(BlockModelDispatcher dispatcher, String texID) {

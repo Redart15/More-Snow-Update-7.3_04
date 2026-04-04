@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
+  "package": "net.helinos.moresnow.compat.aether.mixins.mixin",
+  "compatibilityLevel": "JAVA_${java}",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [],
+  "client": [
+    "BlockModelFixingAetherGrass"
+  ],
+  "server": []
+}

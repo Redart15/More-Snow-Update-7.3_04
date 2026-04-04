@@ -1,9 +1,9 @@
 package net.helinos.moresnow.block.logic;
 
+import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFencePainted;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.helper.DyeColor;
 
 public class BlockLogicSnowyFencePainted<T extends BlockLogic> extends BlockLogicSnowyFence<T, BlockLogicFencePainted> implements PaintedBlock {

@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixin.accessor;
+package net.helinos.moresnow.mixins.mixin.accessor;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.item.block.ItemBlock;

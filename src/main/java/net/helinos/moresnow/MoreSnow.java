@@ -1,8 +1,10 @@
 package net.helinos.moresnow;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
+import net.helinos.moresnow.command.MoreSnowCommand;
 import net.minecraft.client.gui.options.data.OptionsPage;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
@@ -20,7 +22,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, ModInitializer, ClientModInitializer, BlockInitEntrypoint {
+public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, ModInitializer, ClientModInitializer, BlockInitEntrypoint, DedicatedServerModInitializer {
 	public static final String MOD_ID = "moresnow";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final TomlConfigHandler CONFIG = new TomlConfigHandler(MOD_ID, new Toml("More Snow configuration file."), false);
@@ -55,7 +57,14 @@ public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, Mod
 	public void onInitialize() {/* no need */}
 
 	@Override
-	public void onInitializeClient() {/* no need */}
+	public void onInitializeClient() {
+		MoreSnowCommand.registerClientCommands();
+	}
+
+	@Override
+	public void onInitializeServer() {
+		MoreSnowCommand.registerServerCommands();
+	}
 
 	@Override
 	public void afterGameStart(){
@@ -80,4 +89,6 @@ public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, Mod
 	public void afterBlockInit() {
 		MoreSnowBlocks.init();
 	}
+
+
 }

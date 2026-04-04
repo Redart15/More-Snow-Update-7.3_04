@@ -1,9 +1,10 @@
-package net.helinos.moresnow.block.init;
+package net.helinos.moresnow.block;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.helinos.moresnow.MoreSnow;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyFencePainted;
-import net.helinos.moresnow.mixin.accessor.BlockAccessor;
+import net.helinos.moresnow.mixins.mixin.accessor.BlockAccessor;
 import net.minecraft.core.block.*;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.data.tag.Tag;
@@ -46,13 +47,11 @@ public class MoreSnowBlocks {
 	public static Block<?> SLATY_FENCE_CHAINLINK;
 
 	private static boolean initialized = false;
-	private static int count = 0;
+	protected static int count = 0;
 	private static final String UNFORMATTED_MESSAGE = "%6d \t %14s -> %s";
 	private static final int STARTING_ID = 4500;
 	private static int currentID = STARTING_ID;
-//	public static final Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.NOT_IN_CREATIVE_MENU;
-	public static final Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.OVERRIDE_STEPSOUND;
-	public static final String MOD_ID = MoreSnow.MOD_ID;
+	public static Tag<Block<?>> NOT_IN_CREATIVE_MENU = BlockTags.NOT_IN_CREATIVE_MENU;
 
 	private MoreSnowBlocks() {
 	}
@@ -62,6 +61,11 @@ public class MoreSnowBlocks {
 		if (initialized) return;
 		initialized = true;
 		LOGGER.info("Create Snowy variant of vanilla blocks.");
+		if(FabricLoader.getInstance().isDevelopmentEnvironment()){
+			NOT_IN_CREATIVE_MENU = BlockTags.OVERRIDE_STEPSOUND;
+		}
+
+
 		for (Block<? extends BlockLogic> block : Blocks.blocksList) {
 			if (block == null) {
 				continue;
@@ -75,10 +79,10 @@ public class MoreSnowBlocks {
 			for (Block<?> layerBlock : LAYERS) {
 				String prefix = MoreSnow.LAYERS.getKey(layerBlock);
 				MoreSnowBlockInitializer.createFlower(block, logic, prefix);
-				MoreSnowBlockInitializer.createFlowerStackable(block, logic, prefix);
-				MoreSnowBlockInitializer.createGrass(block, logic, prefix);
-				MoreSnowBlockInitializer.createSapling(block, logic, prefix);
-				MoreSnowBlockInitializer.createMushrooms(block, logic, prefix);
+//				MoreSnowBlockInitializer.createFlowerStackable(block, logic, prefix);
+//				MoreSnowBlockInitializer.createGrass(block, logic, prefix);
+//				MoreSnowBlockInitializer.createSapling(block, logic, prefix);
+//				MoreSnowBlockInitializer.createMushrooms(block, logic, prefix);
 				MoreSnowBlockInitializer.createSlab(block, logic, prefix);
 				MoreSnowBlockInitializer.createStairs(block, logic, prefix);
 				MoreSnowBlockInitializer.createFence(block, logic, prefix);
@@ -102,9 +106,10 @@ public class MoreSnowBlocks {
 	}
 
 	public static void printMessage(int id, String blockType, @NotNull NamespaceID namespaceID) {
-		String message = String.format(UNFORMATTED_MESSAGE, id, blockType, namespaceID);
-		LOGGER.info(message);
-		count++;
+		if(FabricLoader.getInstance().isDevelopmentEnvironment()){
+			String message = String.format(UNFORMATTED_MESSAGE, id, blockType, namespaceID);
+			LOGGER.info(message);
+		}
 	}
 
 	public static boolean convertBlock(World world, int id, int x, int y, int z, String prefix) {
@@ -121,10 +126,15 @@ public class MoreSnowBlocks {
 			DyeColor color = ((IPainted) logic).getColor(world, x, y, z);
 			name = name + "_" + color.colorID;
 		}
-		NamespaceID namespaceID = NamespaceID.getPermanent(MOD_ID, name);
+		NamespaceID namespaceID = NamespaceID.getPermanent(MoreSnowBlockInitializer.getModID(logic), name);
 		Block<?> replaceBlock = Blocks.blockMap.get(namespaceID);
 		if (replaceBlock == null || replaceBlock.getLogic() == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
-			return false;
+			NamespaceID adjusted = NamespaceID.getPermanent(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
+			Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
+			if (adjustedBlock == null || adjustedBlock.getLogic() == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
+				return false;
+			}
+			replaceBlock = adjustedBlock;
 		}
 		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(world, id, x, y, z);
 	}

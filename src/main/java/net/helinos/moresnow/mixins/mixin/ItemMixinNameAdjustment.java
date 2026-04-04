@@ -1,18 +1,18 @@
-package net.helinos.moresnow.mixin;
+package net.helinos.moresnow.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.helinos.moresnow.MoreSnow;
-import net.helinos.moresnow.block.init.MoreSnowBlocks;
+import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.helinos.moresnow.mixin.accessor.ItemBlockAccessor;
+import net.helinos.moresnow.mixins.mixin.accessor.ItemBlockAccessor;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.block.ItemBlock;
 import org.spongepowered.asm.mixin.Mixin;
 
-import static net.helinos.moresnow.block.init.MoreSnowBlocks.MOD_ID;
+import static net.helinos.moresnow.MoreSnow.MOD_ID;
 
 
 @Mixin(value = Item.class, remap = false)

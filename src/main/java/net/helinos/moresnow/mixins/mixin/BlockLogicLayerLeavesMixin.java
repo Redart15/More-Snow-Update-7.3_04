@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixin;
+package net.helinos.moresnow.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

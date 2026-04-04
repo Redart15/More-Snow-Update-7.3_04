@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixin;
+package net.helinos.moresnow.mixins.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -27,11 +27,14 @@ public abstract class BlockLogicLayerSnowMixin {
 
 	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I"))
 	private int blockId1(World world, int x, int y, int z, Operation<Integer> original) {
-		int id = original.call(world, x, y, z);
-		if (id == Blocks.LAYER_SNOW.id()) {
+		Block<?> block = world.getBlock(x, y, z);
+		if(block == null){
+			return 0;
+		}
+		if (block.id() == Blocks.LAYER_SNOW.id() || (block.getLogic() instanceof BlockLogicSnowy)) {
 			return Blocks.LAYER_SNOW.id();
 		}
-		return id;
+		return block.id();
 	}
 
 	@WrapOperation(method = "canPlaceBlockAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/block/Block;isSolidRender()Z"))

@@ -23,4 +23,9 @@ public class BlockLogicSnowyFenceChainlink<T extends BlockLogic> extends BlockLo
     public boolean isClimbable(World world, int x, int y, int z) {
        return true;
     }
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
+	}
  }

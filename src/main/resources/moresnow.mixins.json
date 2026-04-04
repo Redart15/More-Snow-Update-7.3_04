@@ -3,7 +3,7 @@
   "mixinextras": {
     "minVersion": "0.5.0"
   },
-  "package": "net.helinos.moresnow.mixin",
+  "package": "net.helinos.moresnow.mixins.mixin",
   "compatibilityLevel": "JAVA_${java}",
   "injectors": {
     "defaultRequire": 1

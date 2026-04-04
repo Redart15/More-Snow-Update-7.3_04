@@ -5,6 +5,7 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFenceWallPaper;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.tag.BlockTags;
+import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
 public class BlockLogicSnowyFenceWallPaper<T extends BlockLogic> extends BlockLogicSnowyFenceThin<T, BlockLogicFenceWallPaper> {
@@ -16,5 +17,10 @@ public class BlockLogicSnowyFenceWallPaper<T extends BlockLogic> extends BlockLo
 	public boolean canConnectTo(WorldSource world, int x, int y, int z) {
 		int blockID = world.getBlockId(x, y, z);
 		return Blocks.hasTag(blockID, BlockTags.FENCES_CONNECT);
+	}
+
+	@Override
+	public boolean getSupportsOwnSnow() {
+		return false;
 	}
 }
