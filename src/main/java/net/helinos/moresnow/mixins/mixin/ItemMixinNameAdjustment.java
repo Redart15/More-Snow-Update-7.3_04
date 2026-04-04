@@ -21,7 +21,7 @@ public abstract class ItemMixinNameAdjustment {
 	private String adjustName(ItemStack itemstack, Operation<String> original){
 		String result = original.call(itemstack);
 		Item asThis = (Item) (Object) this;
-		if(asThis instanceof ItemBlock && MOD_ID.equals(asThis.namespaceID.namespace())){
+		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
 			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
 				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy)block.getLogic()).layerBlock)) + result;
@@ -33,7 +33,7 @@ public abstract class ItemMixinNameAdjustment {
 	@WrapMethod(method = "getTranslatedDescription")
 	private String adjustDesc(ItemStack itemstack, Operation<String> original){
 		Item asThis = (Item) (Object) this;
-		if(asThis instanceof ItemBlock && MOD_ID.equals(asThis.namespaceID.namespace())){
+		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
 			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
 				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(block));
