@@ -25,14 +25,10 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 
 	public void register(CommandDispatcher<CommandSource> dispatcher) {
 		ArgumentBuilderLiteral<CommandSource> command =
-			(ArgumentBuilderLiteral) ((ArgumentBuilderLiteral) ArgumentBuilderLiteral.literal("protect")
+			(ArgumentBuilderLiteral) ((ArgumentBuilderLiteral) ArgumentBuilderLiteral.literal("lesssnow")
 				.requires((t) -> ((CommandSource) t).hasAdmin())
-				.then(ArgumentBuilderLiteral.literal("chunk")
-					.executes(CommandRemoveSnowy::chunk)
-					.then(ArgumentBuilderRequired.argument("point", ArgumentTypeVec3.vec3d())
-						.executes(CommandRemoveSnowy::chunk))
-					.then(ArgumentBuilderRequired.argument("radius", ArgumentTypeInteger.integer(1, 9))
-						.executes(CommandRemoveSnowy::chunkRadius))));
+				.then(ArgumentBuilderRequired.argument("radius", ArgumentTypeInteger.integer(1, 9))
+					.executes(CommandRemoveSnowy::chunkRadius)));
 		dispatcher.register(command);
 	}
 
@@ -54,21 +50,6 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 		return sum;
 	}
 
-	private static int chunk(CommandContext<Object> context) {
-		CommandSource source = (CommandSource) context.getSource();
-		DoubleCoordinates point;
-		try {
-			point = context.getArgument("point", DoubleCoordinates.class);
-		} catch (IllegalArgumentException noargs) {
-			Player player = source.getSender();
-			DoubleCoordinate x = new DoubleCoordinate(false, player.x);
-			DoubleCoordinate y = new DoubleCoordinate(false, player.y);
-			DoubleCoordinate z = new DoubleCoordinate(false, player.z);
-			point = new DoubleCoordinates(x, y, z);
-		}
-		return CommandRemoveSnowy.chunk(source, point);
-	}
-
 	private static int chunk(CommandSource source, DoubleCoordinates point) {
 		int fx;
 		int fz;
@@ -80,38 +61,32 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 		}
 		World world = source.getWorld();
 		Chunk chunk = world.getChunkFromChunkCoords(Math.floorDiv(fx, 16), Math.floorDiv(fz, 16));
-		if(!chunk.isLoaded){
+		if (!chunk.isLoaded) {
 			return 0;
 		}
-		for (int i = 0; i < Chunk.CHUNK_SECTIONS; i++) {
-			ChunkSection section = chunk.getSection(i);
-			for (int x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
-				for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
-					for (int y = 0; y < ChunkSection.SECTION_SIZE_Y; y++) {
-						CommandRemoveSnowy.removeSnowyBlocks(section, x, y, z);
-					}
+
+		for (int x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
+			for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
+				for (int y = 0; y < World.HEIGHT_BLOCKS; y++) {
+					CommandRemoveSnowy.removeSnowyBlocks(chunk, x, y, z);
 				}
 			}
 		}
+
 		return 1;
 	}
 
-	private static void removeSnowyBlocks(ChunkSection section, int x, int y, int z) {
-		int id = section.getBlock(x, y, z);
+	private static void removeSnowyBlocks(Chunk chunk, int x, int y, int z) {
+		int id = chunk.getBlockID(x, y, z);
 		if (id == 0) {
 			return;
 		}
 		Block<?> block = Blocks.getBlock(id);
-		if (block == null || block.getLogic() == null) {
+		if (block == null || block.getLogic() == null || !(block.getLogic() instanceof BlockLogicSnowy)) {
 			return;
 		}
-		BlockLogic logic = block.getLogic();
-		if (!(logic instanceof BlockLogicSnowy)) {
-			return;
-		}
-		BlockLogicSnowy snowy = (BlockLogicSnowy) logic;
-		section.setBlock(x, y, z, (short) snowy.storedBlock.id());
-		section.setData(x, y, z, snowy.getStoredBlockMetadata(section.getData(x, y, z)));
+		BlockLogicSnowy snowy = (BlockLogicSnowy) block.getLogic();
+		chunk.setBlockIDWithMetadataRaw(x, y, z, snowy.storedBlock.id(), snowy.getStoredBlockMetadata(chunk.getBlockMetadata(x,y,z)));
 	}
 
 }

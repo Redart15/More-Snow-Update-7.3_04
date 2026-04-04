@@ -123,7 +123,7 @@ public abstract class WeatherSnowMixin extends Weather {
 		if (y < 0 || y >= world.getHeightBlocks() || chunk.getBrightness(LightLayer.Block, x, y, z) >= 10 || MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snow_%s")) {
 			return;
 		}
-		int blockIDBelow = chunk.getBlockID(x, y - 1, z);
-		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y - 1, z, "snow_%s");
+		int blockIDBelow = chunk.getBlockID(x, y, z);
+		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y, z, "snow_%s");
 	}
 }

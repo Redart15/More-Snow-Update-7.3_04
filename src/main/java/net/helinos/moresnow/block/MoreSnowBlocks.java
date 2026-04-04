@@ -155,12 +155,17 @@ public class MoreSnowBlocks {
 			DyeColor color = DyeColor.colorFromBlockMeta(metadata >> 4);
 			name = name + "_" + color.colorID;
 		}
-		NamespaceID namespaceID = NamespaceID.getPermanent(MOD_ID, name);
+		NamespaceID namespaceID = NamespaceID.getPermanent(MoreSnowBlockInitializer.getModID(logic), name);
 		Block<?> replaceBlock = Blocks.blockMap.get(namespaceID);
 		if (replaceBlock == null || replaceBlock.getLogic() == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
-			return false;
+			NamespaceID adjusted = NamespaceID.getPermanent(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
+			Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
+			if (adjustedBlock == null || adjustedBlock.getLogic() == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
+				return false;
+			}
+			replaceBlock = adjustedBlock;
 		}
-		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(chunk, replaceBlock.id(), x, y, z);
+		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(chunk, id, x, y, z);
 	}
 
 	public static @NotNull String prePendName(Block<?> block, ItemStack itemStack, String prefix) {

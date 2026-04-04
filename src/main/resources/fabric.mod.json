@@ -24,7 +24,7 @@
 		"initModels": 				["net.helinos.moresnow.model.MSModels"],
 		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"],
 		"server": 						["net.helinos.moresnow.MoreSnow"],
-		"preLaunch": 					["net.helinos.moresnow.compat.aether.MoreSnowAetherMixins"]
+		"preLaunch": 					["net.helinos.moresnow.compat.aether.MoreSnowAetherLoader"]
 	},
   "mixins": [
     "moresnow.mixins.json"

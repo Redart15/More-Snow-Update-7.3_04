@@ -5,7 +5,7 @@ import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.spongepowered.asm.mixin.Mixins;
 import turniplabs.halplibe.helper.EnvironmentHelper;
 
-public class MoreSnowAetherMixins implements PreLaunchEntrypoint {
+public class MoreSnowAetherLoader implements PreLaunchEntrypoint {
 
 	@Override
 	public void onPreLaunch() {
