@@ -3,10 +3,12 @@
   "id": "moresnow",
   "version": "${version}",
   "name": "More Snow",
-  "description": "Add more snow to BTA.",
+  "description": "Add more snow to BTA, as well support for other layers.",
   "authors": [
-    "Helinos"
+    "Helinos",
+		"Redart15"
   ],
+	"icon": "icon.png",
   "contact": {
     "sources": "https://github.com/Helinos/More-Snow",
     "issues": "https://github.com/Helinos/More-Snow/issues"

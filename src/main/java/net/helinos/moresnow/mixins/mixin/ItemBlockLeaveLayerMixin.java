@@ -40,6 +40,9 @@ public class ItemBlockLeaveLayerMixin {
 
 		if (itemstack.itemID == layerBlock.id() && side == Side.TOP && block.getLogic() instanceof BlockLogicSnowy) {
 			BlockLogicSnowy<?> blockSnowy = (BlockLogicSnowy<?>) block.getLogic();
+			if(blockSnowy.layerBlock.id() != layerBlock.id()){
+				return false;
+			}
 			int newLayers = blockSnowy.getLayers(metadata) + 1;
 
 			AABB bbBox = AABB.getTemporaryBB(blockX, blockY, blockZ, block.getBounds().maxX, block.getBounds().maxY + 0.125f, block.getBounds().maxZ);
