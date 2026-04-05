@@ -60,7 +60,7 @@ public class MoreSnowBlocks {
 	public static void init() {
 		if (initialized) return;
 		initialized = true;
-		LOGGER.info("Create Snowy variant of vanilla blocks.");
+		LOGGER.info("Create Snowy variants of blocks.");
 		if(FabricLoader.getInstance().isDevelopmentEnvironment()){
 			NOT_IN_CREATIVE_MENU = BlockTags.OVERRIDE_STEPSOUND;
 		}
@@ -91,6 +91,7 @@ public class MoreSnowBlocks {
 			}
 			MoreSnowBlockInitializer.createFenceThin(block, logic);
 		}
+		LOGGER.info("Finished creating snowy variants of blocks");
 		LOGGER.info("Blocks created:{}", count);
 	}
 

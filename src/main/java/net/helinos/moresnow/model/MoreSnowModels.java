@@ -12,12 +12,14 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 
 import static net.helinos.moresnow.block.MoreSnowBlocks.*;
+import static net.helinos.moresnow.MoreSnow.*;
 
 public class MoreSnowModels {
 	public static final String SNOW_PATH = "minecraft:block/block_snow";
 	public static final double zFactor = 0.0001;
 
 	public static void initBlockModels(BlockModelDispatcher dispatcher) {
+		LOGGER.info("Assign models to snowy blocks.");
 		String texID = "minecraft:block/block_snow";
 		MoreSnowModels.assignModelCrossed(dispatcher, texID);
 //		MoreSnowModels.assignModelFlower(dispatcher, texID);
@@ -28,6 +30,7 @@ public class MoreSnowModels {
 		MoreSnowModels.assignModelFence(dispatcher, texID);
 		MoreSnowModels.assignModelFenceThin(dispatcher, texID);
 		MoreSnowModels.assignModelFenceGate(dispatcher, texID);
+		LOGGER.info("Finished assigning models.");
 	}
 
 	private static void assignModelCrossed(BlockModelDispatcher dispatcher, String texID){

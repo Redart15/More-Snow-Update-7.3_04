@@ -25,44 +25,26 @@ import org.slf4j.LoggerFactory;
 public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, ModInitializer, ClientModInitializer, BlockInitEntrypoint, DedicatedServerModInitializer {
 	public static final String MOD_ID = "moresnow";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final TomlConfigHandler CONFIG = new TomlConfigHandler(MOD_ID, new Toml("More Snow configuration file."), false);
     public static final Registry<Block<?>> LAYERS = new Registry<>();
-    public ModSettings modSettings;
 	public static I18n LANGUAGE = null;
 	public static OptionsPage MOD_OPTIONS = null;
 
-	static {
-		File configFile = CONFIG.getConfigFile();
-		if (configFile.exists()) {
-			CONFIG.loadConfig();
-            CONFIG.setDefaults(CONFIG.getRawParsed());
-		} else {
-			Toml defaultConfig = new Toml("More Snow configuration file.");
-			defaultConfig.addCategory("BlockIDs");
-
-			CONFIG.setDefaults(defaultConfig);
-
-			try {
-                configFile.getParentFile().mkdirs();
-                configFile.createNewFile();
-                CONFIG.writeConfig();
-                CONFIG.loadConfig();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to generate configuration file!", e);
-            }
-		}
-	}
+	// not going to be needed for the version
+	public ModSettings modSettings;
+	public static final TomlConfigHandler CONFIG = new TomlConfigHandler(MOD_ID, new Toml("More Snow configuration file."), false);
 
 	@Override
 	public void onInitialize() {/* no need */}
 
 	@Override
 	public void onInitializeClient() {
+		LOGGER.info("Register client side commands.");
 		MoreSnowCommand.registerClientCommands();
 	}
 
 	@Override
 	public void onInitializeServer() {
+		LOGGER.info("Register server side commands.");
 		MoreSnowCommand.registerServerCommands();
 	}
 
@@ -73,6 +55,7 @@ public class MoreSnow implements ClientStartEntrypoint, GameStartEntrypoint, Mod
 
 	@Override
 	public void beforeGameStart() {
+		LOGGER.info("Register more snow layers.");
 		MoreSnow.LAYERS.register("snow", Blocks.LAYER_SNOW);
 		MoreSnow.LAYERS.register("leaves", Blocks.LAYER_LEAVES_OAK);
 		MoreSnow.LAYERS.register("slate", Blocks.LAYER_SLATE);
