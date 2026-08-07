@@ -1,6 +1,7 @@
 package net.helinos.moresnow.block.logic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
 import net.helinos.moresnow.block.interfaces.PaintedBlock;
@@ -11,6 +12,10 @@ import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation, PaintedBlock {
 	protected DyeColor color;
@@ -27,7 +32,7 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 	}
 
 	@Override
-	public String getLanguageKey(int meta) {
+	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 
@@ -36,44 +41,46 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 		return id == getStoredBlockId(metadata) && (metadata & 8) == 0;
 	}
 
-	public boolean tryMakeSnowy(World world, int id, int meta, int x, int y, int z) {
-		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, world, id, meta, x, y, z);
+	public boolean tryMakeSnowy(World world, int id, int meta, TilePosc tilePosc) {
+		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, world, id, meta, tilePosc);
 	}
 
-	public boolean tryMakeSnowy(Chunk chunk, int id, int meta, int x, int y, int z) {
-		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, chunk, id, meta, x, y, z);
-	}
-
-	@Override
-	public void accumulate(World world, int x, int y, int z) {
-		super.accumulate(world, x, y, z);
+	public boolean tryMakeSnowy(Chunk chunk, int id, int meta, TilePosc tilePosc) {
+		return BlockLogicSnowyStairs.tryMakeSnowyDo(this, chunk, id, meta, tilePosc);
 	}
 
 	@Override
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	public void getCollidingBoundingBoxes(World world, int x, int y, int z, AABB aabb, ArrayList aabbList) {
-		int metadata = world.getBlockMetadata(x, y, z);
+	public void accumulate(World world, TilePosc tilePosc) {
+		super.accumulate(world, tilePosc);
+	}
+
+	@Override
+	public void getCollisionAABBs(@NotNull World world, @NotNull TilePosc tilePos, @NotNull AABBdc aabb, @NotNull List<@NotNull AABBdc> aabbList) {
+		int metadata = world.getBlockData(tilePos);
 		int rotation = this.getRotation(metadata);
 		int layers = this.getLayers(metadata);
 		double heightFromSnow = layers * 2 / 16.0;
+		int x = tilePos.x();
+		int y = tilePos.y();
+		int z = tilePos.z();
 		if (rotation == 0) {
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, 1.0, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.0, 0.5, 0.5 + heightFromSnow, 1.0).translate(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.5, 0.0, 0.0, 1.0, 1.0, 1.0).translate(x, y, z), aabbList);
 		} else if (rotation == 1) {
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, 1.0, 1.0).move(x, y, z), aabbList);
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.0, 0.5, 1.0, 1.0).translate(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.5, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 1.0).translate(x, y, z), aabbList);
 		} else if (rotation == 2) {
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 0.5).move(x, y, z), aabbList);
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, 1.0, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.0, 1.0, 0.5 + heightFromSnow, 0.5).translate(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.5, 1.0, 1.0, 1.0).translate(x, y, z), aabbList);
 		} else {
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 1.0, 0.5).move(x, y, z), aabbList);
-			this.addIntersectingBoundingBox(aabb, AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, 0.5 + heightFromSnow, 1.0).move(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.0, 1.0, 1.0, 0.5).translate(x, y, z), aabbList);
+			this.addIntersectingBoundingBox(aabb, new AABBd(0.0, 0.0, 0.5, 1.0, 0.5 + heightFromSnow, 1.0).translate(x, y, z), aabbList);
 		}
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
-		BlockLogicSnowyStairs.onNeighborBlockChangeDo(this, world, x, y, z, blockId);
+	public void onNeighborChanged(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Block<?> block) {
+		BlockLogicSnowyStairs.onNeighborBlockChangeDo(this, world, tilePos, block);
 	}
 
 	@Override

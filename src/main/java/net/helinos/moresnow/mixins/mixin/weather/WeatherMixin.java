@@ -5,6 +5,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.TilePos;
 import net.minecraft.core.world.weather.Weather;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +35,7 @@ public abstract class WeatherMixin {
 				world.setBlockMetadata(x, y, z, metadata - 1);
 				world.markBlockNeedsUpdate(x, y, z);
 			} else if (!world.getBlockBiome(x, y, z).hasSurfaceSnow()) {
-				blockSnowy.removeSnow(world, metadata, x, y, z);
+				blockSnowy.removeSnow(world, metadata, new TilePos(x, y, z));
 			}
 		}
 	}
@@ -54,6 +55,6 @@ public abstract class WeatherMixin {
 		if (layers > 1 && world.getBlockBiome(chunk.xPosition * 16 + x, y, chunk.zPosition * 16 + z).hasSurfaceSnow()) {
 			chunk.setBlockMetadata(x, y, z, metadata - (layers - 2));
 		}
-		blockSnowy.removeSnow(chunk, metadata, x, y, z);
+		blockSnowy.removeSnow(chunk, metadata, new TilePos(x, y, z));
 	}
 }

@@ -12,6 +12,8 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelStandard<T> {
@@ -25,14 +27,14 @@ public abstract class BlockModelSnowy<T extends BlockLogic> extends BlockModelSt
 		this.iconCoordinate = TextureRegistry.getTexture(texID);
 	}
 
-    @Override
-    public IconCoordinate getBlockTexture(WorldSource blockAccess, int x, int y, int z, Side side) {
-        if (this.renderingSnow) {
-            return this.iconCoordinate;
-        }
-        int metadata = blockAccess.getBlockMetadata(x, y, z);
-        return this.getBlockTextureFromSideAndMetadata(side, metadata);
-    }
+	@Override
+	public @Nullable IconCoordinate getBlockTexture(@NotNull WorldSource source, @NotNull TilePosc tilePos, @NotNull Side side) {
+		if (this.renderingSnow) {
+			return this.iconCoordinate;
+		}
+		int metadata = source.getBlockData(tilePos);
+		return this.getBlockTextureFromSideAndMetadata(side, metadata);
+	}
 
 	/// TODO: figure out if this is needed
     @Override

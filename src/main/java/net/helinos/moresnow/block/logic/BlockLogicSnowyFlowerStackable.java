@@ -12,6 +12,10 @@ import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicPlant {
 
@@ -20,30 +24,31 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 		block.setTicking(true);
 	}
 
+
 	@Override
-	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y, z);
+	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
+		int metadata = source.getBlockData(tilePos);
 		int layers = this.getLayers(metadata);
 		double height = layers * 2 / 16.0;
-		return AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, height, 1.0);
+		return new AABBd(0.0, 0.0, 0.0, 1.0, height, 1.0);
 	}
 
+
+	@SuppressWarnings({"java:S5411"})
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random random) {
-		super.updateTick(world, x, y, z, random);
-
-		int metadata = world.getBlockMetadata(x, y, z);
-
+	public void updateTick(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Random random, boolean isRandomTick) {
+		super.updateTick(world, tilePos, random, isRandomTick);
+		int metadata = world.getBlockData(tilePos);
 		if (
 			!BlockLogicFlower.isPermanent(metadata) &&
-			world.getGameRuleValue(GameRules.DO_SEASONAL_GROWTH) &&
-			world.getSeasonManager().getCurrentSeason() != null &&
-			world.getSeasonManager().getCurrentSeason().killFlowers &&
-			this.getKilledByWeather(metadata) &&
-			random.nextInt(256) == 0
+				world.getGameRuleValue(GameRules.DO_SEASONAL_GROWTH) &&
+				world.getSeasonManager().getCurrentSeason() != null &&
+				world.getSeasonManager().getCurrentSeason().killFlowers &&
+				this.getKilledByWeather(metadata) &&
+				random.nextInt(256) == 0
 		) {
-			this.dropBlockWithCause(world, EnumDropCause.WORLD, x, y, z, world.getBlockMetadata(x, y, z), null, null);
-			world.setBlockAndMetadataWithNotify(x, y, z, Blocks.LAYER_SNOW.id(), this.getLayers(metadata) - 1);
+			this.dropWithCause(world, EnumDropCause.WORLD, tilePos,world.getBlockData(tilePos), null, null);
+			world.setBlockTypeDataNotify(tilePos, Blocks.LAYER_SNOW, this.getLayers(metadata) - 1);
 		}
 	}
 

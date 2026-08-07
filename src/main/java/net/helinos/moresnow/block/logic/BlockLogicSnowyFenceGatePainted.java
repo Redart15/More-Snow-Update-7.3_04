@@ -4,6 +4,7 @@ import net.helinos.moresnow.block.interfaces.PaintedBlock;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.util.helper.DyeColor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockLogicSnowyFenceGatePainted extends BlockLogicSnowyFenceGate  implements PaintedBlock {
@@ -20,7 +21,7 @@ public class BlockLogicSnowyFenceGatePainted extends BlockLogicSnowyFenceGate  i
 	}
 
 	@Override
-	public String getLanguageKey(int meta) {
+	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 

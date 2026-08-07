@@ -6,6 +6,10 @@ import net.minecraft.core.block.BlockLogicSlab;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab> extends BlockLogicSnowy<T> {
 	public BlockLogicSnowySlab(Block<T> block, Block<?> storedBlock) {
@@ -20,12 +24,14 @@ public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab>
 		}
 		return false;
 	}
-
 	@Override
-	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		int l = this.getRelativeLayers(world.getBlockMetadata(x, y, z)) - 1;
+	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
+		int x = tilePos.x();
+		int y = tilePos.y();
+		int z = tilePos.z();
+		int l = this.getRelativeLayers(source.getBlockMetadata(x, y, z)) - 1;
 		float f = (2 * (1 + l)) / 16.0F;
-		return AABB.getTemporaryBB(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
+		return new AABBd(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
 	}
 
 	@Override

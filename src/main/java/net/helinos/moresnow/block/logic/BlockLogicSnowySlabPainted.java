@@ -7,6 +7,11 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogicSnowy<T> implements PaintedBlock {
 	private final DyeColor color;
@@ -22,7 +27,7 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 	}
 
 	@Override
-	public String getLanguageKey(int meta) {
+	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(this.color.blockMeta << 4);
 	}
 
@@ -32,10 +37,13 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 	}
 
 	@Override
-	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		int l = this.getRelativeLayers(world.getBlockMetadata(x, y, z)) - 1;
+	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
+		int x = tilePos.x();
+		int y = tilePos.y();
+		int z = tilePos.z();
+		int l = this.getRelativeLayers(source.getBlockData(new TilePos(x, y, z)) - 1);
 		float f = (2 * (1 + l)) / 16.0F;
-		return AABB.getTemporaryBB(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
+		return new AABBd(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
 	}
 
 	@Override

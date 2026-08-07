@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
+import net.minecraft.core.block.material.Materials;
 import net.minecraft.core.world.LevelListener;
 
 import net.minecraft.core.block.Block;
@@ -21,7 +22,13 @@ import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.biome.BiomeTags;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.ChunkTilePos;
+import net.minecraft.core.world.pos.ChunkTilePosc;
+import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
@@ -57,6 +64,10 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return storedBlock;
 	}
 
+	public Block<?> getStoredBlock(int metadata) {
+		return storedBlock;
+	}
+
 	@SuppressWarnings("java:S1172")
 	public int getStoredBlockId(int metadata) {
 		return this.storedBlock.id();
@@ -73,7 +84,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	}
 
 	@Override
-	public String getLanguageKey(int meta) {
+	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "bug" : storedBlock.getLogic().getLanguageKey(meta);
 	}
 
@@ -93,15 +104,17 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return this.maxLayers + this.lowestLayerHeight;
 	}
 
-	public boolean canSupportSnow(World world, int x, int y, int z) {
-		Block<?> belowBlock = world.getBlock(x, y - 1, z);
-		int belowMetadata = world.getBlockMetadata(x, y - 1, z);
+	public boolean canSupportSnow(World world, TilePosc tilePosc) {
+		TilePosc posBelow = new TilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
+		Block<?> belowBlock = world.getBlockType(posBelow);
+		int belowMetadata = world.getBlockData(posBelow);
 		return this.canSupportSnow(belowBlock, belowMetadata);
 	}
 
-	public boolean canSupportSnow(Chunk chunk, int x, int y, int z) {
-		int belowID = chunk.getBlockID(x, y - 1, z);
-		int belowMetadata = chunk.getBlockMetadata(x, y - 1, z);
+	public boolean canSupportSnow(Chunk chunk, TilePosc tilePosc) {
+		ChunkTilePosc posBelow = new ChunkTilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
+		int belowID = chunk.getBlockId(posBelow);
+		int belowMetadata = chunk.getBlockData(posBelow);
 		Block<?> belowBlock = Blocks.getBlock(belowID);
 		return this.canSupportSnow(belowBlock, belowMetadata);
 	}
@@ -115,19 +128,17 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		}
 		Material belowMaterial = belowBlock.getMaterial();
 		BlockLogic logic = belowBlock.getLogic();
-		if (logic instanceof BlockLogicSnowy) {
-			BlockLogicSnowy snowyLogic = (BlockLogicSnowy) logic;
-			if (snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()) {
+		if (logic instanceof BlockLogicSnowy<?> snowyLogic && snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()) {
 				return true;
 			}
-		}
+
 		if ((logic instanceof BlockLogicSlab && (metadata & 0b11) != 0) || (logic instanceof BlockLogicStairs && (metadata & 0b1000) != 0)) {
 			return true;
 		}
 		if (belowBlock == Blocks.ICE || (!belowBlock.isSolidRender() && !(logic instanceof BlockLogicLeavesBase))) {
 			return false;
 		}
-		return belowMaterial == Material.leaves || belowMaterial.blocksMotion();
+		return belowMaterial == Materials.LEAVES || belowMaterial.blocksMotion();
 	}
 
 	/**
@@ -136,11 +147,11 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 * @param id The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
 	 */
-	public boolean tryMakeSnowy(World world, int id, int x, int y, int z) {
-		int meta = world.getBlockMetadata(x, y, z);
-		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(world, x, y, z))
+	public boolean tryMakeSnowy(World world, int id, TilePosc tilePos) {
+		int meta = world.getBlockData(tilePos);
+		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(world, tilePos))
 			return false;
-		return world.setBlockAndMetadataWithNotify(x, y, z, this.block.id(), this.blockToMetadata(id, meta));
+		return world.setBlockTypeDataNotify(tilePos, this.block, this.blockToMetadata(id, meta));
 	}
 
 	/**
@@ -149,68 +160,72 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 * @param id The block id to be "stored" inside the snow covered block
 	 * @return Whether the block was placed successfully
 	 */
-	public boolean tryMakeSnowy(Chunk chunk, int id, int x, int y, int z) {
-		int meta = chunk.getBlockMetadata(x, y, z);
-		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(chunk, x, y, z))
+	public boolean tryMakeSnowy(Chunk chunk, int id, TilePosc tilePos) {
+		ChunkTilePos chunkTilePos = new ChunkTilePos(tilePos);
+		int meta = chunk.getBlockData(chunkTilePos);
+		if (!this.canReplaceBlock(id, meta) || !canSupportSnow(chunk, tilePos))
 			return false;
-		return chunk.setBlockIDWithMetadata(x, y, z, this.block.id(), this.blockToMetadata(id, meta));
+		return chunk.setBlockIdData(chunkTilePos, this.block.id(), this.blockToMetadata(id, meta));
 	}
 
 	/**
 	 * Remove the snow covered block and replace it with its actual block
 	 *
 	 * @param metadata The metadata of the snow covered block
-	 * @see BlockLogicSnowy#removeSnow(Chunk, int, int, int, int)
+	 * @see BlockLogicSnowy#removeSnow(World, int, TilePosc)
 	 */
-	public void removeSnow(World world, int metadata, int x, int y, int z) {
-		world.setBlockAndMetadataWithNotify(x, y, z, this.getStoredBlockId(metadata), this.getStoredBlockMetadata(metadata));
+	public void removeSnow(World world, int metadata, TilePosc tilePos) {
+		world.setBlockTypeDataNotify(tilePos, this.getStoredBlock(metadata), this.getStoredBlockMetadata(metadata));
 	}
 
 	/**
 	 * Remove the snow covered block and replace it with its actual block
 	 *
 	 * @param metadata The metadata of the snow covered block
-	 * @see BlockLogicSnowy#removeSnow(World, int, int, int, int)
+	 * @see BlockLogicSnowy#removeSnow(Chunk, int, TilePosc)
 	 */
-	public void removeSnow(Chunk chunk, int metadata, int x, int y, int z) {
-		chunk.setBlockIDWithMetadata(x, y, z, this.getStoredBlockId(metadata), this.getStoredBlockMetadata(metadata));
+	public void removeSnow(Chunk chunk, int metadata, TilePosc tilePos) {
+		chunk.setBlockIdData(new ChunkTilePos(tilePos), this.getStoredBlockId(metadata), this.getStoredBlockMetadata(metadata));
 	}
 
 	// Vanilla accumulate function but get layers from function rather than directly
 	// from metadata
-	public void accumulate(World world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y + 1, z);
+	public void accumulate(World world, TilePosc tilePos) {
+		int x = tilePos.x();
+		int y = tilePos.y();
+		int z = tilePos.z();
+		int metadata = world.getBlockData(new TilePos(x, y + 1, z));
 		int layers = this.getLayers(metadata);
 		if (layers >= this.getMaxLayers()) {
 			return;
 		}
 		int relativeLayers = this.getRelativeLayers(metadata);
-
-		if (!this.isBlockValid(world, x + 1, y + 1, z, relativeLayers)) {
+		if (!this.isBlockValid(world, new TilePos(x + 1, y + 1, z), relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x, y + 1, z + 1, relativeLayers)) {
+		if (!this.isBlockValid(world, new TilePos(x, y + 1, z + 1), relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x - 1, y + 1, z, relativeLayers)) {
+		if (!this.isBlockValid(world, new TilePos(x - 1, y + 1, z), relativeLayers)) {
 			return;
 		}
-		if (!this.isBlockValid(world, x, y + 1, z - 1, relativeLayers)) {
+		if (!this.isBlockValid(world, new TilePos(x, y + 1, z - 1), relativeLayers)) {
 			return;
 		}
-		world.setBlockMetadataWithNotify(x, y + 1, z, metadata + 1);
+		world.setBlockDataNotify(new TilePos(x, y + 1, z), metadata + 1);
 	}
 
-	private boolean isBlockValid(World world, int x, int y, int z, int relativeLayers) {
-		return world.isBlockOpaqueCube(x, y, z) || this.isSnow(world, x, y, z) && this.getOthersLayers(world, x, y, z) >= relativeLayers;
+
+	private boolean isBlockValid(World world, TilePosc tilePosc, int relativeLayers) {
+		return world.isBlockOpaqueCube(tilePosc) || this.isSnow(world, tilePosc) && this.getOthersLayers(world, tilePosc) >= relativeLayers;
 	}
 
 	/**
 	 * @return True if the block at the given coordinates is either snow covered or
 	 * a snow layer
 	 */
-	private boolean isSnow(World world, int x, int y, int z) {
-		int id = world.getBlockId(x, y, z);
+	private boolean isSnow(World world, TilePosc tilePosc) {
+		int id = world.getBlockType(tilePosc).id();
 		return id == Blocks.LAYER_SNOW.id();
 	}
 
@@ -218,9 +233,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 * @return How many layers a block at the given coordinates has, presuming the
 	 * block is snowy or a layer block
 	 */
-	private int getOthersLayers(World world, int x, int y, int z) {
-		Block<?> block = world.getBlock(x, y, z);
-		int metadata = world.getBlockMetadata(x, y, z);
+	private int getOthersLayers(World world, TilePosc tilePosc) {
+		Block<?> block = world.getBlockType(tilePosc);
+		int metadata = world.getBlockData(tilePosc);
 
 		if (block.getLogic() instanceof BlockLogicSnowy) {
 			return ((BlockLogicSnowy<?>) block.getLogic()).getRelativeLayers(metadata);
@@ -228,50 +243,45 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return metadata;
 	}
 
+
 	@Override
-	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, Side side, int metadata, Player player, Item item) {
-		this.removeSnow(world, metadata, x, y, z);
+	public void onDestroyedByPlayer(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Side side, int metadata, @NotNull Player player, @Nullable Item item) {
+		this.removeSnow(world, metadata, tilePos);
 	}
 
 	@Override
-	public ItemStack[] getBreakResult(World world, EnumDropCause dropCause, int x, int y, int z, int meta, TileEntity tileEntity) {
-		switch (dropCause) {
-			case SILK_TOUCH:
-			case PICK_BLOCK:
-			case PROPER_TOOL: {
-				return this.layerBlock.getBreakResult(world, dropCause, x, y, z, this.getLayers(meta) - 1, tileEntity);
-			}
-			case IMPROPER_TOOL: {
-				return null;
-			}
-			default: { // Drop the underlying block if it's destroyed by WORLD or EXPLOSION
-				return storedBlock.getBreakResult(world, dropCause, x, y, z, this.getStoredBlockMetadata(meta), tileEntity);
+	public @NotNull ItemStack @Nullable [] getBreakResult(@NotNull World world, @NotNull EnumDropCause dropCause, @NotNull TilePosc tilePos, int metadata, @Nullable TileEntity tileEntity) {
+		return switch (dropCause) {
+			case SILK_TOUCH, PICK_BLOCK, PROPER_TOOL ->
+				this.layerBlock.getBreakResult(world, dropCause, tilePos, this.getLayers(metadata) - 1, tileEntity);
+			case IMPROPER_TOOL -> null;
+			default -> // Drop the underlying block if it's destroyed by WORLD or EXPLOSION
+				storedBlock.getBreakResult(world, dropCause, tilePos, this.getStoredBlockMetadata(metadata), tileEntity);
+		};
+	}
 
-			}
+	@Override
+	public void updateTick(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Random rand, boolean isRandomTick){
+		if (world.getSavedLightValue(LightLayer.Block, tilePos) > 11) {
+			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
+		}
+		if (shouldSnowMelt(world, tilePos)) {
+			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
 		}
 	}
 
-	@Override
-	public void updateTick(World world, int x, int y, int z, Random random) {
-		if (world.getSavedLightValue(LightLayer.Block, x, y, z) > 11) {
-			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
-		}
-		if (shouldSnowMelt(world, x, y, z)) {
-			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
-		}
+	private static boolean shouldSnowMelt(World world, TilePosc tilePos) {
+		return !world.getBlockBiome(tilePos).hasTag(BiomeTags.HAS_SURFACE_SNOW) &&
+			world.getSeasonManager().getCurrentSeason() != null &&
+			world.getSeasonManager().getCurrentSeason().letWeatherCleanUpSnow;
 	}
 
-	private static boolean shouldSnowMelt(World world, int x, int y, int z) {
-		return !world.getBlockBiome(x, y, z).hasSurfaceSnow() &&
-			world.seasonManager.getCurrentSeason() != null &&
-			world.seasonManager.getCurrentSeason().letWeatherCleanUpSnow;
-	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
-		if (!this.canSupportSnow(world, x, y, z)) {
-			this.removeSnow(world, world.getBlockMetadata(x, y, z), x, y, z);
-			world.playBlockEvent(null, LevelListener.EVENT_BLOCK_BREAK, x, y - 1, z, this.layerBlock.id());
+	public void onNeighborChanged(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Block<?> block) {
+		if (!this.canSupportSnow(world, tilePos)) {
+			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
+			world.playBlockEvent(null, new TilePos(tilePos.x(), tilePos.y() - 1, tilePos.z()), LevelListener.EVENT_BLOCK_BREAK, this.layerBlock.id());
 		}
 	}
 

@@ -4,9 +4,12 @@ import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnowy<T> implements IBlockLogicSnowyRotation {
 	public BlockLogicSnowyPartial(Block<T> block) {
@@ -20,24 +23,24 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 	}
 
 	@Override
-	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y, z);
+	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
+		int metadata = source.getBlockData(tilePos);
 		int rotation = this.getRotation(metadata);
 		int layers = this.getLayers(metadata);
 		double heightFromSnow = layers * 2 / 16.0;
 		if (rotation == 0) {
-			return AABB.getTemporaryBB(0.5, 0.0, 0.0, 1.0, heightFromSnow, 1.0);
+			return new AABBd(0.5, 0.0, 0.0, 1.0, heightFromSnow, 1.0);
 		} else if (rotation == 1) {
-			return AABB.getTemporaryBB(0.0, 0.0, 0.0, 0.5, heightFromSnow, 1.0);
+			return new AABBd(0.0, 0.0, 0.0, 0.5, heightFromSnow, 1.0);
 		} else if (rotation == 2) {
-			return AABB.getTemporaryBB(0.0, 0.0, 0.5, 1.0, heightFromSnow, 1.0);
+			return new AABBd(0.0, 0.0, 0.5, 1.0, heightFromSnow, 1.0);
 		} else {
-			return AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, heightFromSnow, 0.5);
+			return new AABBd(0.0, 0.0, 0.0, 1.0, heightFromSnow, 0.5);
 		}
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
+	public void onNeighborChanged(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Block<?> block) {
 //		Block<?> blockBelow = world.getBlock(x, y - 1, z);
 //		if (blockBelow != null && blockBelow.getLogic() instanceof IBlockLogicSnowyStairs) {
 //			IBlockLogicSnowyStairs blockSnowyStairs = (IBlockLogicSnowyStairs) blockBelow.getLogic();
@@ -64,11 +67,6 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 	}
 
 	@Override
-	protected int blockToMetadata(int blockId, int metadata) {
-		return 0;
-	}
-
-	@Override
 	public boolean isSolidRender() {
 		return false;
 	}
@@ -77,9 +75,4 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 	public boolean isCubeShaped() {
 		return false;
 	}
-
-	@Override
-	public int getStoredBlockMetadata(int metadata) {
-		return 0;
-	};
 }

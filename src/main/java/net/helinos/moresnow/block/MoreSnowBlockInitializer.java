@@ -12,7 +12,7 @@ import net.minecraft.core.data.tag.Tag;
 import net.minecraft.core.util.HardIllegalArgumentException;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.DyeColor;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import turniplabs.halplibe.helper.BlockBuilder;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class MoreSnowBlockInitializer {
 		return tag.toArray(new Tag[0]);
 	}
 
-	public static @NonNull String getModID(BlockLogic logic) {
+	public static @NotNull String getModID(BlockLogic logic) {
 		return MOD_ID +  "." + logic.namespaceId().namespace();
 	}
 
@@ -67,7 +67,7 @@ public class MoreSnowBlockInitializer {
 		String[] splitstring = blockID.value().split("/");
 		String result = String.format(prefix, splitstring[splitstring.length - 1]);
 		try {
-			if(Blocks.blockMap.containsKey(NamespaceID.getPermanent("moresnow:block/" + result))){
+			if(Blocks.blockMap.containsKey(NamespaceID.fromPool("moresnow:block/" + result))){
 				result += "_" + blockID.namespace();
 			}
 		} catch (HardIllegalArgumentException e) {

@@ -11,8 +11,11 @@ import net.minecraft.core.data.tag.Tag;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.collection.NamespaceID;
 import net.minecraft.core.util.helper.DyeColor;
+import net.minecraft.core.util.helper.Toggleable;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.ChunkTilePos;
+import net.minecraft.core.world.pos.TilePos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -115,58 +118,46 @@ public class MoreSnowBlocks {
 
 	public static boolean convertBlock(World world, int id, int x, int y, int z, String prefix) {
 		Block<?> block = Blocks.getBlock(id);
-		if (block == null) {
-			return false;
-		}
 		BlockLogic logic = block.getLogic();
-		if (logic == null) {
-			return false;
-		}
 		String name = "block/" + convertNameSpaceID(block.namespaceId(), prefix);
-		if (logic instanceof IPainted) {
-			DyeColor color = ((IPainted) logic).getColor(world, x, y, z);
+		if (logic instanceof IPainted paintedLogic) {
+			DyeColor color = paintedLogic.getColor(world, new TilePos(x, y, z));
 			name = name + "_" + color.colorID;
 		}
-		NamespaceID namespaceID = NamespaceID.getPermanent(MoreSnowBlockInitializer.getModID(logic), name);
+		NamespaceID namespaceID = NamespaceID.fromPool(MoreSnowBlockInitializer.getModID(logic), name);
 		Block<?> replaceBlock = Blocks.blockMap.get(namespaceID);
-		if (replaceBlock == null || replaceBlock.getLogic() == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
-			NamespaceID adjusted = NamespaceID.getPermanent(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
+		if (replaceBlock == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
+			NamespaceID adjusted = NamespaceID.fromPool(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
 			Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
-			if (adjustedBlock == null || adjustedBlock.getLogic() == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
+			if (adjustedBlock == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
 				return false;
 			}
 			replaceBlock = adjustedBlock;
 		}
-		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(world, id, x, y, z);
+		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(world, id, new TilePos(x, y, z));
 	}
 
 
 	public static boolean convertBlock(Chunk chunk, int id, int x, int y, int z, String prefix) {
 		Block<?> block = Blocks.getBlock(id);
-		if (block == null) {
-			return false;
-		}
 		BlockLogic logic = block.getLogic();
-		if (logic == null) {
-			return false;
-		}
 		String name = "block/" + convertNameSpaceID(block.namespaceId(), prefix);
 		if (logic instanceof IPainted) {
-			int metadata = chunk.getBlockMetadata(x, y, z);
+			int metadata = chunk.getBlockData(new ChunkTilePos(x, y, z));
 			DyeColor color = DyeColor.colorFromBlockMeta(metadata >> 4);
 			name = name + "_" + color.colorID;
 		}
-		NamespaceID namespaceID = NamespaceID.getPermanent(MoreSnowBlockInitializer.getModID(logic), name);
+		NamespaceID namespaceID = NamespaceID.fromPool(MoreSnowBlockInitializer.getModID(logic), name);
 		Block<?> replaceBlock = Blocks.blockMap.get(namespaceID);
-		if (replaceBlock == null || replaceBlock.getLogic() == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
-			NamespaceID adjusted = NamespaceID.getPermanent(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
+		if (replaceBlock == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
+			NamespaceID adjusted = NamespaceID.fromPool(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
 			Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
-			if (adjustedBlock == null || adjustedBlock.getLogic() == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
+			if (adjustedBlock == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
 				return false;
 			}
 			replaceBlock = adjustedBlock;
 		}
-		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(chunk, id, x, y, z);
+		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(chunk, id, new TilePos(x, y, z));
 	}
 
 	public static @NotNull String prePendName(Block<?> block, ItemStack itemStack, String prefix) {

@@ -10,6 +10,7 @@ import net.minecraft.core.world.World;
 import net.minecraft.core.world.biome.Biome;
 import net.minecraft.core.world.biome.Biomes;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.TilePos;
 import net.minecraft.core.world.weather.Weather;
 import net.minecraft.core.world.weather.WeatherSnow;
 
@@ -95,9 +96,9 @@ public abstract class WeatherSnowMixin extends Weather {
 			}
 
 			if (blockID == Blocks.LAYER_SNOW.id()) {
-				Blocks.LAYER_SNOW.getLogic().accumulate(world, x, y, z);
+				Blocks.LAYER_SNOW.getLogic().accumulate(world, new TilePos(x, y, z));
 			} else if ((Blocks.getBlock(blockID) != null && ((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).layerBlock.id() == Blocks.LAYER_SNOW.id())) {
-				((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).accumulate(world, x, y - 1, z);
+				((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).accumulate(world, new TilePos(x, y - 1, z));
 			}
 
 			return;

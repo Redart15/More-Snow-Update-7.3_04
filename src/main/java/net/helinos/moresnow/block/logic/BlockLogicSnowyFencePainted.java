@@ -5,6 +5,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFencePainted;
 import net.minecraft.core.util.helper.DyeColor;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockLogicSnowyFencePainted<T extends BlockLogic> extends BlockLogicSnowyFence<T, BlockLogicFencePainted> implements PaintedBlock {
 	public final DyeColor color;
@@ -20,7 +21,7 @@ public class BlockLogicSnowyFencePainted<T extends BlockLogic> extends BlockLogi
 	}
 
 	@Override
-	public String getLanguageKey(int meta) {
+	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 
