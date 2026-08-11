@@ -5,9 +5,7 @@ import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.helper.DyeColor;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.WorldSource;
-import net.minecraft.core.world.pos.TilePos;
 import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
 import org.joml.primitives.AABBd;
@@ -38,10 +36,7 @@ public class BlockLogicSnowySlabPainted<T extends BlockLogic> extends BlockLogic
 
 	@Override
 	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
-		int x = tilePos.x();
-		int y = tilePos.y();
-		int z = tilePos.z();
-		int l = this.getRelativeLayers(source.getBlockData(new TilePos(x, y, z)) - 1);
+		int l = this.getRelativeLayers(source.getBlockData(tilePos)) - 1;
 		float f = (2 * (1 + l)) / 16.0F;
 		return new AABBd(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
 	}

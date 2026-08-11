@@ -9,47 +9,30 @@ import net.minecraft.core.block.BlockLogicSlab;
 import net.minecraft.core.block.BlockLogicStairs;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = BlockLogicLayerSnow.class, remap = false)
 public abstract class BlockLogicLayerSnowMixin {
 
-	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockMetadata(III)I"))
-	private int metadata1(World world, int x, int y, int z, Operation<Integer> original) {
-		int metadata = original.call(world, x, y, z);
-		Block<?> block = world.getBlock(x, y, z);
-		if (block != null && block.getLogic() instanceof BlockLogicSnowy) {
+	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockData(Lnet/minecraft/core/world/pos/TilePosc;)I"))
+	private int metadata1(@NotNull World world, @NotNull TilePosc tilePos, Operation<Integer> original) {
+		int metadata = original.call(world, tilePos);
+		Block<?> block = world.getBlockType(tilePos);
+		if (block.getLogic() instanceof BlockLogicSnowy) {
 			return ((BlockLogicSnowy<?>) block.getLogic()).getRelativeLayers(metadata) - 1;
 		}
 		return metadata;
 	}
 
-	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I"))
-	private int blockId1(World world, int x, int y, int z, Operation<Integer> original) {
-		Block<?> block = world.getBlock(x, y, z);
-		if(block == null){
-			return 0;
-		}
+	@WrapOperation(method = "accumulate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockType(Lnet/minecraft/core/world/pos/TilePosc;)Lnet/minecraft/core/block/Block;"))
+	private Block<?> blockId1(@NotNull World world, @NotNull TilePosc tilePos, Operation<Block<?>> original) {
+		Block<?> block = original.call(world, tilePos);
 		if (block.id() == Blocks.LAYER_SNOW.id() || (block.getLogic() instanceof BlockLogicSnowy)) {
-			return Blocks.LAYER_SNOW.id();
+			return Blocks.LAYER_SNOW;
 		}
-		return block.id();
-	}
-
-	@WrapOperation(method = "canPlaceBlockAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/block/Block;isSolidRender()Z"))
-	private boolean topSlabAndUpsideDownStairsFix(Block<?> block, Operation<Boolean> original, World world, int x, int y, int z) {
-		int metadata = world.getBlockMetadata(x, y - 1, z);
-		if (block != null && block.getLogic() instanceof BlockLogicSlab) {
-			return (metadata & 3) != 0;
-		}
-		if (block != null && block.getLogic() instanceof BlockLogicStairs) {
-			return (metadata & 8) != 0;
-		}
-		if(block != null && block.getLogic() instanceof BlockLogicSnowy){
-			BlockLogicSnowy<?> snowy = (BlockLogicSnowy<?>) block.getLogic();
-			return snowy.getLayers(metadata) >= snowy.getMaxLayers();
-		}
-		return original.call(block);
+		return block;
 	}
 }

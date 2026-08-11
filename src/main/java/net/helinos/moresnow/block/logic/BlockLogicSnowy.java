@@ -5,6 +5,9 @@ import java.util.Random;
 import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.material.Materials;
+import net.minecraft.core.block.support.FullSupport;
+import net.minecraft.core.block.support.ISupport;
+import net.minecraft.core.block.support.PartialSupport;
 import net.minecraft.core.world.LevelListener;
 
 import net.minecraft.core.block.Block;
@@ -41,7 +44,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	private final int lowestLayerHeight;
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight) {
-		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, storedBlock.getMaterial());
+//		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, storedBlock.getMaterial());
+		// default because game wont let us reference logic yet, we will fix these blocks later.
+		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, Materials.TOP_SNOW);
 	}
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, Block<?> layerBlock, int maxLayers, int lowestLayerHeight, Material material) {
@@ -76,6 +81,10 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	@SuppressWarnings("java:S1172")
 	public int getStoredBlockMetadata(int metadata) {
 		return 0;
+	}
+
+	public int convertBlockToMetadata(int blockId, int metadata) {
+		return this.blockToMetadata(blockId, metadata);
 	}
 
 	@SuppressWarnings("java:S1172")
@@ -139,6 +148,16 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 			return false;
 		}
 		return belowMaterial == Materials.LEAVES || belowMaterial.blocksMotion();
+	}
+
+	public boolean tryMakeSnowyCheck(World world, int id, TilePosc tilePos) {
+		int meta = world.getBlockData(tilePos);
+		return this.canReplaceBlock(id, meta) && canSupportSnow(world, tilePos);
+	}
+
+	public boolean tryMakeSnowyCheck(Chunk chunk, int id, TilePosc tilePos) {
+		int meta = chunk.getBlockData(new ChunkTilePos(tilePos));
+		return this.canReplaceBlock(id, meta) && canSupportSnow(chunk, tilePos);
 	}
 
 	/**
@@ -265,7 +284,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		if (world.getSavedLightValue(LightLayer.Block, tilePos) > 11) {
 			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
 		}
-		if (shouldSnowMelt(world, tilePos)) {
+		if (shouldSnowMelt(world, tilePos) && this.layerBlock.id() == Blocks.LAYER_SNOW.id()) {
 			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
 		}
 	}
@@ -287,5 +306,9 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 
 	public boolean getSupportsOwnSnow() {
 		return true;
+	}
+
+	public @NotNull ISupport getSupport(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Side side) {
+		return this.getLayers(world.getBlockData(tilePos)) != this.getMaxLayers() ? PartialSupport.INSTANCE : FullSupport.INSTANCE;
 	}
 }

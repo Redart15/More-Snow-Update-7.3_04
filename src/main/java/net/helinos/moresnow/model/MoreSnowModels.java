@@ -1,13 +1,9 @@
 package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.MoreSnowBlocks;
-import net.helinos.moresnow.block.logic.BlockLogicSnowyFencePainted;
-import net.minecraft.client.render.EntityRenderDispatcher;
-import net.minecraft.client.render.TileEntityRenderDispatcher;
-import net.minecraft.client.render.block.color.BlockColorDispatcher;
+import net.helinos.moresnow.block.logic.*;
 import net.minecraft.client.render.block.model.BlockModel;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
-import net.minecraft.client.render.item.model.ItemModelDispatcher;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 
@@ -15,134 +11,104 @@ import static net.helinos.moresnow.block.MoreSnowBlocks.*;
 import static net.helinos.moresnow.MoreSnow.*;
 
 public class MoreSnowModels {
-	public static final String SNOW_PATH = "minecraft:block/block_snow";
 	public static final double zFactor = 0.0001;
+
+	private MoreSnowModels(){}
 
 	public static void initBlockModels(BlockModelDispatcher dispatcher) {
 		LOGGER.info("Assign models to snowy blocks.");
-		String texID = "minecraft:block/block_snow";
-		MoreSnowModels.assignModelCrossed(dispatcher, texID);
-//		MoreSnowModels.assignModelFlower(dispatcher, texID);
-//		MoreSnowModels.assignModelGrass(dispatcher, texID);
-//		MoreSnowModels.assignModelSapling(dispatcher, texID);
-		MoreSnowModels.assignModelSlab(dispatcher, texID);
-		MoreSnowModels.assignModelStairs(dispatcher, texID);
-		MoreSnowModels.assignModelFence(dispatcher, texID);
-		MoreSnowModels.assignModelFenceThin(dispatcher, texID);
-		MoreSnowModels.assignModelFenceGate(dispatcher, texID);
+		MoreSnowModels.assignModelCrossed(dispatcher);
+		MoreSnowModels.assignModelSlab(dispatcher);
+		MoreSnowModels.assignModelStairs(dispatcher);
+		MoreSnowModels.assignModelFence(dispatcher);
+		MoreSnowModels.assignModelFenceThin(dispatcher);
+		MoreSnowModels.assignModelFenceGate(dispatcher);
 		LOGGER.info("Finished assigning models.");
 	}
 
-	private static void assignModelCrossed(BlockModelDispatcher dispatcher, String texID){
-		for (Block<?> block : SNOWY_FLOWERS) {
+	private static void assignModelCrossed(BlockModelDispatcher dispatcher){
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_FLOWERS) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyCrossed<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyCrossed<>(block, model));
 		}
 	}
 
-	private static void assignModelFlower(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_FLOWERS) {
+	private static void assignModelSlab(BlockModelDispatcher dispatcher) {
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_SLAB) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyPlant<>(block, model, texID).setAllTextures(0, SNOW_PATH));
-		}
-	}
-
-	private static void assignModelGrass(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_GRASS) {
-			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyCrossed<>(block, model, texID).setAllTextures(0, SNOW_PATH));
-		}
-	}
-
-	private static void assignModelSapling(BlockModelDispatcher dispatcher, String texID) {
-	}
-
-	private static void assignModelSlab(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_SLAB) {
-			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowySlab<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowySlab<>(block, model));
 		}
 
-		for (Block<?> block : SNOWY_SLAB_PAINTED) {
+		for (Block<BlockLogicSnowySlabPainted<?>> block : SNOWY_SLAB_PAINTED) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowySlabPainted(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowySlabPainted<>(block, model));
 		}
 
 	}
 
-	private static void assignModelStairs(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_STAIRS) {
+	private static void assignModelStairs(BlockModelDispatcher dispatcher) {
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_STAIRS) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyStairs<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyStairs<>(block, model));
 		}
 
-		for (Block<?> block : SNOWY_STAIRS_PAINTED) {
+		for (Block<BlockLogicSnowyStairsPainted<?>> block : SNOWY_STAIRS_PAINTED) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyStairsPainted(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyStairsPainted<>(block, model));
 		}
 
 	}
 
-	private static void assignModelFence(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_FENCE) {
+	private static void assignModelFence(BlockModelDispatcher dispatcher) {
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_FENCE) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyFence<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyFence<>(block, model));
 		}
 
 		for (Block<BlockLogicSnowyFencePainted<?>> block : SNOWY_FENCE_PAINTED) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyFencePainted<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyFencePainted<>(block, model));
 		}
 
 	}
 
-	private static void assignModelFenceThin(BlockModelDispatcher dispatcher, String texID) {
+	private static void assignModelFenceThin(BlockModelDispatcher dispatcher) {
 		BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SNOW);
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_CHAINLINK, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_STEEL, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_WALLPAPER, model, texID).setAllTextures(0, SNOW_PATH));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_CHAINLINK, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_STEEL, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SNOWY_FENCE_WALLPAPER, model));
 
 		model = BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_LEAVES_OAK);
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_CHAINLINK, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_STEEL, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_WALLPAPER, model, texID).setAllTextures(0, SNOW_PATH));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_CHAINLINK, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_STEEL, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.LEAVY_FENCE_WALLPAPER, model));
 
 		model = BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_SLATE);
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_CHAINLINK, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_STEEL, model, texID).setAllTextures(0, SNOW_PATH));
-		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_WALLPAPER, model, texID).setAllTextures(0, SNOW_PATH));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_CHAINLINK, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_STEEL, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.SLATY_FENCE_WALLPAPER, model));
 
-		for (Block<?> block : SNOWY_FENCE_THIN) {
+		model = BlockModelDispatcher.getInstance().getDispatch(Blocks.LAYER_ASH);
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.ASHY_FENCE_CHAINLINK, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.ASHY_FENCE_STEEL, model));
+		dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(MoreSnowBlocks.ASHY_FENCE_WALLPAPER, model));
+
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_FENCE_THIN) {
 			BlockModel<?> nmodel = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(block, nmodel, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyFenceThin<>(block, nmodel));
 		}
 	}
 
-	private static void assignModelFenceGate(BlockModelDispatcher dispatcher, String texID) {
-		for (Block<?> block : SNOWY_FENCE_GATE) {
+	private static void assignModelFenceGate(BlockModelDispatcher dispatcher) {
+		for (Block<? extends BlockLogicSnowy<?>> block : SNOWY_FENCE_GATE) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyFenceGate<>(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyFenceGate<>(block, model));
 		}
 
-		for (Block<?> block : SNOWY_FENCE_GATES_PAINTED) {
+		for (Block<BlockLogicSnowyFenceGatePainted<?>> block : SNOWY_FENCE_GATES_PAINTED) {
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(getLayerBlock(block));
-			dispatcher.addDispatch(new BlockModelSnowyFenceGatePainted(block, model, texID).setAllTextures(0, SNOW_PATH));
+			dispatcher.addDispatch(new BlockModelSnowyFenceGatePainted<>(block, model));
 		}
 
-	}
-
-	private static void assignModelTrapDoor(BlockModelDispatcher dispatcher, String texID) {
-	}
-
-	public void initItemModels(ItemModelDispatcher dispatcher, String texID) {
-	}
-
-	public void initEntityModels(EntityRenderDispatcher dispatcher, String texID) {
-	}
-
-	public void initTileEntityModels(TileEntityRenderDispatcher dispatcher, String texID) {
-	}
-
-	public void initBlockColors(BlockColorDispatcher dispatcher, String texID) {
 	}
 }

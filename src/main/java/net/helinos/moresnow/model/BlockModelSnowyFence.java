@@ -1,43 +1,50 @@
 package net.helinos.moresnow.model;
 
+import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.helinos.moresnow.block.logic.BlockLogicSnowyFence;
 import net.minecraft.client.render.block.model.BlockModel;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.util.phys.AABB;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
+import org.joml.primitives.AABBdc;
 
 import static net.helinos.moresnow.model.MoreSnowModels.zFactor;
 
-public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<T> {
-	public BlockModelSnowyFence(Block<T> block, BlockModel<?> layerModel, String texID) {
-		super(block, layerModel, texID);
+public class BlockModelSnowyFence<T extends BlockLogicSnowy<?>> extends BlockModelSnowy<T> {
+	public BlockModelSnowyFence(Block<T> block, BlockModel<?> layerModel) {
+		super(block, layerModel);
 	}
 
 	@Override
-	public boolean render(Tessellator tessellator, int x, int y, int z) {
+	public boolean render(@NotNull TessellatorGeneral tessellator, @NotNull WorldSource worldSource, @NotNull TilePosc tilePos) {
 		BlockLogicSnowyFence<?, ?> logic = (BlockLogicSnowyFence<?, ?>) this.block.getLogic();
-		int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
+		int metadata = worldSource.getBlockData(tilePos);
 		boolean somethingRendered = false;
-		somethingRendered |= this.renderSnowLayers(tessellator, x, y, z, logic);
+		somethingRendered |= this.renderSnowLayers(tessellator, worldSource, tilePos, logic);
 		int layers = logic.getLayers(metadata);
 		double height = layers * 2 / 16.0;
-		AABB bounds = AABB.getTemporaryBB(-zFactor, 0.0, -zFactor, 1.0f + zFactor, height + zFactor, 1.0f + zFactor);
-		somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
+		AABBdc bounds = new AABBd(-zFactor, 0.0, -zFactor, 1.0f + zFactor, height + zFactor, 1.0f + zFactor);
+		somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this.layerModel, bounds, tilePos);
 		return somethingRendered;
 	}
 
-	private boolean renderSnowLayers(Tessellator tessellator, int x, int y, int z, BlockLogicSnowyFence<?, ?> logic) {
+
+	private boolean renderSnowLayers(TessellatorGeneral tessellator, @NotNull WorldSource worldSource, @NotNull TilePosc tilePos, BlockLogicSnowyFence<?, ?> logic) {
 		boolean somethingRendered = false;
 		// Center post
-		AABB bounds = AABB.getTemporaryBB(0.375, 0.0, 0.375, 0.625, 1.0, 0.625);
-		this.renderStandardBlock(tessellator, bounds, x, y, z);
-		boolean connectEast = logic.canConnectTo(renderBlocks.blockAccess, x - 1, y, z);
-		boolean connectWest = logic.canConnectTo(renderBlocks.blockAccess, x + 1, y, z);
-		boolean connectNorth = logic.canConnectTo(renderBlocks.blockAccess, x, y, z - 1);
-		boolean connectSouth = logic.canConnectTo(renderBlocks.blockAccess, x, y, z + 1);
+		AABBd bounds = new AABBd(0.375, 0.0, 0.375, 0.625, 1.0, 0.625);
+		int x = tilePos.x();
+		int y = tilePos.y();
+		int z = tilePos.z();
+		renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
+		boolean connectEast = logic.canConnectTo(worldSource,	 new TilePos(x - 1, y, z));
+		boolean connectWest = logic.canConnectTo(worldSource,	 new TilePos(x + 1, y, z));
+		boolean connectNorth = logic.canConnectTo(worldSource,	 new TilePos(x, y, z - 1));
+		boolean connectSouth = logic.canConnectTo(worldSource,	 new TilePos(x, y, z + 1));
 		boolean renderEastWest = connectEast || connectWest;
 		boolean renderNorthSouth = connectNorth || connectSouth;
 
@@ -48,31 +55,32 @@ public class BlockModelSnowyFence<T extends BlockLogic> extends BlockModelSnowy<
 
 		// Upper connecting posts
 		if (renderEastWest) {
-			bounds.set(east, 0.75, 0.4375, west, 0.9375, 0.5625);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			bounds.setMin(east, 0.75, 0.4375).setMax(west, 0.9375, 0.5625);
+			somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
 		}
 
 		if (renderNorthSouth) {
-			bounds.set(0.4375, 0.75, north, 0.5625, 0.9375, south);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			bounds.setMin(0.4375, 0.75, north).setMax(0.5625, 0.9375, south);
+			somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
 		}
 
 		// Lower connecting posts
 		if (renderEastWest) {
-			bounds.set(east, 0.375, 0.4375, west, 0.5625, 0.5625);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			bounds.setMin(east, 0.375, 0.4375).setMax(west, 0.5625, 0.5625);
+			somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
 		}
 
 		if (renderNorthSouth) {
-			bounds.set(0.4375, 0.375, north, 0.5625, 0.5625, south);
-			somethingRendered |= this.renderStandardBlock(tessellator, bounds, x, y, z);
+			bounds.setMin(0.4375, 0.375, north).setMax(0.5625, 0.5625, south);
+			somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
 		}
 		return somethingRendered;
 	}
 
-	@Override
-	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
-		GL11.glTranslatef(0.0F, -0.25F, 0.0F);
-		this.layerModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+
+	public void renderLayerOnInventory(@NotNull TessellatorGeneral tessellator, int metadata, byte lightIndex) {
+		tessellator.offsetTranslation(0.0F, -0.25F, 0.0F);
+		this.layerModel.renderStandalone(tessellator, metadata, lightIndex);
+		tessellator.offsetTranslation(0.0F, 0.25, 0.0F);
 	}
 }

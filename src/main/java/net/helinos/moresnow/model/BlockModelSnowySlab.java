@@ -2,36 +2,36 @@ package net.helinos.moresnow.model;
 
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.client.render.block.model.BlockModel;
-import net.minecraft.client.render.tessellator.Tessellator;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.util.phys.AABB;
-import net.minecraft.core.world.World;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.core.world.WorldSource;
+import net.minecraft.core.world.pos.TilePosc;
+import org.jetbrains.annotations.NotNull;
+import org.joml.primitives.AABBd;
 
-public class BlockModelSnowySlab<T extends BlockLogic> extends BlockModelSnowy<T> {
-    public BlockModelSnowySlab(Block<T> block, BlockModel<?> layerModel, String texID) {
-		super(block, layerModel, texID);
-    }
-
-    @Override
-    public boolean render(Tessellator tessellator, int x, int y, int z) {
-        int metadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
-        // Render the slab
-        AABB bounds = AABB.getTemporaryBB(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
-        boolean somethingRendered = this.renderStandardBlock(tessellator, bounds, x, y, z);
-        // Render the snow
-        int layers = ((BlockLogicSnowy<?>) block.getLogic()).getLayers(metadata);
-        double height = layers * 2 / 16.0;
-        bounds.set(0.0, 0.5, 0.0, 1.0, 0.5 + height, 1.0);
-        somethingRendered |= this.layerModel.renderStandardBlock(tessellator, bounds, x, y, z);
-        return somethingRendered;
+public class BlockModelSnowySlab<T extends BlockLogicSnowy<?>> extends BlockModelSnowy<T> {
+    public BlockModelSnowySlab(Block<T> block, BlockModel<?> layerModel) {
+		super(block, layerModel);
     }
 
 	@Override
-	public void renderLayerOnInventory(Tessellator tessellator, int metadata, float brightness, float alpha, @Nullable Integer lightmapCoordinate) {
-		GL11.glTranslatef(0.0F, 0.25F, 0.0F);
-		this.layerModel.renderBlockOnInventory(tessellator, metadata, brightness, alpha, lightmapCoordinate);
+	public boolean render(@NotNull TessellatorGeneral tessellator, @NotNull WorldSource worldSource, @NotNull TilePosc tilePos) {
+		int metadata = worldSource.getBlockData(tilePos);
+		// Render the slab
+		AABBd bounds = new AABBd(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
+		boolean somethingRendered = renderBlocks.renderStandardBlock(tessellator, worldSource, this, bounds, tilePos);
+		// Render the snow
+		int layers = block.getLogic().getLayers(metadata);
+		double height = layers * 2 / 16.0;
+		bounds.setMin(0.0, 0.5, 0.0).setMax(1.0, 0.5 + height, 1.0);
+		somethingRendered |= renderBlocks.renderStandardBlock(tessellator, worldSource, this.layerModel, bounds, tilePos);
+		return somethingRendered;
+	}
+
+	@Override
+	public void renderLayerOnInventory(@NotNull TessellatorGeneral tessellator, int metadata, byte lightIndex) {;
+		tessellator.offsetTranslation(0.0F, 0.25F, 0.0F);
+		this.layerModel.renderStandalone(tessellator, metadata, lightIndex);
+		tessellator.offsetTranslation(0.0F, -0.25F, 0.0F);
 	}
 }

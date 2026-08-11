@@ -9,13 +9,13 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "BlockLogicLayerLeavesMixin",
     "BlockLogicLayerSnowMixin",
     "BlockLogicSugarCaneMixin",
-    "ItemBlockLayerMixin",
-    "ItemBlockLeaveLayerMixin",
+    "BlocksMixinAfterAllBlocks",
+    "IAccumulatableMixin",
     "ItemMixinNameAdjustment",
     "accessor.BlockAccessor",
+    "accessor.BlockLogicAccessor",
     "accessor.ItemBlockAccessor",
     "weather.WeatherMixin",
     "weather.WeatherSnowMixin"

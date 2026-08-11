@@ -17,15 +17,8 @@
   "environment": "*",
   "entrypoints": {
 		"main": 							["net.helinos.moresnow.MoreSnow"],
-		"beforeGameStart": 		["net.helinos.moresnow.MoreSnow"],
-		"afterGameStart": 		["net.helinos.moresnow.MoreSnow"],
-		"client": 						["net.helinos.moresnow.MoreSnow"],
-		"beforeClientStart": 	["net.helinos.moresnow.MoreSnow"],
-		"afterClientStart":		["net.helinos.moresnow.MoreSnow"],
-		"afterBlockInit": 		["net.helinos.moresnow.MoreSnow"],
-		"initModels": 				["net.helinos.moresnow.model.MSModels"],
-		"modmenu": 						["net.helinos.moresnow.impl.ModMenuApiImpl"],
-		"server": 						["net.helinos.moresnow.MoreSnow"],
+		"client": 						["net.helinos.moresnow.MoreSnowClient"],
+		"server": 						["net.helinos.moresnow.MoreSnowServer"],
 		"preLaunch": 					["net.helinos.moresnow.compat.aether.MoreSnowAetherLoader"]
 	},
   "mixins": [

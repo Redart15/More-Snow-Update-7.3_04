@@ -108,10 +108,10 @@ public class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends BlockLogic
 		return id == this.storedBlock.id();
 	}
 
-	@Override
-	public boolean canPlaceOnSurface() {
-		return true;
-	}
+//	@Override
+//	public boolean canPlaceOnSurface() {
+//		return true;
+//	}
 
 	@Override
 	public boolean isSolidRender() {

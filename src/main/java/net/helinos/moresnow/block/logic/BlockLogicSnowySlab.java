@@ -24,12 +24,10 @@ public class BlockLogicSnowySlab<T extends BlockLogic, S extends BlockLogicSlab>
 		}
 		return false;
 	}
+
 	@Override
 	public @NotNull AABBdc getBoundsFromState(@NotNull WorldSource source, @NotNull TilePosc tilePos) {
-		int x = tilePos.x();
-		int y = tilePos.y();
-		int z = tilePos.z();
-		int l = this.getRelativeLayers(source.getBlockMetadata(x, y, z)) - 1;
+		int l = this.getRelativeLayers(source.getBlockData(tilePos)) - 1;
 		float f = (2 * (1 + l)) / 16.0F;
 		return new AABBd(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
 	}

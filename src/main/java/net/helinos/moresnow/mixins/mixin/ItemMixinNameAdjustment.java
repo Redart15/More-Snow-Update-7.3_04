@@ -12,8 +12,6 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.block.ItemBlock;
 import org.spongepowered.asm.mixin.Mixin;
 
-import static net.helinos.moresnow.MoreSnow.MOD_ID;
-
 
 @Mixin(value = Item.class, remap = false)
 public abstract class ItemMixinNameAdjustment {
@@ -23,8 +21,8 @@ public abstract class ItemMixinNameAdjustment {
 		Item asThis = (Item) (Object) this;
 		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
-			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
-				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy)block.getLogic()).layerBlock)) + result;
+			if(block != null && block.getLogic() instanceof BlockLogicSnowy){
+				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy<?>)block.getLogic()).layerBlock)) + result;
 			}
 		}
 		return result;
@@ -35,8 +33,8 @@ public abstract class ItemMixinNameAdjustment {
 		Item asThis = (Item) (Object) this;
 		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
-			if(block != null && block.getLogic() != null && block.getLogic() instanceof BlockLogicSnowy){
-				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(block));
+			if(block != null && block.getLogic() instanceof BlockLogicSnowy logicSnowy){
+				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(logicSnowy.layerBlock));
 			}
 		}
 		return original.call(itemstack);

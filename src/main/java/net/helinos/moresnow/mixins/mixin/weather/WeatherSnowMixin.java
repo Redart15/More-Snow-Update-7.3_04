@@ -1,22 +1,24 @@
 package net.helinos.moresnow.mixins.mixin.weather;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
-import net.helinos.moresnow.mixins.MoreSnowMixin;
 import net.minecraft.core.block.*;
 import net.minecraft.core.enums.LightLayer;
-import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.biome.Biome;
-import net.minecraft.core.world.biome.Biomes;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.ChunkTilePos;
 import net.minecraft.core.world.pos.TilePos;
-import net.minecraft.core.world.weather.Weather;
 import net.minecraft.core.world.weather.WeatherSnow;
-
-import java.util.Random;
-
-import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,106 +27,94 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(value = WeatherSnow.class, remap = false)
-public abstract class WeatherSnowMixin extends Weather {
-	// So sorry if anyone else tries to inject into this method in the future, but the way I originally implemented this
-	// was simply too hard for me to wrap my head around, especially when trying to update this to newer versions
-	// of BTA. When this inevitably causes an incompatibilty with another mod let me know and I'll fix it.
+public abstract class WeatherSnowMixin {
 
-	private WeatherSnowMixin(int id) {
-		super(id);
+	@WrapOperation(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;findTopSolidBlock(II)I"))
+	private int findTopSolidBlockThatIsntSnowy(
+		World world, int x, int z,
+		Operation<Integer> original,
+		@Share("block") LocalRef<Block<?>> blockLocalRef,
+		@Share("blockBelow") LocalRef<Block<?>> blockBelowRef,
+		@Share("yLevel")LocalIntRef yLevel
+		) {
+		int y = original.call(world, x, z);
+		TilePos tilePos = new TilePos(x, y - 1, z);
+		Block<?> blockBelow = world.getBlockType(tilePos);
+
+		while (y < 0 && advanceBelow(blockBelow.getLogic())) {
+			tilePos.down();
+			blockBelow = world.getBlockType(tilePos);
+		}
+		blockBelowRef.set(world.getBlockType(tilePos));
+		blockLocalRef.set(world.getBlockType(tilePos.up()));
+		yLevel.set(tilePos.y());
+		return tilePos.y();
 	}
 
-	@Inject(method = "doEnvironmentUpdate", at = @At(value = "HEAD"), cancellable = true)
-	private void doEnvironmentUpdate(World world, Random random, int x, int z, CallbackInfo callbackInfo) {
-		callbackInfo.cancel();
-
-		double probability = 64.0 * 1.0 / world.weatherManager.getWeatherPower();
-		boolean biomeHasDeeperSnow = world.getSeasonManager().getCurrentSeason() == null ? false : world.getSeasonManager().getCurrentSeason().hasDeeperSnow;
-		if (biomeHasDeeperSnow) {
-			probability /= 2;
-		}
-
-		boolean snowWillFall = random.nextInt((int) probability) == 0;
-		// All snowy blocks have the snow material so they all technically "block motion".
-		// Thus, this function will always return the y value of the block above them.
-		int y = world.findTopSolidBlock(x, z);
-
-		int blockIDBelow = world.getBlockId(x, y - 1, z);
-		Block<?> blockBelow = Blocks.getBlock(blockIDBelow);
-		BlockLogic blockBelowLogic = blockBelow != null ? blockBelow.getLogic() : null;
-
-		while (MoreSnowMixin.advanceBelow(world, random, blockBelow, blockBelowLogic, x, y - 1, z)) {
-			y -= 1;
-			blockBelow = world.getBlock(x, y - 1, z);
-			blockBelowLogic = blockBelow != null ? blockBelow.getLogic() : null;
-		}
-
-		int blockID = world.getBlockId(x, y, z);
-		Biome biome = world.getBlockBiome(x, y, z);
-
-		if (ArrayUtils.contains(biome.blockedWeathers, ((WeatherSnow) (Object) this))
-			|| world.weatherManager.getWeatherPower() <= 0.6
-			|| y < 0
-			|| y >= world.getHeightBlocks()
-			|| world.getSavedLightValue(LightLayer.Block, x, y, z) >= 10
-		) {
-			return;
-		}
-
-		if (blockIDBelow != 0) {
-			if (blockID == 0 && Blocks.LAYER_SNOW.canPlaceBlockAt(world, x, y, z) && blockIDBelow != Blocks.ICE.id()) {
-				world.setBlockWithNotify(x, y, z, Blocks.LAYER_SNOW.id());
-				return;
-			}
-
-			if (MoreSnowBlocks.tryMakeSnowy(world, blockID, x, y, z, "snow_%s")) {
-				return;
-			}
-
-			if (MoreSnowBlocks.tryMakeSnowy(world, blockIDBelow, x, y - 1, z, "snow_%s")) {
-				return;
-			}
-		}
-
-		if (
-			(blockID == Blocks.LAYER_SNOW.id() || (Blocks.getBlock(blockID) != null && Blocks.getBlock(blockID).getLogic() instanceof BlockLogicSnowy))
-			&& world.getSeasonManager().getCurrentSeason() != null
-			&& (biomeHasDeeperSnow || biome == Biomes.OVERWORLD_GLACIER)
-		) {
-			if (!snowWillFall) {
-				return;
-			}
-
-			if (blockID == Blocks.LAYER_SNOW.id()) {
-				Blocks.LAYER_SNOW.getLogic().accumulate(world, new TilePos(x, y, z));
-			} else if ((Blocks.getBlock(blockID) != null && ((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).layerBlock.id() == Blocks.LAYER_SNOW.id())) {
-				((BlockLogicSnowy<?>) (Blocks.getBlock(blockID).getLogic())).accumulate(world, new TilePos(x, y - 1, z));
-			}
-
-			return;
-		}
-
-		if (
-			blockIDBelow == Blocks.FLUID_WATER_STILL.id()
-			&& world.getBlockMetadata(x, y - 1, z) == 0
-			&& random.nextFloat() < world.weatherManager.getWeatherPower() * world.weatherManager.getWeatherIntensity()
-		) {
-			for(Direction direction : Direction.horizontalDirections) {
-				Block<?> block = world.getBlock(x + direction.getOffsetX(), y - 1, z + direction.getOffsetZ());
-				if (block == Blocks.ICE || block != null && block.isSolidRender()) {
-					world.setBlockWithNotify(x, y - 1, z, Blocks.ICE.id());
-					break;
-				}
-			}
-		}
+	@Unique
+	private static boolean advanceBelow(BlockLogic blockBelowLogic) {
+		return blockBelowLogic instanceof BlockLogicSnowy<?> blockLogicSnowy
+			&& !(blockLogicSnowy.getSupportsOwnSnow())
+			|| blockBelowLogic instanceof BlockLogicFence
+			|| blockBelowLogic instanceof BlockLogicFenceThin
+			|| blockBelowLogic instanceof BlockLogicSugarcane;
 	}
+
+	@WrapOperation(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;setBlockWithNotify(IIII)Z", ordinal = 0))
+	private boolean setSnowyBlock(World world, int x, int y, int z, int id, Operation<Boolean> original) {
+		boolean makeSnowy = MoreSnowBlocks.tryMakeSnowy(world, id, x, y, z, "snow_%s");
+		if (makeSnowy) {
+			return true;
+		}
+		int blockIdBelow = world.getBlockType(new TilePos(x, y - 1, z)).id();
+		boolean makeBelowSnowy = MoreSnowBlocks.tryMakeSnowy(world, blockIdBelow, x, y - 1, z, "snow_%s");
+		if (makeBelowSnowy) {
+			return true;
+		}
+		return original.call(world, x, y, z, Blocks.LAYER_SNOW.id());
+	}
+
+	@Definition(id = "snow", local = @Local(type = boolean.class))
+	@Expression("snow")
+	@ModifyExpressionValue(method = "doEnvironmentUpdate", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private boolean modifyAccumulateLogic(
+		boolean original,
+		@Share("blockLocalRef") LocalRef<Block<?>> blockLocalRef,
+		@Share("yLevel") LocalIntRef yLevel,
+		@Local(argsOnly = true) World world,
+		@Local(argsOnly = true, ordinal = 0) int x,
+		@Local(argsOnly = true, ordinal = 1) int z
+	) {
+		if(!original){
+			return false;
+		}
+		Block<?> block = blockLocalRef.get();
+		if (block.id() == Blocks.LAYER_SNOW.id()) {
+			return true;
+		}
+		BlockLogic logic = block.getLogic();
+		if(logic instanceof BlockLogicSnowy<?> logicSnowy){
+			if(logicSnowy.layerBlock.id() == Blocks.LAYER_SNOW.id()){
+				logicSnowy.accumulate(world, new TilePos(x, yLevel.get() - 1, z));
+			}
+			return false;
+		}
+		return true;
+	}
+
 
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
-	private void doChunkLoadEffect(World world, Chunk chunk, CallbackInfo callbackInfo, int x, int worldX, int z, int worldZ, int y, Biome biome, int blockId) {
-		if (y < 0 || y >= world.getHeightBlocks() || chunk.getBrightness(LightLayer.Block, x, y, z) >= 10 || MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snow_%s")) {
+	private void doChunkLoadEffect(
+		World world, Chunk chunk, CallbackInfo callbackInfo,
+		int x, int worldX, int z, int worldZ, int y, Biome biome, int blockId
+	) {
+		ChunkTilePos chunkTilePos = new ChunkTilePos(x, y, z);
+		if (y < 0 || y >= world.getHeightBlocks()
+			|| chunk.getLightLevel(LightLayer.Block, chunkTilePos) >= 10
+			|| MoreSnowBlocks.tryMakeSnowy(chunk, blockId, x, y, z, "snow_%s")) {
 			return;
 		}
-		int blockIDBelow = chunk.getBlockID(x, y, z);
+		int blockIDBelow = chunk.getBlockId(chunkTilePos);
 		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y, z, "snow_%s");
 	}
 }
