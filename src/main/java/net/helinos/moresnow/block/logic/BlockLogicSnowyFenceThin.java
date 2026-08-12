@@ -1,6 +1,5 @@
 package net.helinos.moresnow.block.logic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.block.Block;
@@ -8,7 +7,6 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicFenceThin;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.util.helper.Direction;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 import net.minecraft.core.world.pos.TilePos;
@@ -105,7 +103,7 @@ public class BlockLogicSnowyFenceThin<T extends BlockLogic, F extends BlockLogic
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == this.storedBlock.id();
+		return id == this.storedBlock().id();
 	}
 
 //	@Override

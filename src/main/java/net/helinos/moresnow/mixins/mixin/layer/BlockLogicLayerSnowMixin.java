@@ -1,12 +1,10 @@
-package net.helinos.moresnow.mixins.mixin;
+package net.helinos.moresnow.mixins.mixin.layer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicLayerSnow;
-import net.minecraft.core.block.BlockLogicSlab;
-import net.minecraft.core.block.BlockLogicStairs;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.pos.TilePosc;

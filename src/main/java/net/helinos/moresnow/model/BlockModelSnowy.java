@@ -23,9 +23,9 @@ public abstract class BlockModelSnowy<T extends BlockLogicSnowy<?>> extends Bloc
     @Override
     public IconCoordinate getBlockTextureFromSideAndMetadata(Side side, int metadata) {
         BlockLogicSnowy<?> logic = this.block.getLogic();
-        int storedBlockID = logic.getStoredBlockId(metadata);
+        int storedBlockID = logic.storedBlockId(metadata);
         Block<?> storedBlock = Blocks.getBlock(storedBlockID);
-        int storedBlockMetadata = logic.getStoredBlockMetadata(metadata);
+        int storedBlockMetadata = logic.storedBlockMetadata(metadata);
         try {
             return BlockModelDispatcher.getInstance().getDispatch(storedBlock).getParticleTexture(side, storedBlockMetadata);
         } catch (NullPointerException e) {
@@ -35,7 +35,7 @@ public abstract class BlockModelSnowy<T extends BlockLogicSnowy<?>> extends Bloc
 
 	@Override
 	public void renderStandalone(@NotNull TessellatorGeneral tessellator, int metadata, byte lightIndex) {
-		Block<?> storedBlock = this.block.getLogic().getStoredBlock();
+		Block<?> storedBlock = this.block.getLogic().storedBlock();
 		BlockModel<?> storedBlockModel = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
 		storedBlockModel.renderStandalone(tessellator, metadata,lightIndex);
 		this.renderLayerOnInventory(tessellator, metadata,lightIndex);

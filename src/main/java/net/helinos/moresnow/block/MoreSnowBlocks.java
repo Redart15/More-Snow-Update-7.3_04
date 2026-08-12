@@ -118,18 +118,18 @@ public class MoreSnowBlocks {
 	}
 
 	public static boolean convertBlock(World world, int id, int x, int y, int z, String prefix) {
-		Block<?> replaceBlock = getBlock(id, world.getBlockData(new TilePos(x, y, z)), prefix);
+		Block<? extends BlockLogicSnowy<?>> replaceBlock = getBlock(id, world.getBlockData(new TilePos(x, y, z)), prefix);
 		if (replaceBlock == null) return false;
-		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(world, id, new TilePos(x, y, z));
+		return replaceBlock.getLogic().tryMakeSnowy(world, id, new TilePos(x, y, z));
 	}
 
 	public static boolean convertBlock(Chunk chunk, int id, int x, int y, int z, String prefix) {
-		Block<?> replaceBlock = getBlock(id, chunk.getBlockData(new ChunkTilePos(x, y, z)), prefix);
+		Block<? extends BlockLogicSnowy<?>> replaceBlock = getBlock(id, chunk.getBlockData(new ChunkTilePos(x, y, z)), prefix);
 		if (replaceBlock == null) return false;
-		return ((BlockLogicSnowy<?>) replaceBlock.getLogic()).tryMakeSnowy(chunk, id, new TilePos(x, y, z));
+		return replaceBlock.getLogic().tryMakeSnowy(chunk, id, new TilePos(x, y, z));
 	}
 
-	public static @Nullable Block<?> getBlock(int id, int metadata, @Nullable String prefix) {
+	public static @Nullable Block<? extends BlockLogicSnowy<?>> getBlock(int id, int metadata, @Nullable String prefix) {
 		if(prefix == null){
 			return null;
 		}
@@ -142,15 +142,15 @@ public class MoreSnowBlocks {
 		}
 		NamespaceID namespaceID = NamespaceID.fromPool(getModID(logic), name);
 		Block<?> replaceBlock = Blocks.blockMap.get(namespaceID);
-		if (replaceBlock == null || !(replaceBlock.getLogic() instanceof BlockLogicSnowy)) {
-			NamespaceID adjusted = NamespaceID.fromPool(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
-			Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
-			if (adjustedBlock == null || !(adjustedBlock.getLogic() instanceof BlockLogicSnowy)) {
-				return null;
-			}
-			replaceBlock = adjustedBlock;
+		if (replaceBlock != null && replaceBlock.getLogic() instanceof BlockLogicSnowy) {
+			return (Block<? extends BlockLogicSnowy<?>>) replaceBlock;
 		}
-		return replaceBlock;
+		NamespaceID adjusted = NamespaceID.fromPool(MoreSnow.MOD_ID, name + "." + block.getLogic().namespaceId().namespace());
+		Block<?> adjustedBlock = Blocks.blockMap.get(adjusted);
+		if (adjustedBlock != null && adjustedBlock.getLogic() instanceof BlockLogicSnowy) {
+			return (Block<? extends BlockLogicSnowy<?>>) adjustedBlock;
+		}
+		return null;
 	}
 
 	public static @NotNull String prePendName(Block<?> block, ItemStack itemStack, String prefix) {

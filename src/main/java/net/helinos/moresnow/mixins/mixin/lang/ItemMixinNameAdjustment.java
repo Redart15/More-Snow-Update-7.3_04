@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixins.mixin;
+package net.helinos.moresnow.mixins.mixin.lang;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -21,8 +21,8 @@ public abstract class ItemMixinNameAdjustment {
 		Item asThis = (Item) (Object) this;
 		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
-			if(block != null && block.getLogic() instanceof BlockLogicSnowy){
-				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy<?>)block.getLogic()).layerBlock)) + result;
+			if(block != null && block.getLogic() instanceof BlockLogicSnowy<?>){
+				 result = MoreSnowBlocks.prePendName(block, itemstack, MoreSnow.LAYERS.getKey(((BlockLogicSnowy<?>)block.getLogic()).layerBlock())) + result;
 			}
 		}
 		return result;
@@ -33,8 +33,8 @@ public abstract class ItemMixinNameAdjustment {
 		Item asThis = (Item) (Object) this;
 		if(asThis instanceof ItemBlock){
 			Block<?> block = ((ItemBlockAccessor)asThis).getBlock();
-			if(block != null && block.getLogic() instanceof BlockLogicSnowy logicSnowy){
-				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(logicSnowy.layerBlock));
+			if(block != null && block.getLogic() instanceof BlockLogicSnowy<?> logicSnowy){
+				return MoreSnowBlocks.prePendDesc(block, itemstack, MoreSnow.LAYERS.getKey(logicSnowy.layerBlock()));
 			}
 		}
 		return original.call(itemstack);

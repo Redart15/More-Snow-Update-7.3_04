@@ -20,7 +20,7 @@ public class BlockModelSnowyPlant<T extends BlockLogicSnowy<?>> extends BlockMod
 		int metadata = worldSource.getBlockData(tilePos);
 		// Render the slab
 		AABBd bounds = new AABBd(0.0, 0.0, 0.0, 1.0, 0.5, 1.0);
-		Block<?> storedBlock = this.block.getLogic().getStoredBlock();
+		Block<?> storedBlock = this.block.getLogic().storedBlock();
 		BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
 		boolean somethingRendered = model.render(tessellator, worldSource, tilePos);
 		// Render the snow

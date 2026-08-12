@@ -32,7 +32,7 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == this.getStoredBlockId(metadata);
+		return id == this.storedBlockId(metadata);
 	}
 
 
@@ -100,7 +100,7 @@ public class BlockLogicSnowyFenceGate<T extends BlockLogic> extends BlockLogicSn
 
 
 	@Override
-	public int getStoredBlockMetadata(int metadata) {
+	public int storedBlockMetadata(int metadata) {
 		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, 0);
 	}
 

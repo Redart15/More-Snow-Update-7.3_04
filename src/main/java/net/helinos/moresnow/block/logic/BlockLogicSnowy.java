@@ -3,11 +3,13 @@ package net.helinos.moresnow.block.logic;
 import java.util.Random;
 
 import net.helinos.moresnow.block.MoreSnowBlocks;
+import net.helinos.moresnow.mixins.interfaces.BlockReplacement;
 import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.material.Materials;
 import net.minecraft.core.block.support.FullSupport;
 import net.minecraft.core.block.support.ISupport;
 import net.minecraft.core.block.support.PartialSupport;
+import net.minecraft.core.entity.Entity;
 import net.minecraft.core.world.LevelListener;
 
 import net.minecraft.core.block.Block;
@@ -34,18 +36,16 @@ import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
+public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic implements BlockReplacement {
 	public static final int START_INDEX = 4;
 	public static final int END_INDEX = 7;
 	public static final int FULL_BLOCK = 8;
-	public final Block<?> storedBlock;
-	public final Block<?> layerBlock;
+	private final Block<?> storedBlock;
+	private final Block<?> layerBlock;
 	private final int maxLayers;
 	private final int lowestLayerHeight;
 
 	protected BlockLogicSnowy(Block<T> block, Block<?> storedBlock, int maxLayers, int lowestLayerHeight) {
-//		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, storedBlock.getMaterial());
-		// default because game wont let us reference logic yet, we will fix these blocks later.
 		this(block, storedBlock, MoreSnowBlocks.getLayerBlock(block), maxLayers, lowestLayerHeight, Materials.TOP_SNOW);
 	}
 
@@ -57,30 +57,46 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		this.lowestLayerHeight = lowestLayerHeight;
 	}
 
+	public Block<?> block(){return this.block;}
+
+	public Block<?> layerBlock() {
+		return this.layerBlock;
+	}
+
+	public Block<?> storedBlock() {
+		return storedBlock;
+	}
+
+	public Block<?> storedBlock(int metadata) {
+		return storedBlock;
+	}
+
+	@SuppressWarnings("java:S1172")
+	public int storedBlockId(int metadata) {
+		return this.storedBlock.id();
+	}
+
+	@SuppressWarnings("java:S1172")
+	public int storedBlockMetadata(int metadata) {
+		return 0;
+	}
+
+	public int getLayers(int metadata) {
+		return BlockMetadata.getLowerBlock(metadata) + 1;
+	}
+
+
+
 	/**
 	 * Check a given block id with given metadata is capable of being replaced by a
 	 * snow covered block.
 	 */
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == this.getStoredBlockId(metadata);
+		return id == this.storedBlockId(metadata);
 	}
 
-	public Block<?> getStoredBlock() {
-		return storedBlock;
-	}
-
-	public Block<?> getStoredBlock(int metadata) {
-		return storedBlock;
-	}
-
-	@SuppressWarnings("java:S1172")
-	public int getStoredBlockId(int metadata) {
-		return this.storedBlock.id();
-	}
-
-	@SuppressWarnings("java:S1172")
-	public int getStoredBlockMetadata(int metadata) {
-		return 0;
+	public int convertBlockToMetadata(Block<?> block, int metadata) {
+		return this.blockToMetadata(block.id(), metadata);
 	}
 
 	public int convertBlockToMetadata(int blockId, int metadata) {
@@ -95,10 +111,6 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	@Override
 	public @NotNull String getLanguageKey(int meta) {
 		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "bug" : storedBlock.getLogic().getLanguageKey(meta);
-	}
-
-	public int getLayers(int metadata) {
-		return BlockMetadata.getLowerBlock(metadata) + 1;
 	}
 
 	public int getMaxLayers() {
@@ -194,7 +206,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 * @see BlockLogicSnowy#removeSnow(World, int, TilePosc)
 	 */
 	public void removeSnow(World world, int metadata, TilePosc tilePos) {
-		world.setBlockTypeDataNotify(tilePos, this.getStoredBlock(metadata), this.getStoredBlockMetadata(metadata));
+		world.setBlockTypeDataNotify(tilePos, this.storedBlock(metadata), this.storedBlockMetadata(metadata));
 	}
 
 	/**
@@ -204,7 +216,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 	 * @see BlockLogicSnowy#removeSnow(Chunk, int, TilePosc)
 	 */
 	public void removeSnow(Chunk chunk, int metadata, TilePosc tilePos) {
-		chunk.setBlockIdData(new ChunkTilePos(tilePos), this.getStoredBlockId(metadata), this.getStoredBlockMetadata(metadata));
+		chunk.setBlockIdData(new ChunkTilePos(tilePos), this.storedBlockId(metadata), this.storedBlockMetadata(metadata));
 	}
 
 	// Vanilla accumulate function but get layers from function rather than directly
@@ -262,10 +274,17 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 		return metadata;
 	}
 
+	@Override
+	public Block<?> beforeDestroyedByPlayer(World world, TilePosc tilepos, Side side, int data, Player player, ItemStack heldItem){
+		int metadata = world.getBlockData(tilepos);
+		this.removeSnow(world, metadata, tilepos);
+		return this.storedBlock();
+	}
+
 
 	@Override
 	public void onDestroyedByPlayer(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Side side, int metadata, @NotNull Player player, @Nullable Item item) {
-		this.removeSnow(world, metadata, tilePos);
+//		this.removeSnow(world, metadata, tilePos);
 	}
 
 	@Override
@@ -275,7 +294,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 				this.layerBlock.getBreakResult(world, dropCause, tilePos, this.getLayers(metadata) - 1, tileEntity);
 			case IMPROPER_TOOL -> null;
 			default -> // Drop the underlying block if it's destroyed by WORLD or EXPLOSION
-				storedBlock.getBreakResult(world, dropCause, tilePos, this.getStoredBlockMetadata(metadata), tileEntity);
+				storedBlock.getBreakResult(world, dropCause, tilePos, this.storedBlockMetadata(metadata), tileEntity);
 		};
 	}
 
@@ -310,5 +329,10 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic {
 
 	public @NotNull ISupport getSupport(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Side side) {
 		return this.getLayers(world.getBlockData(tilePos)) != this.getMaxLayers() ? PartialSupport.INSTANCE : FullSupport.INSTANCE;
+	}
+
+	@Override
+	public void onEntityCollision(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Entity entity) {
+		this.storedBlock().onEntityCollision(world, tilePos, entity);
 	}
 }

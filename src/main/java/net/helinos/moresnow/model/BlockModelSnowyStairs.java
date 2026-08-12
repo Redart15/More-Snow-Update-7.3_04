@@ -103,10 +103,10 @@ public class BlockModelSnowyStairs<T extends BlockLogicSnowy<?>> extends BlockMo
 
 	@Override
 	public void renderStandalone(@NotNull TessellatorGeneral tessellator, int metadata, byte lightIndex) {
-		Block<?> storedBlock = this.block.getLogic().getStoredBlock();
+		Block<?> storedBlock = this.block.getLogic().storedBlock();
 		BlockModel<?> storedBlockModel = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
 		storedBlockModel.renderStandalone(tessellator, metadata, lightIndex);
-		int color = (BlockColorDispatcher.getInstance().getDispatch(this.block.getLogic().layerBlock)).getFallbackColor(metadata, 0);
+		int color = (BlockColorDispatcher.getInstance().getDispatch(this.block.getLogic().layerBlock())).getFallbackColor(metadata, 0);
 		tessellator.setColor2i(color, 255);
 		float yOffset = 0.5F;
 		AABBd bounds = new AABBd(0.0, 0.5, 0.5, 1.0, 0.5 + 2 / 16.0, 1.0);

@@ -23,7 +23,7 @@ public class BlockModelSnowyCrossed<T extends BlockLogicSnowy<?>> extends BlockM
 
 	@Override
 	public void renderStandalone(@NotNull TessellatorGeneral tessellator, int metadata, byte lightIndex) {
-		if(block.getLogic().layerBlock.id() == Blocks.LAYER_SNOW.id()){
+		if(block.getLogic().layerBlock().id() == Blocks.LAYER_SNOW.id()){
 			this.renderCrossInventory(tessellator, metadata, lightIndex);
 			this.renderLayerOnInventory(tessellator, metadata, lightIndex);
 		}else{
@@ -37,10 +37,10 @@ public class BlockModelSnowyCrossed<T extends BlockLogicSnowy<?>> extends BlockM
 		// Render the slab
 		AABBd bounds = new AABBd(0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
 		boolean somethingRendered = false;
-		if(block.getLogic().layerBlock.id() == Blocks.LAYER_SNOW.id()){
+		if(block.getLogic().layerBlock().id() == Blocks.LAYER_SNOW.id()){
 			somethingRendered |= this.renderCrossShaped(tessellator, worldSource, tilePos);
 		}else{
-			Block<?> storedBlock = this.block.getLogic().getStoredBlock();
+			Block<?> storedBlock = this.block.getLogic().storedBlock();
 			BlockModel<?> model = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
 			somethingRendered |= model.render(tessellator, worldSource, tilePos);
 		}
@@ -107,7 +107,7 @@ public class BlockModelSnowyCrossed<T extends BlockLogicSnowy<?>> extends BlockM
 		double xd = x;
 		double yd = y;
 		double zd = z;
-		Block<?> stored = this.block.getLogic().storedBlock;
+		Block<?> stored = this.block.getLogic().storedBlock();
 		if (stored == Blocks.TALLGRASS || stored == Blocks.TALLGRASS_FERN || stored == Blocks.SPINIFEX) {
 			long dRandom = (long) x * 3129871L ^ (long) z * 116129781L ^ (long) y;
 			dRandom = dRandom * dRandom * 42317861L + dRandom * 11L;

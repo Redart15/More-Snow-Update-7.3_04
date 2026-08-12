@@ -8,7 +8,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.Block;
-import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.net.command.CommandManager;
 import net.minecraft.core.net.command.CommandSource;
@@ -16,25 +15,29 @@ import net.minecraft.core.net.command.helpers.DoubleCoordinate;
 import net.minecraft.core.net.command.helpers.DoubleCoordinates;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
+import net.minecraft.core.world.pos.ChunkPos;
+import net.minecraft.core.world.pos.ChunkTilePos;
 
 public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 
 
 	public void register(CommandDispatcher<CommandSource> dispatcher) {
-		ArgumentBuilderLiteral<CommandSource> command =
-			(ArgumentBuilderLiteral) ((ArgumentBuilderLiteral) ArgumentBuilderLiteral.literal("lesssnow")
-				.requires((t) -> ((CommandSource) t).hasAdmin())
-				.then(ArgumentBuilderRequired.argument("radius", ArgumentTypeInteger.integer(1, 9))
-					.executes(CommandRemoveSnowy::chunkRadius)));
-		dispatcher.register(command);
+		dispatcher.register(ArgumentBuilderLiteral.<CommandSource>literal("lesssnow")
+			.requires((t) -> t.hasAdmin() && t.getSender() != null)
+			.then(ArgumentBuilderRequired.<CommandSource, Integer>argument("radius", ArgumentTypeInteger.integer(1, 9))
+				.executes(CommandRemoveSnowy::chunkRadius)
+			)
+		);
 	}
 
-	private static int chunkRadius(CommandContext<Object> context) {
+	private static int chunkRadius(CommandContext<CommandSource> context) {
 		int sum = 0;
 
-		CommandSource source = (CommandSource) context.getSource();
+		CommandSource source = context.getSource();
 		Player player = source.getSender();
-
+		if(player == null){
+			return -1;
+		}
 		int radius = context.getArgument("radius", Integer.class);
 		for (int x = -radius; x < radius; x++) {
 			for (int z = -radius; z < radius; z++) {
@@ -57,7 +60,7 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 			throw new RuntimeException(e);
 		}
 		World world = source.getWorld();
-		Chunk chunk = world.getChunkFromChunkCoords(Math.floorDiv(fx, 16), Math.floorDiv(fz, 16));
+		Chunk chunk = world.getChunk(new ChunkPos(fx, fz));
 		if (!chunk.isLoaded) {
 			return 0;
 		}
@@ -65,7 +68,7 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 		for (int x = 0; x < Chunk.CHUNK_SIZE_X; x++) {
 			for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
 				for (int y = 0; y < World.HEIGHT_BLOCKS; y++) {
-					CommandRemoveSnowy.removeSnowyBlocks(chunk, x, y, z);
+					CommandRemoveSnowy.removeSnowyBlocks(chunk, new ChunkTilePos(x, y, z));
 				}
 			}
 		}
@@ -73,17 +76,12 @@ public class CommandRemoveSnowy implements CommandManager.CommandRegistry {
 		return 1;
 	}
 
-	private static void removeSnowyBlocks(Chunk chunk, int x, int y, int z) {
-		int id = chunk.getBlockID(x, y, z);
-		if (id == 0) {
+	private static void removeSnowyBlocks(Chunk chunk, ChunkTilePos chunkTilePos) {
+		Block<?> block = chunk.getBlock(chunkTilePos);
+		if (!(block.getLogic() instanceof BlockLogicSnowy<?> logicSnowy)) {
 			return;
 		}
-		Block<?> block = Blocks.getBlock(id);
-		if (block == null || block.getLogic() == null || !(block.getLogic() instanceof BlockLogicSnowy)) {
-			return;
-		}
-		BlockLogicSnowy snowy = (BlockLogicSnowy) block.getLogic();
-		chunk.setBlockIDWithMetadataRaw(x, y, z, snowy.storedBlock.id(), snowy.getStoredBlockMetadata(chunk.getBlockMetadata(x,y,z)));
+		chunk.setBlockIdDataRaw(chunkTilePos, logicSnowy.storedBlock().id(), logicSnowy.storedBlockMetadata(chunk.getBlockData(chunkTilePos)));
 	}
 
 }

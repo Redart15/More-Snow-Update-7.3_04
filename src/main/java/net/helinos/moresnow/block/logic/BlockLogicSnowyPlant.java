@@ -3,11 +3,9 @@ package net.helinos.moresnow.block.logic;
 import java.util.Random;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicPlant;
-import net.minecraft.core.block.Block;
-import net.minecraft.core.block.BlockLogic;
-import net.minecraft.core.block.BlockLogicFlower;
-import net.minecraft.core.block.Blocks;
+import net.minecraft.core.block.*;
 import net.minecraft.core.data.gamerule.GameRules;
+import net.minecraft.core.entity.Entity;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
@@ -32,7 +30,7 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 	}
 
 	@Override
-    public int getStoredBlockMetadata(int metadata) {
+    public int storedBlockMetadata(int metadata) {
         return (metadata) & 0b10000000;
     }
 
@@ -56,7 +54,7 @@ public class BlockLogicSnowyPlant<T extends BlockLogic, F extends BlockLogicFlow
 
 	@Override
 	public boolean getKilledByWeather(int metadata) {
-		int blockID = this.getStoredBlockId(metadata);
+		int blockID = this.storedBlockId(metadata);
 		return doGetKilledByWeather(blockID);
 	}
 

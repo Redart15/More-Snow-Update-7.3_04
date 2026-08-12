@@ -62,7 +62,7 @@ public class BlockLogicSnowyPartial<T extends BlockLogic> extends BlockLogicSnow
 	}
 
 	@Override
-	public int getStoredBlockId(int metadata) {
+	public int storedBlockId(int metadata) {
 		return 0;
 	}
 

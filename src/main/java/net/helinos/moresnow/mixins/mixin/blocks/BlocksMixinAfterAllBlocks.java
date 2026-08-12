@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixins.mixin;
+package net.helinos.moresnow.mixins.mixin.blocks;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -24,7 +24,7 @@ public abstract class BlocksMixinAfterAllBlocks {
 	private static void fixMaterial(BlockLogic instance, Operation<Void> original){
 		original.call(instance);
 		if(instance instanceof BlockLogicSnowy<?> snowy && instance instanceof BlockLogicAccessor accessor){
-			accessor.setMaterial(snowy.storedBlock.getMaterial());
+			accessor.setMaterial(snowy.storedBlock().getMaterial());
 		}
 	}
 }

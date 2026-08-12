@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixins.mixin;
+package net.helinos.moresnow.mixins.mixin.sugarcane;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -16,12 +16,12 @@ public class BlockLogicSugarCaneMixin {
 
 	@WrapMethod(method = "canPlaceAt")
 	private boolean canSnowy(World world, TilePosc tilePos, Operation<Boolean> original) {
-		Block<?> block = world.getBlockType(new TilePos(tilePos).down());
+		TilePos queryPos = new TilePos();
+		Block<?> block = world.getBlockType(tilePos.down(queryPos));
 		BlockLogic logic = block.getLogic();
 		if (logic instanceof BlockLogicSnowy<?> snowy) {
 			BlockLogicSugarcane asThis = (BlockLogicSugarcane) (Object) this;
-			Block<?> storedBlock = snowy.getStoredBlock();
-			if (storedBlock.id() == asThis.id()) {
+			if (snowy.storedBlock().id() == asThis.id()) {
 				return true;
 			}
 		}

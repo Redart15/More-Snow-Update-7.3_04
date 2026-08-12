@@ -1,6 +1,5 @@
 package net.helinos.moresnow.block.logic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.helinos.moresnow.block.interfaces.IBlockLogicSnowyRotation;
@@ -9,7 +8,6 @@ import net.helinos.moresnow.util.BlockMetadata;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.util.helper.DyeColor;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.Chunk;
 import net.minecraft.core.world.pos.TilePosc;
@@ -33,12 +31,12 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 
 	@Override
 	public @NotNull String getLanguageKey(int meta) {
-		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
+		return this.storedBlock().getLogic() instanceof BlockLogicSnowy ? "snowy" : this.storedBlock().getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == getStoredBlockId(metadata) && (metadata & 8) == 0;
+		return id == storedBlockId(metadata) && (metadata & 8) == 0;
 	}
 
 	public boolean tryMakeSnowy(World world, int id, int meta, TilePosc tilePosc) {
@@ -84,7 +82,7 @@ public class BlockLogicSnowyStairsPainted<T extends BlockLogic> extends BlockLog
 	}
 
 	@Override
-	public int getStoredBlockMetadata(int metadata) {
+	public int storedBlockMetadata(int metadata) {
 		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, this.color.blockMeta & 15);
 	}
 

@@ -13,7 +13,6 @@ import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
-import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 import net.minecraft.core.world.pos.TilePosc;
@@ -64,10 +63,10 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 			return false;
 		} else {
 			ItemStack heldItem = player.getHeldItem();
-			if (heldItem != null && heldItem.stackSize >= 1 && heldItem.getItem().id == this.storedBlock.id()) {
+			if (heldItem != null && heldItem.stackSize >= 1 && heldItem.getItem().id == this.storedBlock().id()) {
 				int newMetadata = setPermanent(setStackCount(metadata, currentStackCount + 1), true);
 				world.setBlockDataNotify(tilePos, newMetadata);
-				world.playBlockSoundEffect(player, tilePos.x() + 0.5F, tilePos.y() + 0.5F, tilePos.z() + 0.5F, this.storedBlock, EnumBlockSoundEffectType.PLACE);
+				world.playBlockSoundEffect(player, tilePos.x() + 0.5F, tilePos.y() + 0.5F, tilePos.z() + 0.5F, this.storedBlock(), EnumBlockSoundEffectType.PLACE);
 				heldItem.consumeItem(player);
 				return true;
 			} else {
@@ -90,17 +89,17 @@ public class BlockLogicSnowyFlowerStackable<T extends BlockLogic> extends BlockL
 
 	@Override
 	public boolean getKilledByWeather(int metadata) {
-		int blockID = this.getStoredBlockId(metadata);
+		int blockID = this.storedBlockId(metadata);
 		return BlockLogicSnowyPlant.doGetKilledByWeather(blockID);
 	}
 
 	@Override
 	public boolean canReplaceBlock(int id, int metadata) {
-		return id == storedBlock.id();
+		return id == this.storedBlock().id();
 	}
 
 	@Override
-    public int getStoredBlockMetadata(int metadata) {
+    public int storedBlockMetadata(int metadata) {
         return (metadata) & 0b11100000;
     }
 

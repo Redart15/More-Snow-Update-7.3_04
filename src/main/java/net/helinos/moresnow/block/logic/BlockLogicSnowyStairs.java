@@ -30,6 +30,10 @@ public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicSta
 		return false;
 	}
 
+	public boolean tryMakeSnowyCheck(World world, int id, TilePosc tilePos) {
+		int meta = world.getBlockData(tilePos);
+		return this.canReplaceBlock(id, meta) && canSupportSnow(world, tilePos);
+	}
 
 	public static boolean tryMakeSnowyDo(BlockLogicSnowy<?> logic, World world, int id, int meta, TilePosc tilePosc) {
 		if (!logic.canReplaceBlock(id, meta)) {
@@ -89,7 +93,7 @@ public class BlockLogicSnowyStairs<T extends BlockLogic, S extends BlockLogicSta
 	}
 
 	@Override
-	public int getStoredBlockMetadata(int metadata) {
+	public int storedBlockMetadata(int metadata) {
 		return BlockMetadata.setBitBlock(metadata >> 4, START_INDEX, END_INDEX, 0);
 	}
 

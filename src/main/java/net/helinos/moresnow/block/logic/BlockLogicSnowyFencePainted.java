@@ -22,11 +22,11 @@ public class BlockLogicSnowyFencePainted<T extends BlockLogic> extends BlockLogi
 
 	@Override
 	public @NotNull String getLanguageKey(int meta) {
-		return storedBlock.getLogic() instanceof BlockLogicSnowy ? "snowy" : storedBlock.getLogic().getLanguageKey(meta) + "." + this.color.colorID;
+		return this.storedBlock().getLogic() instanceof BlockLogicSnowy ? "snowy" : this.storedBlock().getLogic().getLanguageKey(meta) + "." + this.color.colorID;
 	}
 
 	@Override
-	public int getStoredBlockMetadata(int metadata) {
+	public int storedBlockMetadata(int metadata) {
 		return this.color.blockMeta;
 	}
 

@@ -1,4 +1,4 @@
-package net.helinos.moresnow.mixins.mixin;
+package net.helinos.moresnow.mixins.mixin.layer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -41,7 +41,7 @@ public interface IAccumulatableMixin {
 		BlockLogic logic = blockBelow.getLogic();
 		if (
 			logic instanceof BlockLogicSnowy<?> snowyLogic
-				&& itemStack.itemID == snowyLogic.layerBlock.id()
+				&& itemStack.itemID == snowyLogic.layerBlock().id()
 				&& side == Side.TOP
 		) {
 			int newLayers = snowyLogic.getLayers(data) + 1;
@@ -50,7 +50,8 @@ public interface IAccumulatableMixin {
 			}
 		}
 		Block<?> layerBlock = Blocks.getBlock(itemStack.itemID);
-		if (MoreSnowBlocks.canConvert(blockBelow, data, MoreSnow.LAYERS.getKey(layerBlock) + "_%s")) {
+		Block<? extends BlockLogicSnowy<?>> converted = MoreSnowBlocks.getBlock(blockBelow.id(), data, MoreSnow.LAYERS.getKey(layerBlock) + "_%s");
+		if (converted != null && converted.getLogic().canReplaceBlock(blockBelow.id(), data)) {
 			replacementBlock.set(MoreSnowBlocks.getBlock(blockBelow.id(), data, MoreSnow.LAYERS.getKey(layerBlock) + "_%s"));
 			return true;
 		}

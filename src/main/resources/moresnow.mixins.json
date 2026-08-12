@@ -9,23 +9,25 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "BlockLogicLayerSnowMixin",
-    "BlockLogicSugarCaneMixin",
-    "BlocksMixinAfterAllBlocks",
-    "IAccumulatableMixin",
-    "ItemMixinNameAdjustment",
+    "accessor.ServerPlayerControllerAccessor",
     "accessor.BlockAccessor",
     "accessor.BlockLogicAccessor",
     "accessor.ItemBlockAccessor",
+    "blocks.BlocksMixinAfterAllBlocks",
+    "lang.ItemMixinNameAdjustment",
+    "layer.BlockLogicFireMixinAccumulateAshe",
+    "layer.BlockLogicLayerSnowMixin",
+    "layer.IAccumulatableMixin",
+    "sugarcane.BlockLogicSugarCaneMixin",
     "weather.WeatherMixin",
     "weather.WeatherSnowMixin"
   ],
   "client": [
-    "BlockModelGrassMixin",
-    "BlockModelLayerMixinFixSideRenderer",
-    "particle.PlayerControllerMixinSnowyParticle"
+    "blocks.BlockModelGrassMixin",
+    "model.BlockModelLayerMixinFixSideRenderer",
+    "spoof.PlayerControllerMixinSnowyParticle"
   ],
   "server": [
-    "particle.ServerPlayerControllerMixinSnowyParticle"
+    "spoof.ServerPlayerControllerMixinSnowyParticle"
   ]
 }

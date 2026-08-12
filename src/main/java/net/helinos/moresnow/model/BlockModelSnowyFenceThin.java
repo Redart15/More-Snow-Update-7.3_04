@@ -25,7 +25,7 @@ public class BlockModelSnowyFenceThin<T extends BlockLogicSnowy<?>, F extends Bl
 		BlockLogicSnowyFenceThin<?, ?> logic = (BlockLogicSnowyFenceThin<?, ?>) this.block.getLogic();
 		int metadata = worldSource.getBlockData(tilePos);
 		boolean somethingRendered = false;
-		somethingRendered |= BlockModelDispatcher.getInstance().getDispatch(logic.storedBlock).render(tessellator, worldSource, tilePos);
+		somethingRendered |= BlockModelDispatcher.getInstance().getDispatch(logic.storedBlock()).render(tessellator, worldSource, tilePos);
 		// Render snow
 		int layers = logic.getLayers(metadata);
 		double height = layers * 2 / 16.0;

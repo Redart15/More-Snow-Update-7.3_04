@@ -94,7 +94,7 @@ public abstract class WeatherSnowMixin {
 		}
 		BlockLogic logic = block.getLogic();
 		if(logic instanceof BlockLogicSnowy<?> logicSnowy){
-			if(logicSnowy.layerBlock.id() == Blocks.LAYER_SNOW.id()){
+			if(logicSnowy.layerBlock().id() == Blocks.LAYER_SNOW.id()){
 				logicSnowy.accumulate(world, new TilePos(x, yLevel.get() - 1, z));
 			}
 			return false;

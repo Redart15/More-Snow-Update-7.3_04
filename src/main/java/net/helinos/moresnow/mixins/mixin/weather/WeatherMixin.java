@@ -26,7 +26,7 @@ public abstract class WeatherMixin {
 		for (int y = topY; y >= topY - 1; y--) {
 			TilePos tilePos = new TilePos(x, y, z);
 			Block<?> block = world.getBlockType(tilePos);
-			if (!(block.getLogic() instanceof BlockLogicSnowy<?> blockSnowy) || blockSnowy.layerBlock.id() != Blocks.LAYER_SNOW.id()) {
+			if (!(block.getLogic() instanceof BlockLogicSnowy<?> blockSnowy) || blockSnowy.layerBlock().id() != Blocks.LAYER_SNOW.id()) {
 				continue;
 			}
 			int metadata = world.getBlockData(tilePos);
@@ -43,7 +43,7 @@ public abstract class WeatherMixin {
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void doChunkLoadEffect(World world, Chunk chunk, CallbackInfo callbackInfo, int x, int y, int z, int blockId) {
 		Block<?> block = Blocks.getBlock(blockId);
-		if (!(block.getLogic() instanceof BlockLogicSnowy<?> blockSnowy) || blockSnowy.layerBlock.id() != Blocks.LAYER_SNOW.id()) {
+		if (!(block.getLogic() instanceof BlockLogicSnowy<?> blockSnowy) || blockSnowy.layerBlock().id() != Blocks.LAYER_SNOW.id()) {
 			return;
 		}
 		ChunkTilePos chunkTilePos = new ChunkTilePos(x, y, z);
