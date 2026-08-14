@@ -17,7 +17,9 @@ import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.item.IAccumulatable;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Side;
+import net.minecraft.core.util.phys.HitResult;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePos;
 import net.minecraft.core.world.pos.TilePosc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,8 +36,10 @@ public interface IAccumulatableMixin {
 		@NotNull ItemStack itemStack, @NotNull Block<?> blockBelow, int data,
 		@NotNull Side side, double xHit, double yHit,
 		Operation<Boolean> original,
-		@Share("snowyBlock") LocalRef<@Nullable Block<?>> replacementBlock
-	) {
+		@Share("snowyBlock") LocalRef<@Nullable Block<?>> replacementBlock,
+		@Local(argsOnly = true) World world,
+		@Local(argsOnly = true) TilePosc tilePos
+		) {
 		boolean originalResult = original.call(instance, itemStack, blockBelow, data, side, xHit, yHit);
 		replacementBlock.set(null); // no block yet
 		BlockLogic logic = blockBelow.getLogic();
@@ -51,7 +55,7 @@ public interface IAccumulatableMixin {
 		}
 		Block<?> layerBlock = Blocks.getBlock(itemStack.itemID);
 		Block<? extends BlockLogicSnowy<?>> converted = MoreSnowBlocks.getBlock(blockBelow.id(), data, MoreSnow.LAYERS.getKey(layerBlock) + "_%s");
-		if (converted != null && converted.getLogic().canReplaceBlock(blockBelow.id(), data)) {
+		if (converted != null && converted.getLogic().tryMakeSnowyCheck(world, blockBelow.id(), tilePos)) {
 			replacementBlock.set(MoreSnowBlocks.getBlock(blockBelow.id(), data, MoreSnow.LAYERS.getKey(layerBlock) + "_%s"));
 			return true;
 		}
@@ -84,8 +88,10 @@ public interface IAccumulatableMixin {
 		}
 		BlockLogic logic = block.getLogic();
 		if (logic instanceof BlockLogicSnowy<?> snowyLogic && snowyLogic.tryMakeSnowyCheck(world, blockDataResult.block.id(), tilePosc)) {
+			int metadata = snowyLogic.convertBlockToMetadata(block.id(), world.getBlockData(tilePosc));
+			metadata = snowyLogic.isOwned(metadata);
 			blockDataResult.block = block;
-			blockDataResult.data = snowyLogic.convertBlockToMetadata(block.id(), world.getBlockData(tilePosc));
+			blockDataResult.data = metadata;
 			return blockDataResult;
 		}
 		return original.call(instance, itemStack, world, player, tilePosc, side, xHit, yHit, blockDataResult);

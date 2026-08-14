@@ -9,18 +9,23 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "accessor.ServerPlayerControllerAccessor",
     "accessor.BlockAccessor",
     "accessor.BlockLogicAccessor",
     "accessor.ItemBlockAccessor",
+    "accessor.ServerPlayerControllerAccessor",
+    "accessor.WorldFeatureNetherScatterAccessor",
     "blocks.BlocksMixinAfterAllBlocks",
     "lang.ItemMixinNameAdjustment",
     "layer.BlockLogicFireMixinAccumulateAshe",
     "layer.BlockLogicLayerSnowMixin",
+    "layer.BlockLogicLeavesOakMixinAccumulateLeaves",
     "layer.IAccumulatableMixin",
     "sugarcane.BlockLogicSugarCaneMixin",
     "weather.WeatherMixin",
-    "weather.WeatherSnowMixin"
+    "weather.WeatherSnowMixin",
+    "worldfeature.WorldFeatureBonePileMixinAshenPile",
+    "worldfeature.WorldFeatureMagmaMixinAshenPile",
+    "worldfeature.WorldFeatureSoulMixinAshePile"
   ],
   "client": [
     "blocks.BlockModelGrassMixin",

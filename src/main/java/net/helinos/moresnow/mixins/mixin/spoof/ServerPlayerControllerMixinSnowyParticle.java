@@ -55,18 +55,18 @@ public abstract class ServerPlayerControllerMixinSnowyParticle {
 		}
 	}
 
-	@WrapOperation(method = "removeBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/WorldServer;setBlockWithNotify(IIII)Z"))
+	@WrapOperation(method = "mineBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerPlayerController;removeBlock(III)Z"))
 	private boolean replaceBlock(
-		WorldServer instance,
+		ServerPlayerController instance,
 		int x, int y, int z,
-		int blockID,
 		Operation<Boolean> original,
 		@Share("resultBlock") LocalRef<Block<?>> resultBlock
 	){
 		Block<?> block = resultBlock.get();
 		if(block == null){
-			return original.call(instance, x, y, z, blockID);
+			return original.call(instance, x, y, z);
 		}
-		return original.call(instance, x, y, z, block.id());
+		World world = ((ServerPlayerControllerAccessor) instance).getThisWorld();
+		return world.setBlockTypeNotify(new TilePos(x, y, z), block);
 	}
 }

@@ -55,9 +55,14 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 		this.storedBlock = storedBlock;
 		this.maxLayers = maxLayers;
 		this.lowestLayerHeight = lowestLayerHeight;
+		if (layerBlock.id() == Blocks.LAYER_SNOW.id() || layerBlock.id() == Blocks.LAYER_LEAVES_OAK.id()) {
+			block.setTicking(true);
+		}
 	}
 
-	public Block<?> block(){return this.block;}
+	public Block<?> block() {
+		return this.block;
+	}
 
 	public Block<?> layerBlock() {
 		return this.layerBlock;
@@ -84,7 +89,6 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 	public int getLayers(int metadata) {
 		return BlockMetadata.getLowerBlock(metadata) + 1;
 	}
-
 
 
 	/**
@@ -129,37 +133,46 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 		TilePosc posBelow = new TilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
 		Block<?> belowBlock = world.getBlockType(posBelow);
 		int belowMetadata = world.getBlockData(posBelow);
-		return this.canSupportSnow(belowBlock, belowMetadata);
-	}
-
-	public boolean canSupportSnow(Chunk chunk, TilePosc tilePosc) {
-		ChunkTilePosc posBelow = new ChunkTilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
-		int belowID = chunk.getBlockId(posBelow);
-		int belowMetadata = chunk.getBlockData(posBelow);
-		Block<?> belowBlock = Blocks.getBlock(belowID);
-		return this.canSupportSnow(belowBlock, belowMetadata);
-	}
-
-	private boolean canSupportSnow(@Nullable Block<?> belowBlock, int metadata) {
-		if(this.getSupportsOwnSnow()){
+		if (this.getSupportsOwnSnow()) {
 			return true;
 		}
-		if (belowBlock == null) {
-			return false;
-		}
-		Material belowMaterial = belowBlock.getMaterial();
 		BlockLogic logic = belowBlock.getLogic();
-		if (logic instanceof BlockLogicSnowy<?> snowyLogic && snowyLogic.getRelativeLayers(metadata) <= snowyLogic.getMaxLayers()) {
-				return true;
-			}
+		if (logic instanceof BlockLogicSnowy<?> snowyLogic && snowyLogic.getRelativeLayers(belowMetadata) >= snowyLogic.getMaxLayers()) {
+			return true;
+		}
 
-		if ((logic instanceof BlockLogicSlab && (metadata & 0b11) != 0) || (logic instanceof BlockLogicStairs && (metadata & 0b1000) != 0)) {
+		if ((logic instanceof BlockLogicSlab && (belowMetadata & 0b11) != 0) || (logic instanceof BlockLogicStairs && (belowMetadata & 0b1000) != 0)) {
 			return true;
 		}
 		if (belowBlock == Blocks.ICE || (!belowBlock.isSolidRender() && !(logic instanceof BlockLogicLeavesBase))) {
 			return false;
 		}
-		return belowMaterial == Materials.LEAVES || belowMaterial.blocksMotion();
+		ISupport support = belowBlock.getSupport(world, posBelow, Side.TOP);
+		return support == FullSupport.INSTANCE;
+	}
+
+	public boolean canSupportSnow(Chunk chunk, TilePosc tilePosc) {
+		ChunkTilePosc posBelow = new ChunkTilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
+		TilePosc posBelowTile = new TilePos(tilePosc.x(), tilePosc.y() - 1, tilePosc.z());
+		int belowID = chunk.getBlockId(posBelow);
+		int belowMetadata = chunk.getBlockData(posBelow);
+		Block<?> belowBlock = Blocks.getBlock(belowID);
+		if (this.getSupportsOwnSnow()) {
+			return true;
+		}
+		BlockLogic logic = belowBlock.getLogic();
+		if (logic instanceof BlockLogicSnowy<?> snowyLogic && snowyLogic.getRelativeLayers(belowMetadata) <= snowyLogic.getMaxLayers()) {
+			return true;
+		}
+
+		if ((logic instanceof BlockLogicSlab && (belowMetadata & 0b11) != 0) || (logic instanceof BlockLogicStairs && (belowMetadata & 0b1000) != 0)) {
+			return true;
+		}
+		if (belowBlock == Blocks.ICE || (!belowBlock.isSolidRender() && !(logic instanceof BlockLogicLeavesBase))) {
+			return false;
+		}
+		ISupport support = belowBlock.getSupport(chunk.world, posBelowTile, Side.TOP);
+		return support == FullSupport.INSTANCE;
 	}
 
 	public boolean tryMakeSnowyCheck(World world, int id, TilePosc tilePos) {
@@ -275,16 +288,14 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 	}
 
 	@Override
-	public Block<?> beforeDestroyedByPlayer(World world, TilePosc tilepos, Side side, int data, Player player, ItemStack heldItem){
-		int metadata = world.getBlockData(tilepos);
-		this.removeSnow(world, metadata, tilepos);
+	public Block<?> beforeDestroyedByPlayer(World world, TilePosc tilepos, Side side, int data, Player player, ItemStack heldItem) {
 		return this.storedBlock();
 	}
 
 
 	@Override
 	public void onDestroyedByPlayer(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Side side, int metadata, @NotNull Player player, @Nullable Item item) {
-//		this.removeSnow(world, metadata, tilePos);
+		this.removeSnow(world, metadata, tilePos);
 	}
 
 	@Override
@@ -299,19 +310,43 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 	}
 
 	@Override
-	public void updateTick(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Random rand, boolean isRandomTick){
+	public void updateTick(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Random rand, boolean isRandomTick) {
 		if (world.getSavedLightValue(LightLayer.Block, tilePos) > 11) {
 			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
 		}
-		if (shouldSnowMelt(world, tilePos) && this.layerBlock.id() == Blocks.LAYER_SNOW.id()) {
+		if (shouldSnowMelt(world, tilePos, rand, isRandomTick) && this.layerBlock.id() == Blocks.LAYER_SNOW.id()) {
 			this.removeSnow(world, world.getBlockData(tilePos), tilePos);
 		}
+		if (shouldDecay(world, tilePos, rand, isRandomTick) && this.layerBlock().id() == Blocks.LAYER_LEAVES_OAK.id()) {
+			int metadata = world.getBlockData(tilePos);
+			if ((metadata & 128) == 0 && rand.nextInt(2) == 0) {
+				int layer = this.getLayers(metadata) - 1;
+				if (layer > 0) {
+					world.setBlockDataNotify(tilePos, metadata - 1);
+				} else {
+					world.setBlockTypeDataNotify(tilePos, this.storedBlock(), this.storedBlockMetadata(metadata));
+				}
+			}
+		}
+
 	}
 
-	private static boolean shouldSnowMelt(World world, TilePosc tilePos) {
+	private static boolean shouldSnowMelt(World world, TilePosc tilePos, Random random, boolean isRandom) {
 		return !world.getBlockBiome(tilePos).hasTag(BiomeTags.HAS_SURFACE_SNOW) &&
 			world.getSeasonManager().getCurrentSeason() != null &&
 			world.getSeasonManager().getCurrentSeason().letWeatherCleanUpSnow;
+	}
+
+	private static boolean shouldDecay(World world, TilePosc tilePos, Random random, boolean isRandom) {
+		return world.getSeasonManager().getCurrentSeason() != null
+			&& !world.getSeasonManager().getCurrentSeason().hasFallingLeaves;
+	}
+
+	public int isOwned(int metadata) {
+		if (this.layerBlock().id() == Blocks.LAYER_LEAVES_OAK.id()) {
+			return metadata | 128;
+		}
+		return metadata;
 	}
 
 

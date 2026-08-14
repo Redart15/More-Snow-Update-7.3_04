@@ -8,7 +8,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.helinos.moresnow.block.MoreSnowBlocks;
 import net.helinos.moresnow.block.logic.BlockLogicSnowy;
 import net.minecraft.core.block.*;
@@ -18,7 +17,9 @@ import net.minecraft.core.world.biome.Biome;
 import net.minecraft.core.world.chunk.Chunk;
 import net.minecraft.core.world.pos.ChunkTilePos;
 import net.minecraft.core.world.pos.TilePos;
+import net.minecraft.core.world.pos.TilePosc;
 import net.minecraft.core.world.weather.WeatherSnow;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,29 +27,41 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Random;
+
 @Mixin(value = WeatherSnow.class, remap = false)
 public abstract class WeatherSnowMixin {
 
+	@Definition(id = "rand", local = @Local(type = Random.class, argsOnly = true))
+	@Definition(id = "nextInt", method = "Ljava/util/Random;nextInt(I)I")
+	@Definition(id = "probability", local = @Local(type = int.class, ordinal = 2))
+	@Expression("rand.nextInt(probability) == 0")
+	@ModifyExpressionValue(method = "doEnvironmentUpdate", at = @At("MIXINEXTRAS:EXPRESSION"))
+	private boolean spoofed(boolean original){
+		return true;
+	}
+
 	@WrapOperation(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;findTopSolidBlock(II)I"))
-	private int findTopSolidBlockThatIsntSnowy(
+	private int findTopSolidBlockThatIsntSnowyWorld(
 		World world, int x, int z,
 		Operation<Integer> original,
-		@Share("block") LocalRef<Block<?>> blockLocalRef,
-		@Share("blockBelow") LocalRef<Block<?>> blockBelowRef,
 		@Share("yLevel")LocalIntRef yLevel
-		) {
+	) {
 		int y = original.call(world, x, z);
 		TilePos tilePos = new TilePos(x, y - 1, z);
-		Block<?> blockBelow = world.getBlockType(tilePos);
+		y = getTopSolidBlock(world, tilePos, y);
+		yLevel.set(y);
+		return y;
+	}
 
-		while (y < 0 && advanceBelow(blockBelow.getLogic())) {
+	@Unique
+	private static int getTopSolidBlock(@NotNull World world, TilePos tilePos, int y) {
+		Block<?> blockBelow = world.getBlockType(tilePos);
+		while (y > 0 && advanceBelow(blockBelow.getLogic())) {
 			tilePos.down();
 			blockBelow = world.getBlockType(tilePos);
 		}
-		blockBelowRef.set(world.getBlockType(tilePos));
-		blockLocalRef.set(world.getBlockType(tilePos.up()));
-		yLevel.set(tilePos.y());
-		return tilePos.y();
+		return tilePos.up().y();
 	}
 
 	@Unique
@@ -57,57 +70,55 @@ public abstract class WeatherSnowMixin {
 			&& !(blockLogicSnowy.getSupportsOwnSnow())
 			|| blockBelowLogic instanceof BlockLogicFence
 			|| blockBelowLogic instanceof BlockLogicFenceThin
-			|| blockBelowLogic instanceof BlockLogicSugarcane;
+			|| blockBelowLogic instanceof BlockLogicSugarcane
+			|| blockBelowLogic instanceof BlockLogicFenceGate
+			|| blockBelowLogic.block == Blocks.AIR;
 	}
 
-	@WrapOperation(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;setBlockWithNotify(IIII)Z", ordinal = 0))
-	private boolean setSnowyBlock(World world, int x, int y, int z, int id, Operation<Boolean> original) {
-		boolean makeSnowy = MoreSnowBlocks.tryMakeSnowy(world, id, x, y, z, "snow_%s");
-		if (makeSnowy) {
-			return true;
-		}
-		int blockIdBelow = world.getBlockType(new TilePos(x, y - 1, z)).id();
-		boolean makeBelowSnowy = MoreSnowBlocks.tryMakeSnowy(world, blockIdBelow, x, y - 1, z, "snow_%s");
-		if (makeBelowSnowy) {
-			return true;
-		}
-		return original.call(world, x, y, z, Blocks.LAYER_SNOW.id());
-	}
-
-	@Definition(id = "snow", local = @Local(type = boolean.class))
-	@Expression("snow")
-	@ModifyExpressionValue(method = "doEnvironmentUpdate", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private boolean modifyAccumulateLogic(
-		boolean original,
-		@Share("blockLocalRef") LocalRef<Block<?>> blockLocalRef,
-		@Share("yLevel") LocalIntRef yLevel,
-		@Local(argsOnly = true) World world,
-		@Local(argsOnly = true, ordinal = 0) int x,
-		@Local(argsOnly = true, ordinal = 1) int z
+	@Inject(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;getBlockId(III)I", shift = At.Shift.AFTER, ordinal = 1))
+	private void doEnvironmentUpdate(
+		World world, Random random,
+		int x, int z, CallbackInfo ci,
+		@Local boolean snow,
+		@Share("yLevel")LocalIntRef yLevel
 	) {
-		if(!original){
-			return false;
+		int y = yLevel.get();
+		TilePosc tilePosc = new TilePos(x, y, z);
+		Biome biome = world.getBlockBiome(tilePosc);
+		Block<?> blockBelow = world.getBlockType(new TilePos(tilePosc));
+		WeatherSnow asThis = (WeatherSnow) (Object) this;
+		if (biome.blockedWeathers.contains(asThis)
+			|| world.getWeatherManager().getWeatherPower() <= 0.6F
+			|| y < 0
+			|| y >= world.getHeightBlocks()
+			|| world.getSavedLightValue(LightLayer.Block, tilePosc) >= 10) {
+			return;
 		}
-		Block<?> block = blockLocalRef.get();
-		if (block.id() == Blocks.LAYER_SNOW.id()) {
-			return true;
+		if(snow){
+			MoreSnowBlocks.tryMakeSnowy(world, blockBelow.id(), x, y, z, "snow_%s");
 		}
-		BlockLogic logic = block.getLogic();
-		if(logic instanceof BlockLogicSnowy<?> logicSnowy){
-			if(logicSnowy.layerBlock().id() == Blocks.LAYER_SNOW.id()){
-				logicSnowy.accumulate(world, new TilePos(x, yLevel.get() - 1, z));
-			}
-			return false;
-		}
-		return true;
 	}
 
+	@WrapOperation(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;findTopSolidBlock(II)I"))
+	private int findTopSolidBlockThatIsntSnowyChunk(
+		World world, int x, int z,
+		Operation<Integer> original,
+		@Share("yLevel")LocalIntRef yLevel
+	) {
+		int y = original.call(world, x, z);
+		TilePos tilePos = new TilePos(x, y - 1, z);
+		y = getTopSolidBlock(world, tilePos, y);
+		yLevel.set(y);
+		return y;
+	}
 
 	@Inject(method = "doChunkLoadEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/chunk/Chunk;getBlockID(III)I", shift = At.Shift.AFTER, ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
 	private void doChunkLoadEffect(
 		World world, Chunk chunk, CallbackInfo callbackInfo,
-		int x, int worldX, int z, int worldZ, int y, Biome biome, int blockId
+		int x, int worldX, int z, int worldZ, int ny, Biome biome, int blockId,
+		@Share("yLevel")LocalIntRef yLevel
 	) {
+		int y = yLevel.get();
 		ChunkTilePos chunkTilePos = new ChunkTilePos(x, y, z);
 		if (y < 0 || y >= world.getHeightBlocks()
 			|| chunk.getLightLevel(LightLayer.Block, chunkTilePos) >= 10
@@ -117,4 +128,5 @@ public abstract class WeatherSnowMixin {
 		int blockIDBelow = chunk.getBlockId(chunkTilePos);
 		MoreSnowBlocks.tryMakeSnowy(chunk, blockIDBelow, x, y, z, "snow_%s");
 	}
+
 }
