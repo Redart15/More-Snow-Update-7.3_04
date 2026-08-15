@@ -4,10 +4,14 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/Redart15/More-Snow?labelColor=bcd7f1&color=3d85c6&cacheSeconds=120)](https://github.com/Redart15/More-Snow/commits/8.0/)
 [![Lines of Code](https://img.shields.io/endpoint?url=https%3A%2F%2Fghloc.vercel.app%2Fapi%2FRedart15%2FMore-Snow%2Fbadge&labelColor=bcd7f1&color=3d85c6)](https://ghloc.vercel.app/)
 
+> This project is a fork of <a href="https://github.com/Helinos/More-Snow">More-Snow</a>. Originally created by Helinos.
+> Licensed under LGPL-3.0. This version is maintained by Redart15 and contains modifications and updates from the original project.
+
 <img width="1920" height="1017" alt="grafik" src="https://github.com/user-attachments/assets/c2b14f0c-3a14-43fa-ac52-d8b62c9a6b63" />
 
 Adds more snow to BTA. 
 Inspired by [Snow! Real Magic!](https://github.com/Snownee/SnowRealMagic).
+
 
 ## 🍂 Layers can now:
 - Occupy the same block as foliage.
