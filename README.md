@@ -5,7 +5,7 @@
 Adds more snow to BTA. 
 Inspired by [Snow! Real Magic!](https://github.com/Snownee/SnowRealMagic).
 
-### Layers can now:
+## 🍂 Layers can now:
 - Occupy the same block as foliage.
 - Accurately land on top of partial blocks such as stairs, slabs and plants.
 - Land around wooden fences, fence gates, paper walls, chainlink fences and steel fences.
@@ -13,3 +13,8 @@ Inspired by [Snow! Real Magic!](https://github.com/Snownee/SnowRealMagic).
 - Automatically adds this functionality to modded blocks.
 - Allows modders to add their own layers.
 - Naturally generated blocks in layered landscapes are now layered as well, meaning things like flowers in snowy tundras will be covered by snow.
+
+## 🔗  Dependecies
+- BTA Babric >= 8.0.1 https://github.com/Turnip-Labs/bta-fabric-instance-repo/releases
+- HalpLibe >= 6.1.4 https://github.com/Turnip-Labs/bta-halplibe/releases
+- UselessNumerical >= 1.1.1 https://modrinth.com/mod/bta-uselessnumerical
