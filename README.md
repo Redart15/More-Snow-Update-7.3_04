@@ -1,4 +1,6 @@
 # More Snow
+[![GitHub Release](https://img.shields.io/github/v/release/redart15/More-Snow?labelColor=134210&color=751919&cacheSeconds=120)](https://github.com/Redart15/More-Snow/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/Redart15/More-Snow?labelColor=134210&color=751919&cacheSeconds=120)](https://github.com/Redart15/More-Snow/commits/8.0/)
 
 <img width="1920" height="1017" alt="grafik" src="https://github.com/user-attachments/assets/c2b14f0c-3a14-43fa-ac52-d8b62c9a6b63" />
 
