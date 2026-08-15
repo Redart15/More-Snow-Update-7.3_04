@@ -244,6 +244,7 @@ public class MoreSnowBlocks {
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
 				.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "flower", snowy.namespaceId());
 			count++;
@@ -261,6 +262,7 @@ public class MoreSnowBlocks {
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
 				.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "flower", snowy.namespaceId());
 			count++;
@@ -279,6 +281,7 @@ public class MoreSnowBlocks {
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
 				.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "sapling", snowy.namespaceId());
 			count++;
@@ -296,6 +299,7 @@ public class MoreSnowBlocks {
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
 				.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FLOWERS.add(snowy);
 			printMessage(currentBlock.id(), "mushroom", snowy.namespaceId());
 			count++;
@@ -318,6 +322,7 @@ public class MoreSnowBlocks {
 					String key = convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s") + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowySlabPainted<>(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
+					snowy.init();
 					SNOWY_SLAB_PAINTED.add((Block<BlockLogicSnowySlabPainted<?>>) snowy);
 					printMessage(currentBlock.id(), "slab", snowy.namespaceId());
 					count++;
@@ -326,6 +331,7 @@ public class MoreSnowBlocks {
 			}
 			snowy = blockBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowySlab<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_SLAB.add(snowy);
 			printMessage(currentBlock.id(), "slab", snowy.namespaceId());
 			count++;
@@ -348,6 +354,7 @@ public class MoreSnowBlocks {
 					String key = convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s") + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyStairsPainted<>(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
+					snowy.init();
 					SNOWY_STAIRS_PAINTED.add((Block<BlockLogicSnowyStairsPainted<?>>)snowy);
 					printMessage(currentBlock.id(), "stairs", snowy.namespaceId());
 					count++;
@@ -356,6 +363,7 @@ public class MoreSnowBlocks {
 			}
 			snowy = blockBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyStairs<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_STAIRS.add(snowy);
 			printMessage(currentBlock.id(), "stairs", snowy.namespaceId());
 			count++;
@@ -380,6 +388,7 @@ public class MoreSnowBlocks {
 					String key = convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s") + "_" + color.colorID;
 					Block<BlockLogicSnowyFencePainted<?>> fence = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFencePainted<>(block, currentBlock, color));
 					fence.withTags(addTooling(layer));
+					fence.init();
 					SNOWY_FENCE_PAINTED.add(fence);
 					printMessage(currentBlock.id(), "fence", fence.namespaceId());
 					count++;
@@ -388,6 +397,7 @@ public class MoreSnowBlocks {
 			}
 			snowy = blockBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFence<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FENCE.add(snowy);
 			printMessage(currentBlock.id(), "fence", snowy.namespaceId());
 			count++;
@@ -408,6 +418,7 @@ public class MoreSnowBlocks {
 			blockBuilder = blockBuilder.addTags(BlockTags.CHAINLINK_FENCES_CONNECT);
 			snowy = blockBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), (block) -> new BlockLogicSnowyFenceThin<>(block, currentBlock, BlockLogicFenceSteel.class));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_FENCE_THIN.add(snowy);
 			printMessage(currentBlock.id(), "thin-fence", snowy.namespaceId());
 			count++;
@@ -427,21 +438,25 @@ public class MoreSnowBlocks {
 					.withTags(addTooling(Blocks.LAYER_SNOW))
 					.withSound(Blocks.LAYER_SNOW.getSound())
 					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				SNOWY_FENCE_STEEL.init();
 				printMessage(currentBlock.id(), "thin-fence", SNOWY_FENCE_STEEL.namespaceId());
 				LEAVY_FENCE_STEEL = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceSteelBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceSteel::new))
 					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
 					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
 					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				LEAVY_FENCE_STEEL.init();
 				printMessage(currentBlock.id(), "thin-fence", LEAVY_FENCE_STEEL.namespaceId());
 				SLATY_FENCE_STEEL = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceSteelBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceSteel::new))
 					.withTags(addTooling(Blocks.LAYER_SLATE))
 					.withSound(Blocks.LAYER_SLATE.getSound())
 					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				SLATY_FENCE_STEEL.init();
 				printMessage(currentBlock.id(), "thin-fence", SLATY_FENCE_STEEL.namespaceId());
 				ASHY_FENCE_STEEL = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceSteelBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "ashe_%s"), getNextID(), BlockLogicSnowyFenceSteel::new))
 					.withTags(addTooling(Blocks.LAYER_ASH))
 					.withSound(Blocks.LAYER_ASH.getSound())
 					.withHardness(Blocks.LAYER_ASH.getHardness());
+				ASHY_FENCE_STEEL.init();
 				printMessage(currentBlock.id(), "thin-fence", ASHY_FENCE_STEEL.namespaceId());
 				count += 4;
 				return;
@@ -452,21 +467,25 @@ public class MoreSnowBlocks {
 					.withTags(addTooling(Blocks.LAYER_SNOW))
 					.withSound(Blocks.LAYER_SNOW.getSound())
 					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				SNOWY_FENCE_CHAINLINK.init();
 				printMessage(currentBlock.id(), "thin-fence", SNOWY_FENCE_CHAINLINK.namespaceId());
 				LEAVY_FENCE_CHAINLINK = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceChainBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new))
 					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
 					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
 					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				LEAVY_FENCE_CHAINLINK.init();
 				printMessage(currentBlock.id(), "thin-fence", LEAVY_FENCE_CHAINLINK.namespaceId());
 				SLATY_FENCE_CHAINLINK = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceChainBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new))
 					.withTags(addTooling(Blocks.LAYER_SLATE))
 					.withSound(Blocks.LAYER_SLATE.getSound())
 					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				SLATY_FENCE_CHAINLINK.init();
 				printMessage(currentBlock.id(), "thin-fence", SLATY_FENCE_CHAINLINK.namespaceId());
 				ASHY_FENCE_CHAINLINK = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fenceChainBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "ashe_%s"), getNextID(), BlockLogicSnowyFenceChainlink::new))
 					.withTags(addTooling(Blocks.LAYER_ASH))
 					.withSound(Blocks.LAYER_ASH.getSound())
 					.withHardness(Blocks.LAYER_ASH.getHardness());
+				ASHY_FENCE_CHAINLINK.init();
 				printMessage(currentBlock.id(), "thin-fence", ASHY_FENCE_CHAINLINK.namespaceId());
 				count += 4;
 				return;
@@ -477,21 +496,25 @@ public class MoreSnowBlocks {
 					.withTags(addTooling(Blocks.LAYER_SNOW))
 					.withSound(Blocks.LAYER_SNOW.getSound())
 					.withHardness(Blocks.LAYER_SNOW.getHardness());
+				SNOWY_FENCE_WALLPAPER.init();
 				printMessage(currentBlock.id(), "thin-fence", SNOWY_FENCE_WALLPAPER.namespaceId());
 				LEAVY_FENCE_WALLPAPER = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fencePaperWallBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "leaves_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new))
 					.withTags(addTooling(Blocks.LAYER_LEAVES_OAK))
 					.withSound(Blocks.LAYER_LEAVES_OAK.getSound())
 					.withHardness(Blocks.LAYER_LEAVES_OAK.getHardness());
+				LEAVY_FENCE_WALLPAPER.init();
 				printMessage(currentBlock.id(), "thin-fence", LEAVY_FENCE_WALLPAPER.namespaceId());
 				SLATY_FENCE_WALLPAPER = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fencePaperWallBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "slate_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new))
 					.withTags(addTooling(Blocks.LAYER_SLATE))
 					.withSound(Blocks.LAYER_SLATE.getSound())
 					.withHardness(Blocks.LAYER_SLATE.getHardness());
+				SLATY_FENCE_WALLPAPER.init();
 				printMessage(currentBlock.id(), "thin-fence", SLATY_FENCE_WALLPAPER.namespaceId());
 				ASHY_FENCE_WALLPAPER = ((Block<? extends BlockLogicSnowy<?>>) (Block<?>) fencePaperWallBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), "ashe_%s"), getNextID(), BlockLogicSnowyFenceWallPaper::new))
 					.withTags(addTooling(Blocks.LAYER_ASH))
 					.withSound(Blocks.LAYER_ASH.getSound())
 					.withHardness(Blocks.LAYER_ASH.getHardness());
+				ASHY_FENCE_WALLPAPER.init();
 				printMessage(currentBlock.id(), "thin-fence", ASHY_FENCE_WALLPAPER.namespaceId());
 				count += 4;
 			}
@@ -516,6 +539,7 @@ public class MoreSnowBlocks {
 					String key = convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s") + "_" + color.colorID;
 					snowy = blockBuilder.build(key, getNextID(), block -> new BlockLogicSnowyFenceGatePainted(block, currentBlock, color));
 					snowy.withTags(addTooling(layer));
+					snowy.init();
 					SNOWY_FENCE_GATES_PAINTED.add((Block<BlockLogicSnowyFenceGatePainted<?>>) snowy);
 					count ++;
 				}
@@ -523,6 +547,7 @@ public class MoreSnowBlocks {
 			}
 			snowy = blockBuilder.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFenceGate<>(block, currentBlock));
 			snowy.withTags(addTooling(currentBlock));
+			snowy.init();
 			SNOWY_FENCE_GATE.add(snowy);
 			count ++;
 		}
@@ -539,6 +564,7 @@ public class MoreSnowBlocks {
 				.addTags(BlockTags.BROKEN_BY_FLUIDS, BlockTags.OVERRIDE_STEPSOUND, NOT_IN_CREATIVE_MENU)
 				.build(convertNameSpaceIDForBlockBuilder(currentBlock.namespaceId(), prefix + "_%s"), getNextID(), block -> new BlockLogicSnowyFlowerStackable<>(block, currentBlock));
 			snowy.withTags(addTooling(layer));
+			snowy.init();
 			SNOWY_GRASS.add(snowy);
 			printMessage(currentBlock.id(), "grass", logic.namespaceId());
 			count ++;

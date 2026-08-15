@@ -107,11 +107,14 @@ public class BlockModelSnowyStairs<T extends BlockLogicSnowy<?>> extends BlockMo
 		BlockModel<?> storedBlockModel = BlockModelDispatcher.getInstance().getDispatch(storedBlock);
 		storedBlockModel.renderStandalone(tessellator, metadata, lightIndex);
 		int color = (BlockColorDispatcher.getInstance().getDispatch(this.block.getLogic().layerBlock())).getFallbackColor(metadata, 0);
-		tessellator.setColor2i(color, 255);
+//		tessellator.setColor2i(color, 255);
+		boolean invTint = renderBlocks.useInventoryTint;
+		renderBlocks.useInventoryTint = true;
 		float yOffset = 0.5F;
 		AABBd bounds = new AABBd(0.0, 0.5, 0.5, 1.0, 0.5 + 2 / 16.0, 1.0);
 		tessellator.offsetTranslation(-0.5F, 0.0F - yOffset, -0.5F);
 		this.layerModel.renderBlockWithBounds(tessellator, bounds, metadata, lightIndex, color);
+		renderBlocks.useInventoryTint = invTint;
 		tessellator.offsetTranslation(0.5F, yOffset, 0.5F);
 	}
 }

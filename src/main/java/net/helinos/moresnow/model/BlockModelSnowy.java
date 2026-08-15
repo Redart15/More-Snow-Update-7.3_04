@@ -17,7 +17,13 @@ public abstract class BlockModelSnowy<T extends BlockLogicSnowy<?>> extends Bloc
 
     protected BlockModelSnowy(Block<T> block, BlockModel<?> layerModel) {
         super(block);
-		this.layerModel = new BlockModelLayer<>(layerModel.block).setAllTextures(layerModel.getParticleTexture(Side.TOP, 8));
+		this.layerModel = new BlockModelLayer<>(layerModel.block)
+			.setTex(layerModel.getParticleTexture(Side.TOP, 0), Side.TOP)
+			.setTex(layerModel.getParticleTexture(Side.BOTTOM, 0), Side.BOTTOM)
+			.setTex(layerModel.getParticleTexture(Side.NORTH, 0), Side.NORTH)
+			.setTex(layerModel.getParticleTexture(Side.SOUTH, 0), Side.SOUTH)
+			.setTex(layerModel.getParticleTexture(Side.WEST, 0), Side.WEST)
+			.setTex(layerModel.getParticleTexture(Side.EAST, 0), Side.EAST);
 	}
 
     @Override

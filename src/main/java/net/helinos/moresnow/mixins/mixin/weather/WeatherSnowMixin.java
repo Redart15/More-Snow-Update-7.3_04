@@ -32,14 +32,14 @@ import java.util.Random;
 @Mixin(value = WeatherSnow.class, remap = false)
 public abstract class WeatherSnowMixin {
 
-	@Definition(id = "rand", local = @Local(type = Random.class, argsOnly = true))
-	@Definition(id = "nextInt", method = "Ljava/util/Random;nextInt(I)I")
-	@Definition(id = "probability", local = @Local(type = int.class, ordinal = 2))
-	@Expression("rand.nextInt(probability) == 0")
-	@ModifyExpressionValue(method = "doEnvironmentUpdate", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private boolean spoofed(boolean original){
-		return true;
-	}
+//	@Definition(id = "rand", local = @Local(type = Random.class, argsOnly = true))
+//	@Definition(id = "nextInt", method = "Ljava/util/Random;nextInt(I)I")
+//	@Definition(id = "probability", local = @Local(type = int.class, ordinal = 2))
+//	@Expression("rand.nextInt(probability) == 0")
+//	@ModifyExpressionValue(method = "doEnvironmentUpdate", at = @At("MIXINEXTRAS:EXPRESSION"))
+//	private boolean spoofed(boolean original){
+//		return true;
+//	}
 
 	@WrapOperation(method = "doEnvironmentUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/world/World;findTopSolidBlock(II)I"))
 	private int findTopSolidBlockThatIsntSnowyWorld(

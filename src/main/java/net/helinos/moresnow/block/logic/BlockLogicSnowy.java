@@ -10,6 +10,7 @@ import net.minecraft.core.block.support.FullSupport;
 import net.minecraft.core.block.support.ISupport;
 import net.minecraft.core.block.support.PartialSupport;
 import net.minecraft.core.entity.Entity;
+import net.minecraft.core.entity.Mob;
 import net.minecraft.core.world.LevelListener;
 
 import net.minecraft.core.block.Block;
@@ -219,6 +220,7 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 	 * @see BlockLogicSnowy#removeSnow(World, int, TilePosc)
 	 */
 	public void removeSnow(World world, int metadata, TilePosc tilePos) {
+		metadata = metadata & 0b0111_1111;
 		world.setBlockTypeDataNotify(tilePos, this.storedBlock(metadata), this.storedBlockMetadata(metadata));
 	}
 
@@ -370,4 +372,11 @@ public abstract class BlockLogicSnowy<T extends BlockLogic> extends BlockLogic i
 	public void onEntityCollision(@NotNull World world, @NotNull TilePosc tilePos, @NotNull Entity entity) {
 		this.storedBlock().onEntityCollision(world, tilePos, entity);
 	}
+
+
+	@Override
+	public int getPlacedData(@Nullable Player player, @NotNull ItemStack itemStack, @NotNull World world, @NotNull TilePosc tilePosc, @NotNull Side side, double xHit, double yHit){
+		return itemStack.getMetadata();
+	}
+
 }
